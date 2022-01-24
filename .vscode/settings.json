@@ -1,0 +1,17 @@
+{
+    "vsicons.associations.folders": [
+        { "icon": "middleware", "extensions": ["staff"] }
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/node_modules": true,
+        "**/package-lock.json": true,
+        "**/.next": true,
+        "**/next-env.d.ts": true,
+    }
+}
