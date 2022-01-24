@@ -1,0 +1,7 @@
+{
+    "name": "capstone",
+    "scripts": {
+        "app": "cd src/app && npm run --",
+        "staff": "cd src/staff && npm run --"
+    }
+}
