@@ -4,6 +4,15 @@
 
 After installing, run `node -v` and `npm -v` and you should get 2 version numbers above or only slightly below those listed above. If this is the case, you're good to go.
 
+# Resources
+
+- [React](https://reactjs.org/)
+  - [Overview Video](https://www.youtube.com/watch?v=Tn6-PIqc4UM)
+  - [Usage with TypeScript Video](https://www.youtube.com/watch?v=ydkQlJhodio)
+- [Next.JS](https://nextjs.org/docs/getting-started)
+  - [Overview & Tutorial Video](https://www.youtube.com/watch?v=Sklc_fQBmcs&t=485s)
+- Docker *(COMING SOON)*
+
 # Installation
 
 ```bash
