@@ -1,0 +1,14 @@
+version: '3.9'
+services: 
+
+  mongo:
+    image: mongo
+    command: --quiet --port 27020
+    volumes:
+      - ../data/mongodb:/data/db
+
+  nginx:
+    image: nginx
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx/templates:/etc/nginx/templates

@@ -1,7 +1,13 @@
 {
     "vsicons.associations.folders": [
-        { "icon": "middleware", "extensions": ["staff"] }
+        { "icon": "middleware", "extensions": ["staff"] },
     ],
+    "vsicons.associations.files": [
+        { "icon": "nginx", "extensions": ["template"] }
+    ],
+    "files.associations": {
+        "**/nginx/**/*.template": "nginx",
+    },
     "files.exclude": {
         "**/.git": true,
         "**/.svn": true,
