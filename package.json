@@ -5,5 +5,10 @@
         "staff": "cd src/staff && npm run --",
         "docker": "cd docker && npm run --",
         "postinstall": "cd src/app && npm install && cd ../staff && npm install"
+    },
+    "dependencies": {
+        "docker": "file:docker",
+        "app": "file:src/app",
+        "staff": "file:src/staff"
     }
 }
