@@ -1,6 +1,7 @@
 {
     "scripts": {
         "up": "docker-compose -f ./compose/dev.yml -p capstone up -d --build",
+        "dev": "docker-compose -f ./compose/dev.yml -p capstone up --build",
         "down": "docker-compose -f ./compose/dev.yml -p capstone down"
     }
 }

@@ -3,6 +3,7 @@
     "scripts": {
         "app": "cd src/app && npm run --",
         "staff": "cd src/staff && npm run --",
-        "docker": "cd docker && npm run --"
+        "docker": "cd docker && npm run --",
+        "postinstall": "cd src/app && npm install && cd ../staff && npm install"
     }
 }
