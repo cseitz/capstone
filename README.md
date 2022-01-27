@@ -4,14 +4,22 @@
 
 After installing, run `node -v` and `npm -v` and you should get 2 version numbers above or only slightly below those listed above. If this is the case, you're good to go.
 
+If you plan on running the project in the containerized environment, [Docker](https://www.docker.com/products/docker-desktop) is required.
+
 # Resources
 
 - [React](https://reactjs.org/)
-  - [Overview Video](https://www.youtube.com/watch?v=Tn6-PIqc4UM)
+  - [React in 100 seconds](https://www.youtube.com/watch?v=Tn6-PIqc4UM)
   - [Usage with TypeScript Video](https://www.youtube.com/watch?v=ydkQlJhodio)
 - [Next.JS](https://nextjs.org/docs/getting-started)
-  - [Overview & Tutorial Video](https://www.youtube.com/watch?v=Sklc_fQBmcs&t=485s)
-- Docker *(COMING SOON)*
+  - [In 100 seconds & Tutorial Video](https://www.youtube.com/watch?v=Sklc_fQBmcs&t=485s)
+- [Docker](https://www.docker.com/)
+  - [Docker in 100 seconds](https://www.youtube.com/watch?v=Gjnup-PuquQ)
+  - [In-Depth Tutorial](https://www.youtube.com/watch?v=gAkwW2tuIqE)
+- [MongoDB](https://www.mongodb.com/)
+  - [MongoDB in 100 seconds](https://www.youtube.com/watch?v=-bt_y4Loofg)
+  - [Mongoose](https://mongoosejs.com/docs/guide.html) (how we'll interface with MongoDB)
+  - [Database Paradigms](https://www.youtube.com/watch?v=W2Z7fbCLSTw)
 
 # Installation
 
