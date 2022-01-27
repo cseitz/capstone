@@ -5,7 +5,7 @@ export interface MessageAPIResponse {
     time: Date
 }
 
-console.log('running some server code');
+console.log('running some server code2');
 
 export default function handler(req: NextApiRequest, res: NextApiResponse<MessageAPIResponse>) {
     res.json({
