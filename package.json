@@ -7,11 +7,8 @@
         "postinstall": "cd src/app && npm install && cd ../staff && npm install"
     },
     "dependencies": {
-        "@emotion/react": "^11.7.1",
-        "@emotion/styled": "^11.6.0",
-        "@mui/material": "^5.4.0",
-        "app": "file:src/app",
         "docker": "file:docker",
+        "app": "file:src/app",
         "staff": "file:src/staff"
     }
 }
