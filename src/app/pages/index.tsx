@@ -8,21 +8,21 @@ const Data = {
     Landing: {
         Title: "SAMPLE EVENT",
         Subtitle: "Feb 2nd 2022",
-        BackgroundImage: "https://www.freecodecamp.org/news/content/images/2021/06/w-qjCHPZbeXCQ-unsplash.jpg",
+        BackgroundImage: "",
         Logo: "https://png.pngtree.com/element_pic/00/16/07/115783931601b5c.jpg",
     },
     About: {
         Info: "Hey this is some info to put about the event here",
         Content: "This is more information to be put into another box",
         Image: "",
-        BackgroundImage: "https://image.freepik.com/free-vector/hand-painted-watercolor-pastel-sky-background_23-2148902771.jpg?w=1380"
+        BackgroundImage: ""
     }
 }
 
 function LandingPage() {
     const { Landing } = Data;
     const { Title, Subtitle, BackgroundImage, Logo } = Landing;
-    return <Box sx={{ backgroundImage: `url(${BackgroundImage})`, width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
+    return <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
         <Box id="logo-container" style={{ textAlign: 'center' }}>
             <img src={Logo} style={{ padding: '20px' }}></img>
             <Typography variant="h2">{Title}</Typography>
@@ -39,7 +39,7 @@ function LandingPage() {
 function AboutPage() {
     const { About, Landing: { Title} } = Data;
     const { Info, Content, Image, BackgroundImage } = About;
-    return <Box sx={{ backgroundImage: `url(${BackgroundImage})`, width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
+    return <Box sx={{ backgroundColor: 'lightpink', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
         <Typography variant="h3" style={{ textAlign: 'left', padding: '20px' }}>{Title}</Typography>
         <Typography variant="h4" style={{ textAlign: 'right', padding: '30px' }}>{Info}</Typography>
         <Box style={{ width: '50%', margin: 'auto' }}>
@@ -53,7 +53,7 @@ function AboutPage() {
 }
 
 function FAQPage() {
-    return <Box sx={{ alignContent: 'center', textAlign: 'center', pt: 5 }}>
+    return <Box sx={{ backgroundColor: 'cornsilk',  width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", alignContent: 'center', textAlign: 'center', pt: 5 }}>
         <Typography variant="h3">FAQ</Typography>
         <Box style={{ margin: 'auto', width: 'min(800px, 80vw)', paddingTop: '100px' }}>
             <FAQ />
@@ -62,7 +62,7 @@ function FAQPage() {
 }
 
 function Footer() {
-    return <Box sx={{ backgroundColor: 'grey', height: '100px' }}>
+    return <Box sx={{ backgroundColor: 'lightsalmon', height: '100px' }}>
         <Typography variant="h5" sx={{ textAlign: 'initial' }}>Powered By</Typography>
     </Box>
 }
