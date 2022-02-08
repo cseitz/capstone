@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
-import FormControl from '@mui/material/FormControl'
 import Button from '@mui/material/Button'
 import {Typography} from '@mui/material'
 
@@ -22,7 +21,7 @@ export default function login() {
             <br /><br/>
             <TextField label="Password" type="password" name="password" fullWidth onChange={(e) => {setStatus(null); setPassword(e.target.value)}} placeholder="Password" />
             <br /><br />
-            <Button variant="contained" type="submit" onClick={handleSubmit}>Log In</Button>
+            <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Log In</Button>
             <br /><br />
             {status ? <Typography id="errormessage" style={{ color: 'red', textAlign: 'center' }} >{status}</Typography> : ''}
         </Box>);
