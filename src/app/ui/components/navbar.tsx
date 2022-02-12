@@ -47,10 +47,9 @@ export function NavBar() {
                     </Typography>
 
                     <Link href={"/login"}>
-                    <a><Button color='inherit'>
+                    <Button color='inherit'>
                         Login
                     </Button>
-                    </a>
                     </Link>
 
                     <Button color='inherit'>
@@ -68,8 +67,12 @@ export function NavBar() {
                 open={open}
                 onClose={() => setOpen(false)}
             >
+               <Box
+                sx={{p: 5}}>
+
                 <h3> This is a drawer</h3>
                 {list()}
+                </Box>
 
             </Drawer>
 
