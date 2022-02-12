@@ -1,1 +1,3 @@
-## These diagrams can be imported and edited on [draw.io](https://draw.io)
+## Context Diagram
+
+<img src="./Context Diagram.png">
