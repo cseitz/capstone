@@ -3,6 +3,7 @@ import { alignProperty, convertLength } from "@mui/material/styles/cssUtils";
 import Card from '@mui/material/Card';
 import { Box } from "@mui/system";
 import { FAQ } from "../ui/components/faq";
+import { NavBar } from "../ui/components/navbar";
 
 const Data = {
     Landing: {
@@ -53,7 +54,7 @@ function AboutPage() {
 }
 
 function FAQPage() {
-    return <Box sx={{ backgroundColor: 'cornsilk',  width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", alignContent: 'center', textAlign: 'center', pt: 5 }}>
+    return <Box id="faq" sx={{ backgroundColor: 'cornsilk',  width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", alignContent: 'center', textAlign: 'center', pt: 5 }}>
         <Typography variant="h3">FAQ</Typography>
         <Box style={{ margin: 'auto', width: 'min(800px, 80vw)', paddingTop: '100px' }}>
             <FAQ />
@@ -69,6 +70,7 @@ function Footer() {
 
 export default function Homepage() {
     return <Box>
+        <NavBar />
         <Box height='100vh' display="flex" flexDirection="column">
             <LandingPage />
         </Box>
