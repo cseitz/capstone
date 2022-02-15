@@ -25,7 +25,8 @@ jobs:
       
     name: Deploy
     outputs:
-      run_build: ${{ steps.check_build.outputs.run_build }}
+      run_app_build: ${{ steps.check_app_build.outputs.run_app_build }}
+      run_staff_build: ${{ steps.check_staff_build.outputs.run_staff_build }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -35,7 +36,7 @@ jobs:
         with:
           fetch-depth: 2
       - name: Determine App Build Requirement
-        id: check_build
+        id: check_app_build
         run: |
           echo "========== Modified Files =========="
           git diff --name-only HEAD^ HEAD
@@ -47,7 +48,7 @@ jobs:
             echo "::set-output name=run_app_build::false"
           fi
       - name: Determine Staff Build Requirement
-        id: check_build
+        id: check_staff_build
         run: |
           echo "========== Modified Files =========="
           git diff --name-only HEAD^ HEAD
