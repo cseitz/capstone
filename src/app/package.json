@@ -10,6 +10,7 @@
     "dev": "next dev --port 5001",
     "build": "next build",
     "start": "next start --port 5001",
+    "docker": "npm run build && cd ../.. && npm run docker build app",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

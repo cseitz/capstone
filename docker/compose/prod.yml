@@ -1,0 +1,33 @@
+version: '3.9'
+services: 
+
+  app:
+    extends:
+      file: ./services.yml
+      service: app
+
+  staff:
+    extends:
+      file: ./services.yml
+      service: staff
+    links:
+      - "mongo:db"
+
+  mongo:
+    extends:
+      file: ./services.yml
+      service: mongo
+
+  nginx:
+    extends:
+      file: ./services.yml
+      service: nginx
+    environment:
+      - NGINX_HOST_API=http://staff:5000
+      - NGINX_HOST_WEB=http://app:5001
+    ports:
+      - 80:80
+    links:
+      - mongo:mongo
+      - app:app
+      - staff:staff

@@ -2,6 +2,9 @@
     "scripts": {
         "up": "docker-compose -f ./compose/dev.yml -p capstone up -d --build",
         "dev": "docker-compose -f ./compose/dev.yml -p capstone up --build",
-        "down": "docker-compose -f ./compose/dev.yml -p capstone down"
+        "down": "docker-compose -f ./compose/dev.yml -p capstone down",
+        "build": "docker-compose -f ./compose/prod.yml -p capstone up -d --build --",
+        "start": "docker-compose -f ./compose/prod.yml -p capstone up -d",
+        "stop": "docker-compose -f ./compose/prod.yml -p capstone down"
     }
 }

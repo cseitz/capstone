@@ -1,6 +1,12 @@
 version: '3.9'
 services: 
 
+  app:
+    build: ../../src/app
+
+  staff:
+    build: ../../src/staff
+
   mongo:
     image: mongo
     command: --quiet --port 27020
