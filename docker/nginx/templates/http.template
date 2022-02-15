@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name default_server;
+    server_name default_server $NGINX_HOST_NAME;
     location /api {
         proxy_pass $NGINX_HOST_API;
     }

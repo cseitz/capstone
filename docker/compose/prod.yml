@@ -29,7 +29,7 @@ services:
     environment:
       - NGINX_HOST_API=http://staff:5000
       - NGINX_HOST_WEB=http://app:5001
-      - NGINX_HOSTNAME=capstone.lol
+      - NGINX_HOST_NAME=capstone.lol
     ports:
       - 80:80
     links:
