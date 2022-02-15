@@ -70,7 +70,7 @@ jobs:
           port: ${{ secrets.PORT }}
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
-            cd /root/capstone/capstone
+            cd /root/capstone
             echo "Fetching changes from Github"
             git fetch
             echo "Pulling Changes from Github"
@@ -97,7 +97,7 @@ jobs:
           port: ${{ secrets.PORT }}
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
-            cd /root/capstone/capstone
+            cd /root/capstone
             npm run app docker
             exit
   
@@ -116,6 +116,6 @@ jobs:
           port: ${{ secrets.PORT }}
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
-            cd /root/capstone/capstone
+            cd /root/capstone
             npm run staff docker
             exit
