@@ -11,7 +11,7 @@ server {
 
 server {
     listen 80;
-    server_name staff.localhost staff.<host-name>;
+    server_name staff.localhost staff.<host-name> staff.$NGINX_HOST_NAME;
     location / {
         proxy_pass $NGINX_HOST_API;
     }
