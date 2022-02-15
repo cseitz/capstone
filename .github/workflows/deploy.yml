@@ -1,0 +1,120 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI/CD
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  #pull_request:
+    #branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  deploy:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    concurrency:
+      group: automatic_deployment
+      cancel-in-progress: true
+      
+    name: Deploy
+    outputs:
+      run_build: ${{ steps.check_build.outputs.run_build }}
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Determine App Build Requirement
+        id: check_build
+        run: |
+          echo "========== Modified Files =========="
+          git diff --name-only HEAD^ HEAD
+          echo "===================================="
+          if grep -q "src/app" <<< $(git diff --name-only HEAD^ HEAD); then
+            echo "App Build Required"
+            echo "::set-output name=run_app_build::true"
+          else
+            echo "::set-output name=run_app_build::false"
+          fi
+      - name: Determine Staff Build Requirement
+        id: check_build
+        run: |
+          echo "========== Modified Files =========="
+          git diff --name-only HEAD^ HEAD
+          echo "===================================="
+          if grep -q "src/staff" <<< $(git diff --name-only HEAD^ HEAD); then
+            echo "Staff Build Required"
+            echo "::set-output name=run_staff_build::true"
+          else
+            echo "::set-output name=run_staff_build::false"
+          fi
+          
+        
+      - name: Deploying
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          #passphrase: ${{ secrets.KEY_PASSPHRASE }}
+          script: |
+            cd /root/capstone/capstone
+            echo "Fetching changes from Github"
+            git fetch
+            echo "Pulling Changes from Github"
+            git pull
+            echo "Installing Modules"
+            npm install
+            echo "Restarting Application"
+            npm run docker start
+            echo "Finished"
+            exit
+
+  build-app:
+    name: Build App
+    needs: deploy
+    if: github.event_name == 'workflow_dispatch' || needs.deploy.outputs.run_app_build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Building App
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          #passphrase: ${{ secrets.KEY_PASSPHRASE }}
+          script: |
+            cd /root/capstone/capstone
+            npm run app docker
+            exit
+  
+  build-staff:
+    name: Build Staff
+    needs: deploy
+    if: github.event_name == 'workflow_dispatch' || needs.deploy.outputs.run_staff_build == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Building Staff
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          #passphrase: ${{ secrets.KEY_PASSPHRASE }}
+          script: |
+            cd /root/capstone/capstone
+            npm run staff docker
+            exit
