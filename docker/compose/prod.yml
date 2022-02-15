@@ -2,11 +2,13 @@ version: '3.9'
 services: 
 
   app:
+    restart: always
     extends:
       file: ./services.yml
       service: app
 
   staff:
+    restart: always
     extends:
       file: ./services.yml
       service: staff
@@ -14,11 +16,13 @@ services:
       - "mongo:db"
 
   mongo:
+    restart: always
     extends:
       file: ./services.yml
       service: mongo
 
   nginx:
+    restart: always
     extends:
       file: ./services.yml
       service: nginx
