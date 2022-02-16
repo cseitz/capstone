@@ -5,6 +5,11 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import Box from '@mui/material/Box';
 import Link from 'next/link'
+import { FAQ } from './faq';
+import HomeIcon from '@mui/icons-material/Home';
+import LoginIcon from '@mui/icons-material/Login';
+import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
 
 export function NavBar() {
     const [open, setOpen] = useState(false)
@@ -14,18 +19,51 @@ export function NavBar() {
         setOpen(true)
     }
 
+  
     const list = () => (
 
+
         <List>
-            {['Home', 'Staff', 'Support', 'Settings'].map((text, index) => (
-                <ListItem button key={text}>
-                    <ListItemIcon>
-                        {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                    </ListItemIcon>
-                    <ListItemText primary={text} />
-                </ListItem>
-            ))}
+            <Link href={"/"}>
+            <ListItem button>
+                <ListItemIcon>
+                    <HomeIcon />
+                </ListItemIcon>
+                <ListItemText primary="Home" />
+            </ListItem>
+            </Link>
+
+            <Link href={"/login"}>
+            <ListItem button>
+                <ListItemIcon>
+                    <LoginIcon />
+                </ListItemIcon>
+                <ListItemText primary="Login" />
+            </ListItem>
+            </Link>
+
+            <Link href={"/#faq"}>
+            <ListItem button>
+                <ListItemIcon>
+                    <LiveHelpIcon />
+                </ListItemIcon>
+                <ListItemText primary="FAQ" />
+            </ListItem>
+            </Link>
+            
+            <Link href={"/Register"}>
+            <ListItem button>
+                <ListItemIcon>
+                    <HowToRegIcon />
+                </ListItemIcon>
+                <ListItemText primary="Register" />
+            </ListItem>
+            </Link>
+
+        
+
         </List>
+
     );
     return (
         <div>
@@ -47,18 +85,23 @@ export function NavBar() {
                     </Typography>
 
                     <Link href={"/login"}>
-                    <Button color='inherit'>
-                        Login
-                    </Button>
+                        <Button color='inherit'>
+                            Login
+                        </Button>
                     </Link>
 
-                    <Button color='inherit'>
-                        Register
-                    </Button>
+                    <Link href={"/register"}>
+                        <Button color='inherit'>
+                            Register
+                        </Button>
+                    </Link>
 
-                    <Button color='inherit'>
-                        FAQ
-                    </Button>
+                    <Link href={"/#faq"}>
+                        <Button color='inherit'>
+                            FAQ
+                        </Button>
+                    </Link>
+
                 </Toolbar>
             </AppBar>
 
@@ -67,11 +110,11 @@ export function NavBar() {
                 open={open}
                 onClose={() => setOpen(false)}
             >
-               <Box
-                sx={{p: 5}}>
+                <Box
+                    sx={{ p: 5 }}>
 
-                <h3> This is a drawer</h3>
-                {list()}
+                    <h3> Welcome</h3>
+                    {list()}
                 </Box>
 
             </Drawer>
