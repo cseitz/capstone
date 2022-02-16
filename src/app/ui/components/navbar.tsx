@@ -19,48 +19,48 @@ export function NavBar() {
         setOpen(true)
     }
 
-  
+
     const list = () => (
 
 
         <List>
             <Link href={"/"}>
-            <ListItem button>
-                <ListItemIcon>
-                    <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="Home" />
-            </ListItem>
+                <ListItem button>
+                    <ListItemIcon>
+                        <HomeIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Home" />
+                </ListItem>
             </Link>
 
             <Link href={"/login"}>
-            <ListItem button>
-                <ListItemIcon>
-                    <LoginIcon />
-                </ListItemIcon>
-                <ListItemText primary="Login" />
-            </ListItem>
+                <ListItem button>
+                    <ListItemIcon>
+                        <LoginIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Login" />
+                </ListItem>
             </Link>
 
             <Link href={"/#faq"}>
-            <ListItem button>
-                <ListItemIcon>
-                    <LiveHelpIcon />
-                </ListItemIcon>
-                <ListItemText primary="FAQ" />
-            </ListItem>
-            </Link>
-            
-            <Link href={"/register"}>
-            <ListItem button>
-                <ListItemIcon>
-                    <HowToRegIcon />
-                </ListItemIcon>
-                <ListItemText primary="Register" />
-            </ListItem>
+                <ListItem button>
+                    <ListItemIcon>
+                        <LiveHelpIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="FAQ" />
+                </ListItem>
             </Link>
 
-        
+            <Link href={"/register"}>
+                <ListItem button>
+                    <ListItemIcon>
+                        <HowToRegIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Register" />
+                </ListItem>
+            </Link>
+
+
 
         </List>
 
