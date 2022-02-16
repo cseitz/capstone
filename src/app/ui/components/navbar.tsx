@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AppBar, Button, IconButton, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
@@ -10,10 +10,21 @@ import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
+import { useRouter } from 'next/router';
 
 export function NavBar() {
     const [open, setOpen] = useState(false)
-    const [anchor, setAnchor] = useState('left')
+    const [anchor, setAnchor] = useState('left');
+    const router = useRouter();
+    const lastRoute = useRef("");
+    useEffect(() => {
+        if (lastRoute.current != router.route) {
+            lastRoute.current = router.route;
+            if (open) {
+                setOpen(false);
+            }
+        }
+    }, [router.route, open, setOpen]);
 
     const handleDrawer = () => {
         setOpen(true)
