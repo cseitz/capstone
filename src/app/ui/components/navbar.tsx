@@ -51,7 +51,7 @@ export function NavBar() {
             </ListItem>
             </Link>
             
-            <Link href={"/Register"}>
+            <Link href={"/register"}>
             <ListItem button>
                 <ListItemIcon>
                     <HowToRegIcon />
