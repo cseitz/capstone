@@ -77,8 +77,6 @@ jobs:
             git pull
             echo "Installing Modules"
             npm install
-            echo "Restarting Application"
-            npm run docker start
             echo "Finished"
             exit
 
@@ -98,7 +96,8 @@ jobs:
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
             cd /root/capstone
-            npm run app docker
+            npm run app build
+            pm2 restart app
             exit
   
   build-staff:
@@ -117,5 +116,6 @@ jobs:
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
             cd /root/capstone
-            npm run staff docker
+            npm run staff build
+            pm2 restart staff
             exit
