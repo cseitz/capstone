@@ -6,7 +6,7 @@ import { FAQ } from "../ui/components/faq";
 
 const Data = {
     Landing: {
-        Title: "SAMPLE EVENT3",
+        Title: "SAMPLE EVENT",
         Subtitle: "Feb 2nd 2022",
         BackgroundImage: "",
         Logo: "https://png.pngtree.com/element_pic/00/16/07/115783931601b5c.jpg",
