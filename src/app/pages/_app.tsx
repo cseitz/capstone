@@ -1,6 +1,7 @@
 import { createTheme, CssBaseline, useMediaQuery, ThemeProvider } from "@mui/material";
 import { AppProps } from "next/app";
 import { useMemo } from "react";
+import { NavBar } from "../ui/components/navbar";
 import '../ui/styles/global.scss';
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -26,6 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
     }, [prefersDarkMode]);
     return <ThemeProvider theme={theme}>
         <CssBaseline />
+        <NavBar />
         <Component {...pageProps} />
     </ThemeProvider>
 }

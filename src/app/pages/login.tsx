@@ -3,7 +3,6 @@ import Box from '@mui/material/Box'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { Typography } from '@mui/material'
-import { NavBar } from '../ui/components/navbar'
 
 export default function LoginPage() {
     const [username, setUsername] = useState("");
@@ -17,7 +16,6 @@ export default function LoginPage() {
     }
 
     return <Box>
-        <NavBar />
         <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', mt: 20 }}>
             <TextField label="Username" type="text" name="username" fullWidth onChange={(e) => { setStatus(null); setUsername(e.target.value) }} placeholder="Username" />
             <br /><br />

@@ -3,7 +3,6 @@ import { alignProperty, convertLength } from "@mui/material/styles/cssUtils";
 import Card from '@mui/material/Card';
 import { Box } from "@mui/system";
 import { FAQ } from "../ui/components/faq";
-import { NavBar } from "../ui/components/navbar";
 
 const Data = {
     Landing: {
@@ -70,7 +69,6 @@ function Footer() {
 
 export default function Homepage() {
     return <Box>
-        <NavBar />
         <Box height='100vh' display="flex" flexDirection="column">
             <LandingPage />
         </Box>
