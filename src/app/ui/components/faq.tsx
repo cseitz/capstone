@@ -32,8 +32,8 @@ export function FAQ() {
       setExpanded(newExpanded ? panel : -1);
     };
 
-  const info = faqs.map((x, i) => 
-    <Accordion expanded = {expanded === i} onChange = {handleChange(i)}>
+  const info = faqs.map((x, i) =>
+    <Accordion expanded={expanded === i} onChange={handleChange(i)} key={x.question}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
         {x.question}
       </AccordionSummary>
@@ -43,6 +43,6 @@ export function FAQ() {
     </Accordion>
   );
 
-  return(<div>{info}</div>);
+  return (<div>{info}</div>);
 
 }
