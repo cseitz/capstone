@@ -1,56 +1,48 @@
 import { useState } from 'react'
-import { Accordion, AccordionSummary, AccordionDetails, Typography} from '@mui/material'
+import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
+
+//Add New FAQ Entries Here
+const faqs = [
+  {
+    question: "How long did it take to make this accordion?",
+    answer: "Too long."
+  },
+  {
+    question: "Who made it?",
+    answer: "I did."
+  },
+  {
+    question: "Who are you?",
+    answer: "Jake, from StateFarm."
+  },
+  {
+    question: "What are you wearing, Jake from StateFarm",
+    answer: "Nothing. B)"
+  }
+]
+
+
 export function FAQ() {
-  return (
-    <div>
-       <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel1a-content"
-          id="panel1a-header"
-        >
-          <Typography>As I get older, I remember all the people I lost along the way.</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-          Maybe my budding career as a tour guide was not the right choice.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
+  const [expanded, setExpanded] = useState<number>(-1);
 
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2a-content"
-          id="panel2a-header"
-        >
-          <Typography>My mom died when we couldn’t remember her blood type.</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-          As she died, she kept telling us to “be positive,” but it’s hard without her.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
+  const handleChange =
+    (panel: number) => (event: React.SyntheticEvent, newExpanded: boolean) => {
+      setExpanded(newExpanded ? panel : -1);
+    };
 
-      <Accordion>
-        <AccordionSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel3a-content"
-          id="panel3a-header"
-        >
-          <Typography>I have a stepladder...</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Typography>
-          ...because my real ladder left when I was 5.
-          </Typography>
-        </AccordionDetails>
-      </Accordion>
-    </div>
-  )
+  const info = faqs.map((x, i) => 
+    <Accordion expanded = {expanded === i} onChange = {handleChange(i)}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel-content" id="panel-header">
+        {x.question}
+      </AccordionSummary>
+      <AccordionDetails>
+        {x.answer}
+      </AccordionDetails>
+    </Accordion>
+  );
+
+  return(<div>{info}</div>);
+
 }
-
-const faqs = [ { question: "", answer: "" } ];
