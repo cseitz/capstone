@@ -16,8 +16,7 @@ export default function LoginPage() {
     }
 
     return <Box>
-        <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center' }}>
-            <Typography  variant="h3" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 25, marginBottom: 25 }} >Log In</Typography>
+        <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', mt: 20 }}>
             <TextField label="Username" type="text" name="username" fullWidth onChange={(e) => { setStatus(null); setUsername(e.target.value) }} placeholder="Username" />
             <br /><br />
             <TextField label="Password" type="password" name="password" fullWidth onChange={(e) => { setStatus(null); setPassword(e.target.value) }} placeholder="Password" />
