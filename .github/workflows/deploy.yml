@@ -71,6 +71,7 @@ jobs:
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
             cd /root/capstone
+            git checkout .
             echo "Fetching changes from Github"
             git fetch
             echo "Pulling Changes from Github"
