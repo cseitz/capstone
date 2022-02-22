@@ -2,7 +2,7 @@ import { BottomNavigation, Button, CardContent, Container, Fab, Typography } fro
 import { alignProperty, convertLength } from "@mui/material/styles/cssUtils";
 import Card from '@mui/material/Card';
 import { Box } from "@mui/system";
-import { FAQ } from "../ui/components/faq";
+import { FAQ } from "ui/components/faq";
 
 const Data = {
     Landing: {
