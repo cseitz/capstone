@@ -3,7 +3,7 @@ import { isEqual, isPlainObject, reduce, get } from "lodash";
 import { inspect } from 'util';
 import { relative } from 'path';
 
-const DEBUG = true;
+const DEBUG = false;
 
 // Applied to data this plugin is used on
 export interface AuditData<Data = {}> {
