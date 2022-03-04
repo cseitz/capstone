@@ -185,7 +185,7 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
 // Compute dynamic fields
 async function ComputeAudit(details: AuditDetails): Promise<Partial<AuditLogData>> {
     let { user, ...rest } = details;
-    console.log('bruh', { user }, typeof user)
+    if (DEBUG) console.log('bruh', { user }, typeof user);
     // @ts-ignore
     if (typeof user == 'object') user = user?._id.toString();
     if (typeof user == 'string' && user != 'system') {
