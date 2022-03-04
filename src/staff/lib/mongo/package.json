@@ -1,0 +1,6 @@
+{
+    "name": "mongo",
+    "dependencies": {
+        "mongoose": "^6.1.8"
+    }
+}
