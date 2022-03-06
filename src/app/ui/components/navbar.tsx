@@ -43,18 +43,25 @@ export function NavBar() {
         setOpen(true)
     }
 
-  
-    const info = items.map((x) =>
-        <List>
-        <Link href={x.url}>
-        <ListItem button>
-            <ListItemIcon>
-                {x.icon}
-            </ListItemIcon>
-            <ListItemText primary={x.name} />
-        </ListItem>
+
+    const navbarLinks = items.map((x) =>
+        <Link href={x.url} key={x.url}>
+            <Button color='inherit'>
+                {x.name}
+            </Button>
         </Link>
-        </List>
+    );
+
+
+    const drawerLinks = items.map((x) =>
+        <Link href={x.url} key={x.url}>
+            <ListItem button>
+                <ListItemIcon>
+                    {x.icon}
+                </ListItemIcon>
+                <ListItemText primary={x.name} />
+            </ListItem>
+        </Link>
     );
     return (
         <div>
@@ -75,7 +82,7 @@ export function NavBar() {
                         Hello There Welcome
                     </Typography>
 
-                    {info}
+                    {navbarLinks}
 
                 </Toolbar>
             </AppBar>
@@ -89,12 +96,14 @@ export function NavBar() {
                     sx={{ p: 5 }}>
 
                     <h3> Welcome</h3>
-                    {info}
+                    <List>
+                        {drawerLinks}
+                    </List>
                 </Box>
 
             </Drawer>
 
-            
+
         </div>
     );
 }
