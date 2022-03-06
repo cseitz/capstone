@@ -11,6 +11,30 @@ import LoginIcon from '@mui/icons-material/Login';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 
+const items = [
+
+    {
+        name: "Home",
+        url: "/",
+        icon: <HomeIcon />
+    },
+    {
+        name: "Login",
+        url: "/login",
+        icon: <LoginIcon />
+    },
+    {
+        name: "FAQ",
+        url: "/#faq",
+        icon: <LiveHelpIcon />
+    },
+    {
+        name: "Register",
+        url: "/Register",
+        icon: <HowToRegIcon />
+    },
+]
+
 export function NavBar() {
     const [open, setOpen] = useState(false)
     const [anchor, setAnchor] = useState('left')
@@ -20,50 +44,17 @@ export function NavBar() {
     }
 
   
-    const list = () => (
-
-
+    const info = items.map((x) =>
         <List>
-            <Link href={"/"}>
-            <ListItem button>
-                <ListItemIcon>
-                    <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="Home" />
-            </ListItem>
-            </Link>
-
-            <Link href={"/login"}>
-            <ListItem button>
-                <ListItemIcon>
-                    <LoginIcon />
-                </ListItemIcon>
-                <ListItemText primary="Login" />
-            </ListItem>
-            </Link>
-
-            <Link href={"/#faq"}>
-            <ListItem button>
-                <ListItemIcon>
-                    <LiveHelpIcon />
-                </ListItemIcon>
-                <ListItemText primary="FAQ" />
-            </ListItem>
-            </Link>
-            
-            <Link href={"/Register"}>
-            <ListItem button>
-                <ListItemIcon>
-                    <HowToRegIcon />
-                </ListItemIcon>
-                <ListItemText primary="Register" />
-            </ListItem>
-            </Link>
-
-        
-
+        <Link href={x.url}>
+        <ListItem button>
+            <ListItemIcon>
+                {x.icon}
+            </ListItemIcon>
+            <ListItemText primary={x.name} />
+        </ListItem>
+        </Link>
         </List>
-
     );
     return (
         <div>
@@ -80,27 +71,11 @@ export function NavBar() {
                         <MenuIcon />
 
                     </IconButton>
-                    <Typography variant="h6" style={{ flexGrow: 1 }}>
+                    <Typography variant="h6" style={{ flexGrow: 2 }}>
                         Hello There Welcome
                     </Typography>
 
-                    <Link href={"/login"}>
-                        <Button color='inherit'>
-                            Login
-                        </Button>
-                    </Link>
-
-                    <Link href={"/register"}>
-                        <Button color='inherit'>
-                            Register
-                        </Button>
-                    </Link>
-
-                    <Link href={"/#faq"}>
-                        <Button color='inherit'>
-                            FAQ
-                        </Button>
-                    </Link>
+                    {info}
 
                 </Toolbar>
             </AppBar>
@@ -114,11 +89,12 @@ export function NavBar() {
                     sx={{ p: 5 }}>
 
                     <h3> Welcome</h3>
-                    {list()}
+                    {info}
                 </Box>
 
             </Drawer>
 
+            
         </div>
     );
 }
