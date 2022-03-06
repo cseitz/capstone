@@ -11,6 +11,30 @@ import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import { useRouter } from 'next/router';
 
+const items = [
+
+    {
+        name: "Home",
+        url: "/",
+        icon: <HomeIcon />
+    },
+    {
+        name: "Login",
+        url: "/login",
+        icon: <LoginIcon />
+    },
+    {
+        name: "FAQ",
+        url: "/#faq",
+        icon: <LiveHelpIcon />
+    },
+    {
+        name: "Register",
+        url: "/Register",
+        icon: <HowToRegIcon />
+    },
+]
+
 export function NavBar() {
     const [open, setOpen] = useState(false)
     const [anchor, setAnchor] = useState('left');
@@ -29,51 +53,24 @@ export function NavBar() {
         setOpen(true)
     }
 
-
-    const list = () => (
-
-
-        <List>
-            <Link href={"/"}>
-                <ListItem button>
-                    <ListItemIcon>
-                        <HomeIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Home" />
-                </ListItem>
-            </Link>
-
-            <Link href={"/login"}>
-                <ListItem button>
-                    <ListItemIcon>
-                        <LoginIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Login" />
-                </ListItem>
-            </Link>
-
-            <Link href={"/#faq"}>
-                <ListItem button>
-                    <ListItemIcon>
-                        <LiveHelpIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="FAQ" />
-                </ListItem>
-            </Link>
-
-            <Link href={"/register"}>
-                <ListItem button>
-                    <ListItemIcon>
-                        <HowToRegIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Register" />
-                </ListItem>
-            </Link>
+    const navbarLinks = items.map((x) =>
+        <Link href={x.url} key={x.url}>
+            <Button color='inherit'>
+                {x.name}
+            </Button>
+        </Link>
+    );
 
 
-
-        </List>
-
+    const drawerLinks = items.map((x) =>
+        <Link href={x.url} key={x.url}>
+            <ListItem button>
+                <ListItemIcon>
+                    {x.icon}
+                </ListItemIcon>
+                <ListItemText primary={x.name} />
+            </ListItem>
+        </Link>
     );
     return (
         <div>
@@ -90,27 +87,11 @@ export function NavBar() {
                         <MenuIcon />
 
                     </IconButton>
-                    <Typography variant="h6" style={{ flexGrow: 1 }}>
+                    <Typography variant="h6" style={{ flexGrow: 2 }}>
                         Hello There Welcome
                     </Typography>
 
-                    <Link href={"/login"}>
-                        <Button color='inherit'>
-                            Login
-                        </Button>
-                    </Link>
-
-                    <Link href={"/register"}>
-                        <Button color='inherit'>
-                            Register
-                        </Button>
-                    </Link>
-
-                    <Link href={"/#faq"}>
-                        <Button color='inherit'>
-                            FAQ
-                        </Button>
-                    </Link>
+                    {navbarLinks}
 
                 </Toolbar>
             </AppBar>
@@ -124,10 +105,13 @@ export function NavBar() {
                     sx={{ p: 5 }}>
 
                     <h3> Welcome</h3>
-                    {list()}
+                    <List>
+                        {drawerLinks}
+                    </List>
                 </Box>
 
             </Drawer>
+
 
         </div>
     );
