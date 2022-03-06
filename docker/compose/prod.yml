@@ -1,0 +1,38 @@
+version: '3.9'
+services: 
+
+  app:
+    restart: always
+    extends:
+      file: ./services.yml
+      service: app
+
+  staff:
+    restart: always
+    extends:
+      file: ./services.yml
+      service: staff
+    links:
+      - "mongo:db"
+
+  mongo:
+    restart: always
+    extends:
+      file: ./services.yml
+      service: mongo
+
+  nginx:
+    restart: always
+    extends:
+      file: ./services.yml
+      service: nginx
+    environment:
+      - NGINX_HOST_API=http://staff:5000
+      - NGINX_HOST_WEB=http://app:5001
+      - NGINX_HOST_NAME=capstone.lol
+    ports:
+      - 80:80
+    links:
+      - mongo:mongo
+      - app:app
+      - staff:staff

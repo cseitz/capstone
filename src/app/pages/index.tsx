@@ -2,13 +2,12 @@ import { BottomNavigation, Button, CardContent, Container, Fab, Typography } fro
 import { alignProperty, convertLength } from "@mui/material/styles/cssUtils";
 import Card from '@mui/material/Card';
 import { Box } from "@mui/system";
-import { FAQ } from "../ui/components/faq";
-import { NavBar } from "../ui/components/navbar";
+import { FAQ } from "ui/components/faq";
 
 const Data = {
     Landing: {
         Title: "SAMPLE EVENT",
-        Subtitle: "Feb 2nd 2022",
+        Subtitle: "Feb 22nd 2022",
         BackgroundImage: "",
         Logo: "https://png.pngtree.com/element_pic/00/16/07/115783931601b5c.jpg",
     },
@@ -70,7 +69,6 @@ function Footer() {
 
 export default function Homepage() {
     return <Box>
-        <NavBar />
         <Box height='100vh' display="flex" flexDirection="column">
             <LandingPage />
         </Box>
