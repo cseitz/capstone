@@ -1,6 +1,7 @@
 {
     "name": "mongo",
     "dependencies": {
+        "bcrypt": "^5.0.1",
         "mongoose": "^6.1.8"
     }
 }
