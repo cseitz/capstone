@@ -9,7 +9,7 @@ extends TimestampData, AuditData {
     username: string;
     email: string;
     password: string;
-
+    role: 'user' | 'banned' | 'staff' | 'admin';
 }
 
 
@@ -20,6 +20,11 @@ const schema = new Schema<UserData>({
         type: String,
         // Hash password on set
         set: p => !p.startsWith('$2b$') ? hashSync(p, 10) : p,
+    },
+    role: {
+        type: String,
+        enum: ['user', 'banned', 'staff', 'admin'],
+        default: 'user',
     }
 }, {
     ...TimestampOptions
