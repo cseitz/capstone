@@ -2,16 +2,25 @@ import { HydratedDocument, Model, model, models, Schema, Query } from "mongoose"
 import { TimestampData, TimestampOptions, TimestampPlugin } from "../plugins/timestamped";
 import { AuditData, AuditPlugin, AuditSchema } from "../plugins/audit";
 import 'lib/mongo';
+import { hashSync } from "bcrypt";
 
 export interface UserData
 extends TimestampData, AuditData {
-    name: string;
+    username: string;
+    email: string;
+    password: string;
 
 }
 
 
 const schema = new Schema<UserData>({
-    name: String,
+    username: String,
+    email: String,
+    password: {
+        type: String,
+        // Hash password on set
+        set: p => !p.startsWith('$2b$') ? hashSync(p, 10) : p,
+    }
 }, {
     ...TimestampOptions
 })
