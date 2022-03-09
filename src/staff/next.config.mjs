@@ -1,7 +1,5 @@
 import { resolve } from "path";
 
-console.log('run thing')
-
 const __data = resolve(process.env.DATA_DIR);
 export const serverRuntimeConfig = {
     mongodb: process.env?.MONGO || 'mongodb://localhost:27017/capstone_test1',
