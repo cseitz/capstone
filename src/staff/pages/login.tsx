@@ -42,10 +42,10 @@ function LoginView() {
 }
 
 function RegisterView() {
-    const [firstName, setFirstName] = useState<string>(null);
-    const [lastName, setLastName] = useState<string>(null);
-    const [email, setEmail] = useState<string>(null);
-    const [password, setPassword] = useState<string>(null);
+    const [firstName, setFirstName] = useState<string>('');
+    const [lastName, setLastName] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
 
     const [errors, setErrors] = useState<{ [key: string]: string }>(null);
     const [status, setStatus] = useState<string>(null);
@@ -73,19 +73,22 @@ function RegisterView() {
                 email,
                 password,
             })
+        }).then(async res => {
+            if (!res.ok) throw await res.text();
+            alert('registered');
         })
-        .then(async (res) => {
+        .catch(err => {
+            setSubmitting(false);
+            setStatus(err);
+        })
+        /*.then(async (res) => {
             setSubmitting(false);
             if (res.status != 200) {
                 setStatus(await res.text());
             } else {
                 alert('logged in');
             }
-        })
-        .catch(err => {
-            setSubmitting(false);
-            setStatus(err.message);
-        })
+        })*/
         
         console.log('register', {
             firstName,
