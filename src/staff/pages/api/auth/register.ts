@@ -8,5 +8,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     const { method } = req;
     if (method != 'POST') 
         return res.status(405).send('Method Not Allowed');
-    throw new Error('Register - Not Yet Implemented');
+    return res.status(500).send('Not Yet Implemented');
+    //throw new Error('Register - Not Yet Implemented');
 }
