@@ -1,9 +1,11 @@
+import { serialize } from "cookie";
 import { UserModel } from "lib/mongo/schema/user";
 import { Route, RouteResponse, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
+import { createToken } from ".";
 
 export interface AuthenticationRegisterResponse extends RouteResponse {
-    
+    token: string;
 }
 
 // export default async function handler(req: NextApiRequest, res: NextApiResponse<AuthenticationRegisterResponse>) {
@@ -27,6 +29,10 @@ export default Route<AuthenticationRegisterResponse>(async (req, res) => {
             lastName
         }
     });
-
-    throw new StatusError(500, 'Not Yet Implemented: ' + JSON.stringify(req.body));
+    // await user.save();
+    const token = createToken(user);
+    // throw new StatusError(500, 'Not Yet Implemented: ' + JSON.stringify(req.body));
+    return res.setHeader('Set-Cookie', serialize('auth', token, { path: '/' })).json({
+        token,
+    })
 })

@@ -5,6 +5,8 @@ import { dirname, resolve } from "path";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { createPublicKey, generateKeyPairSync, randomUUID } from "crypto";
 import { UserDocument } from "lib/mongo/schema/user";
+import { parse } from "cookie";
+import { Route, StatusError } from "lib/route";
 
 
 const JWT_PATH = resolve(getConfig().serverRuntimeConfig.paths.data, 'rsa_jwt');
@@ -31,14 +33,19 @@ export interface AuthenticationStatusResponse {
 
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<AuthenticationStatusResponse>) {
-    res.send('hi');
-}
+export default Route(async (req, res) => {
+    const cookies = parse(req.headers['cookie'] || '');
+    if ('auth' in cookies) {
+        const token = await verifyToken(cookies.auth);
+        return res.json({ token })
+    }
+    throw new StatusError(401, 'Unauthorized');
+});
 
 
 
 export interface AuthenticationToken {
-    token: string;
+    uuid: string;
     issued: string;
     user: string;
     id: string;
@@ -56,12 +63,12 @@ export function verifyToken(token: string): Promise<AuthenticationToken> {
 
 export function createToken(user: UserDocument) {
     const data: AuthenticationToken = {
-        token: randomUUID(),
+        uuid: randomUUID(),
         issued: new Date().toString(),
         user: user?.['name'] || user?.['email'],
         id: user._id.toString(),
     }
-    return jwt.sign(data, JWT_PRIVATE_KEY);
+    return jwt.sign(data, JWT_PRIVATE_KEY, { algorithm: 'RS256'});
 }
 
 
