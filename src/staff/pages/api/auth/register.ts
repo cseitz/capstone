@@ -1,3 +1,4 @@
+import { UserModel } from "lib/mongo/schema/user";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export interface AuthenticationRegisterResponse {
@@ -14,8 +15,19 @@ export interface AuthenticationRegisterResponse {
 
 export default Route(async (req, res) => {
     const { method } = req;
-    if (method != 'POST') throw new StatusError(405, 'Method Not Allowed');
-    throw new StatusError(500, 'Not Yet Implemented');
+    if (method != 'POST')
+        throw new StatusError(405, 'Method Not Allowed');
+    const { firstName, lastName, email, password } = req.body;
+    const user = new UserModel({
+        email,
+        password,
+        info: {
+            firstName,
+            lastName
+        }
+    });
+    
+    throw new StatusError(500, 'Not Yet Implemented: ' + JSON.stringify(req.body));
 })
 
 class StatusError extends Error {
@@ -27,7 +39,7 @@ class StatusError extends Error {
 }
 
 function Route<T>(handler: (req: NextApiRequest, res: NextApiResponse<T>) => any) {
-    return function(req, res) {
+    return function (req, res) {
         try {
             Promise.resolve(handler(req, res)).catch(err => {
                 if (err instanceof StatusError) {
@@ -36,7 +48,7 @@ function Route<T>(handler: (req: NextApiRequest, res: NextApiResponse<T>) => any
                     throw err;
                 }
             })
-        } catch(err) {
+        } catch (err) {
             if (err instanceof StatusError) {
                 res.status(err.statusCode).send(err.message);
             } else {

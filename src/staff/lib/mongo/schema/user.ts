@@ -10,14 +10,26 @@ extends TimestampData, AuditData {
     email: string;
     password: string;
     role: 'pending' | 'user' | 'banned' | 'staff' | 'admin';
+    info: {
+        firstName: string;
+        lastName: string;
+    }
 }
 
 
 const schema = new Schema<UserData>({
-    username: String,
-    email: String,
+    username: {
+        type: String,
+        unique: true,
+    },
+    email: {
+        type: String,
+        unique: true,
+        required: true,
+    },
     password: {
         type: String,
+        required: true,
         // Hash password on set
         set: p => !p.startsWith('$2b$') ? hashSync(p, 10) : p,
     },
@@ -25,6 +37,10 @@ const schema = new Schema<UserData>({
         type: String,
         enum: ['pending', 'user', 'banned', 'staff', 'admin'],
         default: 'pending',
+    },
+    info: {
+        firstName: String,
+        lastName: String,
     }
 }, {
     ...TimestampOptions
