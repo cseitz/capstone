@@ -29,7 +29,10 @@ export default Route<AuthenticationRegisterResponse>(async (req, res) => {
             lastName
         }
     });
-    // await user.save();
+    await user.audit({
+        process: 'system'
+    })
+    await user.save();
     const token = createToken(user);
     // throw new StatusError(500, 'Not Yet Implemented: ' + JSON.stringify(req.body));
     return res.setHeader('Set-Cookie', serialize('auth', token, { path: '/' })).json({
