@@ -19,19 +19,29 @@ export default function LoginPage() {
 }
 
 function LoginView() {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [status, setStatus] = useState<string>(null);
 
     function handleSubmit(e) {
         e.preventDefault();
-        console.log("username : " + username + "password: " + password)
-        setStatus("Incorrect Password")
+        console.log("username : " + email + "password: " + password)
+        // setStatus("Incorrect Password");
+        fetch('/api/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                password,
+            })
+        })
     }
     return <Box>
         <Typography variant='h4' sx={{ textAlign: 'center' }}>Login</Typography>
         <br />
-        <TextField label="Username" type="text" name="username" fullWidth onChange={(e) => { setStatus(null); setUsername(e.target.value) }} placeholder="Username" />
+        <TextField label="Email" type="text" name="email" fullWidth onChange={(e) => { setStatus(null); setEmail(e.target.value) }} placeholder="Email" />
         <br /><br />
         <TextField label="Password" type="password" name="password" fullWidth onChange={(e) => { setStatus(null); setPassword(e.target.value) }} placeholder="Password" />
         <br /><br />

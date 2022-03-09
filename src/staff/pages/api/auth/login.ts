@@ -1,30 +1,31 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { UserModel } from "lib/mongo/schema/user";
 import { compare } from 'bcrypt';
+import { createToken } from ".";
+import { serialize } from "cookie";
+import { Route, RouteResponse, StatusError } from "lib/route";
 
-export interface AuthenticationLoginResponse {
-
+export interface AuthenticationLoginResponse extends RouteResponse {
+    token: string;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse<AuthenticationLoginResponse>) {
+export default Route<AuthenticationLoginResponse>(async(req, res) => {
     const { method } = req;
     if (method != 'POST')
-        return res.status(405).send('Method Not Allowed');
+        throw new StatusError(405, 'Method Not Allowed');
     try {
         const { body: { email, username, password } } = req;
         const user = await UserModel.findOne(email ? { email } : { username });
         if (user) {
             if (await compare(password, user.password)) {
-                const token = jwt.sign
-                return res.json({
+                const token = createToken(user);
+                return res.setHeader('Set-Cookie', serialize('auth', token, { path: '/' })).json({
                     token,
                 })
             }
         }
-        throw new Error('User does not exist');
+        throw new StatusError(500, 'User does not exist');
     } catch (e) {
-        return res.status(401).json({
-            error: e.toString(),
-        })
+        throw new StatusError(401, e.toString())
     }
-}
+});
