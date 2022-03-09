@@ -151,7 +151,7 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
 
 
     schema.pre('validate', async function (next) {
-        if (this._audit.ready) await this._audit.ready;
+        if (this?._audit?.ready) await this._audit.ready;
         if (!('_audit' in this)) {
             throw new Error('Missing Audit Documentation');
         }
