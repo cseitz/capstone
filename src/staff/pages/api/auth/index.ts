@@ -34,11 +34,9 @@ export interface AuthenticationStatusResponse {
 }
 
 export default Route(async (req, res) => {
-    const cookies = parse(req.headers['cookie'] || '');
-    if ('auth' in cookies) {
-        const token = await verifyToken(cookies.auth);
-        return res.json({ token })
-    }
+    const token = await verifyToken(req);
+    if (token)
+        return res.json({ token });
     throw new StatusError(401, 'Unauthorized');
 });
 
@@ -51,10 +49,19 @@ export interface AuthenticationToken {
     id: string;
 }
 
-export function verifyToken(token: string): Promise<AuthenticationToken> {
+export function verifyToken(token: string | NextApiRequest): Promise<AuthenticationToken> {
+    if (typeof token != 'string' && 'headers' in token) {
+        const cookies = parse(token.headers['cookie'] || '');
+        if ('auth' in cookies) {
+            return verifyToken(cookies.auth);
+        }
+        throw new StatusError(401, 'Not Authenticated');
+    }
+    token = String(token);
     if (token.includes(' ')) return verifyToken(token.trim().split(' ').pop());
+    if (token.length <= 1) throw new StatusError(401, 'Not Authenticated');
     return new Promise(function (resolve, reject) {
-        jwt.verify(token, JWT_PUBLIC_KEY, (err, decoded) => {
+        jwt.verify(token as string, JWT_PUBLIC_KEY, (err, decoded) => {
             if (err) return reject(err);
             resolve(decoded as any);
         })
