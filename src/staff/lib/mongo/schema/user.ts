@@ -9,7 +9,7 @@ extends TimestampData, AuditData {
     username: string;
     email: string;
     password: string;
-    role: 'user' | 'banned' | 'staff' | 'admin';
+    role: 'pending' | 'user' | 'banned' | 'staff' | 'admin';
 }
 
 
@@ -23,8 +23,8 @@ const schema = new Schema<UserData>({
     },
     role: {
         type: String,
-        enum: ['user', 'banned', 'staff', 'admin'],
-        default: 'user',
+        enum: ['pending', 'user', 'banned', 'staff', 'admin'],
+        default: 'pending',
     }
 }, {
     ...TimestampOptions
