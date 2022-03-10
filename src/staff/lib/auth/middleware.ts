@@ -4,6 +4,8 @@ import { NextResponse } from 'next/server';
 import { verifyToken } from '.';
 
 
+
+
 export function AuthenticationGuard(opts: {
     not?: boolean;
     role?: UserDocument['role'][];

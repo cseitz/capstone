@@ -46,3 +46,36 @@ export function verifyToken(token: string | any): Promise<AuthenticationToken> {
         })
     })
 }
+
+
+interface AuthCheckOptions {
+    not?: boolean | AuthCheckOptions;
+    role?: UserDocument['role'][];
+}
+
+
+function MatchesOptions(token: AuthenticationToken, opts: AuthCheckOptions) {
+    let ok = true;
+    if (opts?.role && !opts.role.includes(token.role)) ok = false;
+    if (opts?.not && typeof opts.not == 'object') {
+        if (MatchesOptions(token, opts.not)) ok = false;
+    } else if (ok == Boolean(opts.not)) return false;
+    return ok;
+}
+
+export function isAuthenticated(opts: AuthCheckOptions, token?: any) {
+    const check = function(token: any) {
+        if (!token) return false;
+        if (typeof token != 'string') {
+            return check(token?.['cookies']?.['auth'])
+        }
+        try {
+            const data: AuthenticationToken = jwt.verify(token, JWT_SECRET) as any;
+            return MatchesOptions(data, opts);
+        } catch(e) {
+            return false;
+        }
+    };
+    if (token) return check(token);
+    return check;
+}
