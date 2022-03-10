@@ -96,7 +96,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "16.x"
-      - name: Cache node modules
+      - name: Cache
         uses: actions/cache@v2
         env:
           cache-name: cache-node-modules
@@ -107,6 +107,8 @@ jobs:
             src/app/package-lock.json
             src/staff/node_modules
             src/staff/package-lock.json
+            src/app/.next
+            src/staff/.next
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('src/app/package-lock.json') }}-${{ hashFiles('src/staff/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
@@ -125,7 +127,7 @@ jobs:
           port: ${{ secrets.PORT }}
           strip_components: 2
           source: "src/app/.next/*"
-          target: "test-capstone-dist"
+          target: "test-capstone/src/app"
           rm: true
 
 
