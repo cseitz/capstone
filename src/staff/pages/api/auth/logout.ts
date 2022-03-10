@@ -10,8 +10,6 @@ export interface AuthenticationLogoutResponse extends RouteResponse {
 export default Route<AuthenticationLogoutResponse>(async (req, res) => {
     const token = await verifyToken(req);
     if (token)
-        return res.setHeader('Set-Cookie', serialize('auth', '', { path: '/', maxAge: -1, })).json({
-            
-        });
+        return res.setHeader('Set-Cookie', serialize('auth', '', { path: '/', maxAge: -1, })).redirect('/login');
     throw new StatusError(401, 'Not Authenticated');
 });

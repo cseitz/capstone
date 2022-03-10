@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Button, Grid, TextField, Typography } from '@mui/material'
 import { Box } from '@mui/system';
+import { useRouter } from 'next/router';
 
 export default function LoginPage() {
     const [tab, setTab] = useState<'register' | 'login'>('login');
@@ -22,9 +23,10 @@ function LoginView() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [status, setStatus] = useState<string>(null);
+    const router = useRouter();
 
-    function handleSubmit(e) {
-        e.preventDefault();
+    function handleSubmit(e?: any) {
+        e?.preventDefault();
         console.log("username : " + email + "password: " + password)
         // setStatus("Incorrect Password");
         fetch('/api/auth/login', {
@@ -38,7 +40,8 @@ function LoginView() {
             })
         }).then(async res => {
             if (!res.ok) throw (await res.json())?.error;
-            alert('registered');
+            // alert('registered');
+            router.push('/');
         })
         .catch(err => {
             setStatus(err);
@@ -47,9 +50,9 @@ function LoginView() {
     return <Box>
         <Typography variant='h4' sx={{ textAlign: 'center' }}>Login</Typography>
         <br />
-        <TextField label="Email" type="text" name="email" fullWidth onChange={(e) => { setStatus(null); setEmail(e.target.value) }} placeholder="Email" />
+        <TextField label="Email" type="text" name="email" placeholder="Email" fullWidth onChange={(e) => { setStatus(null); setEmail(e.target.value) }} />
         <br /><br />
-        <TextField label="Password" type="password" name="password" fullWidth onChange={(e) => { setStatus(null); setPassword(e.target.value) }} placeholder="Password" />
+        <TextField label="Password" type="password" name="password" placeholder="Password" fullWidth onChange={(e) => { setStatus(null); setPassword(e.target.value) }} onKeyDown={({ key }) => key == 'Enter' && handleSubmit()} />
         <br /><br />
         <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Log In</Button>
         
