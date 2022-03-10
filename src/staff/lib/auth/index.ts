@@ -1,9 +1,10 @@
-/*import type { NextRequest, NextFetchEvent } from 'next/server';
+import type { NextRequest, NextFetchEvent } from 'next/server';
 import { NextResponse } from 'next/server';
 // import { JWT_SECRET } from './constants';
 import jwt from 'jsonwebtoken';
 
 export const JWT_SECRET = process.env?.JWT_SECRET || 'jwt_secret_test1';
+
 
 // type NextRequest = any;
 // type NextFetchEvent = any;
@@ -84,4 +85,3 @@ export function AuthenticationGuard(opts: {
         return NextResponse.next();
     }
 }
-*/
