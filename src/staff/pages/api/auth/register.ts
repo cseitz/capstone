@@ -2,7 +2,7 @@ import { serialize } from "cookie";
 import { UserModel } from "lib/mongo/schema/user";
 import { Route, RouteResponse, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
-import { createToken } from ".";
+import { createToken } from "lib/auth";
 
 export interface AuthenticationRegisterResponse extends RouteResponse {
     token: string;

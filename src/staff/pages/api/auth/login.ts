@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { UserModel } from "lib/mongo/schema/user";
 import { compare } from 'bcrypt';
-import { createToken } from ".";
+import { createToken } from "lib/auth";
 import { serialize } from "cookie";
 import { Route, RouteResponse, StatusError } from "lib/route";
 
