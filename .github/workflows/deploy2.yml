@@ -87,8 +87,6 @@ jobs:
             src/app/package-lock.json
             src/staff/node_modules
             src/staff/package-lock.json
-            src/app/.next
-            src/staff/.next
           key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('src/app/package-lock.json') }}-${{ hashFiles('src/staff/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-
@@ -108,9 +106,9 @@ jobs:
           username: ${{ secrets.REMOTE_USER }}
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
-          strip_components: 2
+          strip_components: 3
           source: "src/app/.next/*"
-          target: "capstone/src/app"
+          target: "capstone/src/app/.next"
           rm: true
         
       - name: Deploying App
