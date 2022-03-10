@@ -1,4 +1,4 @@
-import { AuthenticationGuard } from "lib/auth";
+import { AuthenticationGuard } from "lib/auth/middleware";
 
 
 export default AuthenticationGuard({

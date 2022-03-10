@@ -16,11 +16,15 @@ export default Route<AuthenticationLoginResponse>(async (req, res) => {
     const { body: { email, username, password } } = req;
     const user = await UserModel.findOne(email ? { email } : { username });
     if (user) {
-        if (await compare(password, user.password)) {
-            const token = createToken(user);
-            return res.setHeader('Set-Cookie', serialize('auth', token, { path: '/' })).json({
-                token,
-            })
+        try {
+            if (await compare(password, user.password)) {
+                const token = createToken(user);
+                return res.setHeader('Set-Cookie', serialize('auth', token, { path: '/' })).json({
+                    token,
+                })
+            }
+        } catch(e) {
+            throw new StatusError(500, 'Incorrect Password');
         }
     }
     throw new StatusError(500, 'User does not exist');
