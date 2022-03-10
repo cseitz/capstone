@@ -120,7 +120,7 @@ jobs:
           port: ${{ secrets.PORT }}
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
-            cd /root/capstone
+            cd /root/capstone/src/app
             npm run install
             pm2 restart app
             exit
@@ -186,7 +186,7 @@ jobs:
           port: ${{ secrets.PORT }}
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
-            cd /root/capstone
+            cd /root/capstone/src/staff
             npm run install
             pm2 restart staff
             exit
