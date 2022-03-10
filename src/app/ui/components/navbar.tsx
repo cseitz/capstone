@@ -45,7 +45,6 @@ export function NavBar() {
 
   
     const info = items.map((x) =>
-        <List>
         <Link href={x.url}>
         <ListItem button>
             <ListItemIcon>
@@ -54,8 +53,8 @@ export function NavBar() {
             <ListItemText primary={x.name} />
         </ListItem>
         </Link>
-        </List>
     );
+
     return (
         <div>
             <AppBar position="sticky" style={{ backgroundColor: "black", color: "white", boxShadow: "0px 0px 0px 0px" }}>
@@ -74,8 +73,9 @@ export function NavBar() {
                     <Typography variant="h6" style={{ flexGrow: 2 }}>
                         Hello There Welcome
                     </Typography>
-
+                    
                     {info}
+                    
 
                 </Toolbar>
             </AppBar>
@@ -89,7 +89,9 @@ export function NavBar() {
                     sx={{ p: 5 }}>
 
                     <h3> Welcome</h3>
+                    <List>
                     {info}
+                    </List>
                 </Box>
 
             </Drawer>
