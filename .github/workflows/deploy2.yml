@@ -97,7 +97,7 @@ jobs:
         with:
           node-version: "16.x"
       - name: Install Dependencies
-        run: npm install
+        run: pwd && npm install
       - name: Build App
         run: npm run build
       - name: Deploy App
