@@ -62,7 +62,7 @@ jobs:
 
   build-app:
     name: Build App
-    needs: deploy
+    needs: check
     if: github.event_name == 'workflow_dispatch' || needs.check.outputs.run_app_build == 'true'
     runs-on: ubuntu-latest
     steps:
@@ -130,8 +130,8 @@ jobs:
 
   build-staff:
     name: Build Staff
-    needs: deploy
-    if: github.event_name == 'workflow_dispatch' || needs.deploy.outputs.run_staff_build == 'true'
+    needs: check
+    if: github.event_name == 'workflow_dispatch' || needs.check.outputs.run_staff_build == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Building Staff
