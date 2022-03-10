@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AppBar, Button, IconButton, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import Box from '@mui/material/Box';
 import Link from 'next/link'
-import { FAQ } from './faq';
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
+import { useRouter } from 'next/router';
 
 const items = [
 
@@ -37,21 +37,39 @@ const items = [
 
 export function NavBar() {
     const [open, setOpen] = useState(false)
-    const [anchor, setAnchor] = useState('left')
+    const [anchor, setAnchor] = useState('left');
+    const router = useRouter();
+    const lastRoute = useRef("");
+    useEffect(() => {
+        if (lastRoute.current != router.route) {
+            lastRoute.current = router.route;
+            if (open) {
+                setOpen(false);
+            }
+        }
+    }, [router.route, open, setOpen]);
 
     const handleDrawer = () => {
         setOpen(true)
     }
 
-  
-    const info = items.map((x) =>
-        <Link href={x.url}>
-        <ListItem button>
-            <ListItemIcon>
-                {x.icon}
-            </ListItemIcon>
-            <ListItemText primary={x.name} />
-        </ListItem>
+    const navbarLinks = items.map((x) =>
+        <Link href={x.url} key={x.url}>
+            <Button color='inherit'>
+                {x.name}
+            </Button>
+        </Link>
+    );
+
+
+    const drawerLinks = items.map((x) =>
+        <Link href={x.url} key={x.url}>
+            <ListItem button>
+                <ListItemIcon>
+                    {x.icon}
+                </ListItemIcon>
+                <ListItemText primary={x.name} />
+            </ListItem>
         </Link>
     );
 
@@ -73,9 +91,8 @@ export function NavBar() {
                     <Typography variant="h6" style={{ flexGrow: 2 }}>
                         Hello There Welcome
                     </Typography>
-                    
-                    {info}
-                    
+
+                    {navbarLinks}
 
                 </Toolbar>
             </AppBar>
@@ -90,13 +107,13 @@ export function NavBar() {
 
                     <h3> Welcome</h3>
                     <List>
-                    {info}
+                        {drawerLinks}
                     </List>
                 </Box>
 
             </Drawer>
 
-            
+
         </div>
     );
 }
