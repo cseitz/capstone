@@ -1,11 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { AuthenticationGuard } from "lib/auth";
 
-export async function middleware(req: NextRequest, ev) {
-    const { pathname } = req.nextUrl;
-    // const token = await isAuthenticated(req as any);
-    // console.log({ token })
-    // // if (pathname.startsWith('/login')) {
-    // //     return NextResponse.rewrite('/api' + pathname);
-    // // }
-    return NextResponse.next();
-}
+
+export default AuthenticationGuard({
+    redirect: '/login',
+    filter(req, ev) {
+        const { pathname } = req.nextUrl;
+        if (!pathname.includes('/api') && !pathname.includes('/login')) {
+            console.log('guard', pathname);
+            return true;
+        }
+        return false;
+    },
+});
