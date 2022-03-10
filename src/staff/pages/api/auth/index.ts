@@ -28,6 +28,10 @@ if (!existsSync(JWT_PATH + '.pem')) {
 }
 const JWT_PUBLIC_KEY = readFileSync(JWT_PATH + '.pub');
 const JWT_PRIVATE_KEY = readFileSync(JWT_PATH + '.pem');
+getConfig().serverRuntimeConfig.jwt = {
+    publicKey: JWT_PUBLIC_KEY,
+    privateKey: JWT_PRIVATE_KEY,
+}
 
 export interface AuthenticationStatusResponse {
 
@@ -67,6 +71,8 @@ export function verifyToken(token: string | NextApiRequest): Promise<Authenticat
         })
     })
 }
+
+
 
 export function createToken(user: UserDocument) {
     const data: AuthenticationToken = {

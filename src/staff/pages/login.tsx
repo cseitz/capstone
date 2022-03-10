@@ -36,6 +36,12 @@ function LoginView() {
                 email,
                 password,
             })
+        }).then(async res => {
+            if (!res.ok) throw (await res.json())?.error;
+            alert('registered');
+        })
+        .catch(err => {
+            setStatus(err);
         })
     }
     return <Box>
@@ -84,7 +90,7 @@ function RegisterView() {
                 password,
             })
         }).then(async res => {
-            if (!res.ok) throw await res.text();
+            if (!res.ok) throw (await res.json())?.error;
             alert('registered');
         })
         .catch(err => {
