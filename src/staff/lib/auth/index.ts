@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken';
 
 export const JWT_SECRET = process.env?.JWT_SECRET || 'jwt_secret_test1';
 
+console.log({ JWT_SECRET })
+
 import type { UserDocument } from 'lib/mongo/schema/user';
 import { parse } from 'cookie';
 import { StatusError } from 'lib/route';
