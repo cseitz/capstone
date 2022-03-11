@@ -1,0 +1,10 @@
+{
+    "name": "mongo",
+    "devDependencies": {
+        "@types/bcrypt": "^5.0.0"
+    },
+    "dependencies": {
+        "bcrypt": "^5.0.1",
+        "mongoose": "6.1.8"
+    }
+}
