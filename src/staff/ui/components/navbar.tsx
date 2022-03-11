@@ -42,11 +42,13 @@ const items = [
 ]
 
 export function NavBar() {
+    const [visible, setVisible] = useState(true);
     const [open, setOpen] = useState(false)
     const [anchor, setAnchor] = useState('left');
     const router = useRouter();
     const lastRoute = useRef("");
     useEffect(() => {
+        setVisible(router.route != '/login');
         if (lastRoute.current != router.route) {
             lastRoute.current = router.route;
             if (open) {
@@ -79,7 +81,7 @@ export function NavBar() {
         </Link>
     );
 
-    return (
+    return visible ? (
         <div>
             <AppBar position="sticky" style={{ backgroundColor: "black", color: "white", boxShadow: "0px 0px 0px 0px" }}>
                 <Toolbar>
@@ -121,5 +123,5 @@ export function NavBar() {
 
 
         </div>
-    );
+    ) : <span />;
 }

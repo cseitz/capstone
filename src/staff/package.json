@@ -27,6 +27,7 @@
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@mui/material": "^5.3.1",
+    "@mui/icons-material": "^5.3.1",
     "csstype": "^3.0.10",
     "lodash": "^4.17.21",
     "mongo": "file:lib/mongo",
