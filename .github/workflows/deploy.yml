@@ -60,23 +60,6 @@ jobs:
             echo "::set-output name=run_staff_build::false"
           fi
           - name: Deploying
-        
-      - name: Fetching Changes
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.REMOTE_HOST }}
-          username: ${{ secrets.REMOTE_USER }}
-          key: ${{ secrets.KEY }}
-          port: ${{ secrets.PORT }}
-          #passphrase: ${{ secrets.KEY_PASSPHRASE }}
-          script: |
-            cd /root/capstone
-            git checkout .
-            echo "Fetching changes from Github"
-            git fetch
-            echo "Pulling Changes from Github"
-            git pull
-            exit
 
   build-app:
     name: Build App
@@ -139,6 +122,9 @@ jobs:
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
             cd /root/capstone/src/app
+            git stash
+            git fetch
+            git pull
             npm install
             pm2 restart app
             exit
@@ -205,6 +191,9 @@ jobs:
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
             cd /root/capstone/src/staff
+            git stash
+            git fetch
+            git pull
             npm install
             pm2 restart staff
             exit
