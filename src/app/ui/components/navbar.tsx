@@ -9,6 +9,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
 
 const items = [
@@ -32,6 +33,11 @@ const items = [
         name: "Register",
         url: "/Register",
         icon: <HowToRegIcon />
+    },
+    {
+        name: "Logout",
+        url: "/logout",
+        icon: <ExitToAppIcon /> 
     },
 ]
 
