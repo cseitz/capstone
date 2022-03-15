@@ -9,7 +9,7 @@ const Data = {
         Title: "SAMPLE EVENT",
         Subtitle: "Feb 22nd 2022",
         BackgroundImage: "",
-        Logo: "https://png.pngtree.com/element_pic/00/16/07/115783931601b5c.jpg",
+        Logo: "http://divisqueeze.com/wp-content/uploads/2017/03/YourLogoHere.png",
     },
     About: {
         Info: "Hey this is some info to put about the event here",
@@ -29,7 +29,7 @@ function LandingPage() {
         </Box>
         <Box id="lading-content-container" style={{ textAlign: 'center' }}>
             <Typography variant="h4">{Subtitle}</Typography>
-            <Button variant="outlined" sx={{ m: 2 }}>
+            <Button variant="contained" color="secondary" sx={{ m: 2 }}>
                 <Typography variant="h6">Register Here</Typography>
             </Button>
         </Box>

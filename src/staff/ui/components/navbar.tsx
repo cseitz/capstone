@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AppBar, Button, IconButton, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText } from "@mui/material";
+import { AppBar, Button, IconButton, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Slide, useScrollTrigger } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
@@ -12,38 +12,50 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
 
-const items = [
+const title = 'Staff Portal';
+const items: {
+    name: string;
+    url: string;
+    icon: any;
+    placement?: 'left' | 'right';
+    visible?: (section?: 'navbar' | 'drawer') => boolean;
+}[] = [
+        {
+            name: "Home",
+            url: "/",
+            icon: <HomeIcon />
+        },
+        {
+            name: "Logout",
+            url: "/logout",
+            placement: 'right',
+            icon: <ExitToAppIcon />
+        },
+    ];
 
-    {
-        name: "Home",
-        url: "/",
-        icon: <HomeIcon />
-    },
-    {
-        name: "Login",
-        url: "/login",
-        icon: <LoginIcon />
-    },
-    {
-        name: "FAQ",
-        url: "/#faq",
-        icon: <LiveHelpIcon />
-    },
-    {
-        name: "Register",
-        url: "/Register",
-        icon: <HowToRegIcon />
-    },
-    {
-        name: "Logout",
-        url: "/logout",
-        icon: <ExitToAppIcon /> 
-    },
-]
+
+function HideOnScroll(props: {
+    window?: () => Window;
+    children: React.ReactElement;
+}) {
+    const { children, window } = props;
+    // Note that you normally won't need to set the window ref as useScrollTrigger
+    // will default to window.
+    // This is only being set here because the demo is in an iframe.
+    const trigger = useScrollTrigger({
+        target: window ? window() : undefined,
+    });
+
+    return (
+        <Slide appear={false} direction="down" in={!trigger}>
+            {children}
+        </Slide>
+    );
+}
 
 export function NavBar() {
+    const [open, setOpen] = useState(false);
     const [visible, setVisible] = useState(true);
-    const [open, setOpen] = useState(false)
     const [anchor, setAnchor] = useState('left');
     const router = useRouter();
     const lastRoute = useRef("");
@@ -56,12 +68,28 @@ export function NavBar() {
             }
         }
     }, [router.route, open, setOpen]);
+    useEffect(() => {
+        if (lastRoute.current != router.route) {
+            lastRoute.current = router.route;
+            if (open) {
+                setOpen(false);
+            }
+        }
+    }, [router.route, open, setOpen]);
 
     const handleDrawer = () => {
         setOpen(true)
     }
 
-    const navbarLinks = items.map((x) =>
+    const navbarLinksLeft = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement != 'right').map((x) =>
+        <Link href={x.url} key={x.url}>
+            <Button color='inherit'>
+                {x.name}
+            </Button>
+        </Link>
+    );
+
+    const navbarLinksRight = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement == 'right').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit'>
                 {x.name}
@@ -70,7 +98,7 @@ export function NavBar() {
     );
 
 
-    const drawerLinks = items.map((x) =>
+    const drawerLinks = items.filter(o => !o?.visible || o?.visible('drawer')).map((x) =>
         <Link href={x.url} key={x.url}>
             <ListItem button>
                 <ListItemIcon>
@@ -81,8 +109,8 @@ export function NavBar() {
         </Link>
     );
 
-    return visible ? (
-        <div>
+    return visible && <>
+        <HideOnScroll>
             <AppBar position="sticky" style={{ backgroundColor: "black", color: "white", boxShadow: "0px 0px 0px 0px" }}>
                 <Toolbar>
                     <IconButton
@@ -96,32 +124,34 @@ export function NavBar() {
                         <MenuIcon />
 
                     </IconButton>
-                    <Typography variant="h6" style={{ flexGrow: 2 }}>
-                        Hello There Welcome
-                    </Typography>
+                    <Box style={{ flexGrow: 2 }}>
+                        {title && <Typography variant="h6" component="span" sx={{ verticalAlign: 'middle', mr: 2 }}>{title}</Typography>}
+                        {navbarLinksLeft}
+                    </Box>
 
-                    {navbarLinks}
+                    {navbarLinksRight}
 
                 </Toolbar>
             </AppBar>
+        </HideOnScroll>
 
-            <Drawer
-                anchor='left'
-                open={open}
-                onClose={() => setOpen(false)}
-            >
-                <Box
-                    sx={{ p: 5 }}>
+        <Drawer
+            anchor='left'
+            open={open}
+            onClose={() => setOpen(false)}
+        >
+            <Box
+                sx={{ p: 5 }}>
 
-                    <h3> Welcome</h3>
-                    <List>
-                        {drawerLinks}
-                    </List>
-                </Box>
+                <h3> Welcome</h3>
+                <List>
+                    {drawerLinks}
+                </List>
+            </Box>
 
-            </Drawer>
+        </Drawer>
 
 
-        </div>
-    ) : <span />;
+
+    </>;
 }
