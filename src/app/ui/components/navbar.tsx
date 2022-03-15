@@ -12,17 +12,17 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
 
-const items = [
-
+const items: {
+    name: string;
+    url: string;
+    icon: any;
+    placement?: 'left' | 'right';
+    visible?: (section?: 'navbar' | 'drawer') => boolean;
+}[] = [
     {
         name: "Home",
         url: "/",
         icon: <HomeIcon />
-    },
-    {
-        name: "Login",
-        url: "/login",
-        icon: <LoginIcon />
     },
     {
         name: "FAQ",
@@ -30,14 +30,31 @@ const items = [
         icon: <LiveHelpIcon />
     },
     {
+        name: "Login",
+        url: "/login",
+        placement: 'right',
+        icon: <LoginIcon />,
+        visible() {
+            return true
+        }
+    },
+    {
         name: "Register",
         url: "/Register",
-        icon: <HowToRegIcon />
+        placement: 'right',
+        icon: <HowToRegIcon />,
+        visible() {
+            return false
+        }
     },
     {
         name: "Logout",
         url: "/logout",
-        icon: <ExitToAppIcon /> 
+        placement: 'right',
+        icon: <ExitToAppIcon />,
+        visible() {
+            return false;
+        }
     },
 ]
 
@@ -59,7 +76,7 @@ export function NavBar() {
         setOpen(true)
     }
 
-    const navbarLinks = items.map((x) =>
+    const navbarLinks = items.filter(o => !o?.visible || o?.visible('navbar')).map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit'>
                 {x.name}
@@ -68,7 +85,7 @@ export function NavBar() {
     );
 
 
-    const drawerLinks = items.map((x) =>
+    const drawerLinks = items.filter(o => !o?.visible || o?.visible('drawer')).map((x) =>
         <Link href={x.url} key={x.url}>
             <ListItem button>
                 <ListItemIcon>
