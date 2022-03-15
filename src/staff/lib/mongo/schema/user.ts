@@ -6,6 +6,7 @@ import { hashSync } from "bcrypt";
 
 export interface UserData
 extends TimestampData, AuditData {
+    id: string;
     username: string;
     email: string;
     password: string;
@@ -44,6 +45,10 @@ const schema = new Schema<UserData>({
     }
 }, {
     ...TimestampOptions
+})
+
+schema.set('toJSON', {
+    virtuals: true
 })
 
 //** Apply Plugins */

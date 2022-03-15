@@ -13,7 +13,7 @@ const isStaff = isAuthenticated({
 
 export default Route<UserListResponse>(async (req, res) => {
     if (!isStaff(req)) throw new StatusError(403, 'Unauthorized');
-    const users = await UserModel.find();
+    const users = await UserModel.find()
     res.json({
         users
     })
