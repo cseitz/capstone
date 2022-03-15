@@ -84,14 +84,37 @@ function UserCard(props: {
 
 
 function UserListItem() {
+    const user: UserData = useMemo(() => ({
+        email: "cseitz5@kent.edu",
+        role: 'pending',
+        password: '',
+        username: 'cseitz',
+        info: {
+            firstName: 'Chris',
+            lastName: 'Seitz'
+        },
+        created: new Date('2022-03-10T19:17:40.571+00:00'),
+        updated: new Date('2022-03-10T19:17:40.571+00:00'),
 
+    }), []);
+    const hasName = Boolean(user?.info?.firstName?.trim() && user?.info?.lastName?.trim());
+    const hasEmail = Boolean(user?.email.trim());
+    const name = !hasName ? 'Missing Name' : user.info.firstName + ' ' + user.info.lastName;
+    const email = !hasEmail ? 'No Email' : user.email;
     return <ListItem secondaryAction={<Checkbox edge="start" />} disablePadding>
         <ListItemButton dense>
             <ListItemText {...{
-                primary: 'Chris Seitz',
+                primary: <>
+                    {name}
+                    <Typography component="span" sx={{ color: 'text.disabled', m: 1 }}>-</Typography>
+                    <Typography component="span" sx={{ color: hasEmail ? 'text.secondary' : 'error.main' }}>{email}</Typography>
+                </>,
+                primaryTypographyProps: { color: !hasName && 'error.main', fontSize: 15 },
                 secondary: <>
-                    <Typography>woah there</Typography>
-                    yeah
+                    <Typography>Registered on {(user.created as Date).toLocaleString('en-us', {
+                        dateStyle: 'short',
+                        timeStyle: 'short'
+                    })}</Typography>
                 </>
             }} />
         </ListItemButton>
