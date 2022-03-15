@@ -1,6 +1,7 @@
 
 
 function getCookie(name) {
+    if (typeof window == 'undefined') return undefined;
     var dc = document.cookie;
     var prefix = name + "=";
     var begin = dc.indexOf("; " + prefix);
