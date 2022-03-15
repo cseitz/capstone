@@ -61,6 +61,7 @@ function LoginView() {
 }
 
 function RegisterView() {
+    const router = useRouter();
     const [firstName, setFirstName] = useState<string>('');
     const [lastName, setLastName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
@@ -94,7 +95,8 @@ function RegisterView() {
             })
         }).then(async res => {
             if (!res.ok) throw (await res.json())?.error;
-            alert('registered');
+            // alert('registered');
+            router.push('/');
         })
         .catch(err => {
             setSubmitting(false);
