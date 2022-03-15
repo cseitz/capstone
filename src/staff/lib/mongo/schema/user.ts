@@ -7,7 +7,7 @@ import { hashSync } from "bcrypt";
 export interface UserData
 extends TimestampData, AuditData {
     id: string;
-    username: string;
+    // username: string;
     email: string;
     password: string;
     role: 'pending' | 'user' | 'banned' | 'staff' | 'admin';
@@ -19,10 +19,6 @@ extends TimestampData, AuditData {
 
 
 const schema = new Schema<UserData>({
-    username: {
-        type: String,
-        unique: true,
-    },
     email: {
         type: String,
         unique: true,
