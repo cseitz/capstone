@@ -11,6 +11,7 @@ import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
+import { isAuthenticated } from 'lib/auth/client';
 
 const items: {
     name: string;
@@ -35,7 +36,7 @@ const items: {
         placement: 'right',
         icon: <LoginIcon />,
         visible() {
-            return true
+            return !Boolean(isAuthenticated())
         }
     },
     {
@@ -53,7 +54,7 @@ const items: {
         placement: 'right',
         icon: <ExitToAppIcon />,
         visible() {
-            return false;
+            return Boolean(isAuthenticated());
         }
     },
 ]
