@@ -23,6 +23,7 @@ export default Route<AuthenticationLoginResponse>(async (req, res) => {
                     token,
                 })
             }
+            throw new StatusError(500, 'Incorrect Password');
         } catch(e) {
             throw new StatusError(500, 'Incorrect Password');
         }
