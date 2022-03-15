@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AppBar, Button, IconButton, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Slide, useScrollTrigger } from "@mui/material";
+import { AppBar, Button, IconButton, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Slide, useScrollTrigger, useMediaQuery } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
@@ -125,6 +125,7 @@ export function NavBar() {
         </Link>
     );
 
+    const isMobile = useMediaQuery('(max-width:600px)');
     return <>
         <HideOnScroll>
             <AppBar position="sticky" style={{ backgroundColor: "black", color: "white", boxShadow: "0px 0px 0px 0px" }}>
@@ -142,7 +143,7 @@ export function NavBar() {
                     </IconButton>
                     <Box style={{ flexGrow: 2 }}>
                         {title && <Typography variant="h6" component="span" sx={{ verticalAlign: 'middle', mr: 2 }}>{title}</Typography>}
-                        {navbarLinksLeft}
+                        {!isMobile && navbarLinksLeft}
                     </Box>
 
                     {navbarLinksRight}
