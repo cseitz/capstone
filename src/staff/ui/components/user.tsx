@@ -46,7 +46,7 @@ function UserCard(props: {
                     <ListItemIcon>
                         <TodayIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Registered" secondary={(user.created as Date).toLocaleString('en-us', {
+                    <ListItemText primary="Registered" secondary={new Date(user.created).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })} />
@@ -55,7 +55,7 @@ function UserCard(props: {
                     <ListItemIcon>
                         <ScheduleIcon />
                     </ListItemIcon>
-                    <ListItemText primary="Updated" secondary={(user.updated as Date).toLocaleString('en-us', {
+                    <ListItemText primary="Updated" secondary={new Date(user.updated).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })} />
@@ -97,7 +97,7 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
                 </>,
                 primaryTypographyProps: { color: !hasName && 'error.main', fontSize: 15 },
                 secondary: <>
-                    <Typography>Registered on {(user.created as Date).toLocaleString('en-us', {
+                    <Typography>Registered on {new Date(user.created).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })}</Typography>
