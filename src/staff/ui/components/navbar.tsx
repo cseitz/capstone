@@ -20,24 +20,9 @@ const items = [
         icon: <HomeIcon />
     },
     {
-        name: "Login",
-        url: "/login",
-        icon: <LoginIcon />
-    },
-    {
-        name: "FAQ",
-        url: "/#faq",
-        icon: <LiveHelpIcon />
-    },
-    {
-        name: "Register",
-        url: "/Register",
-        icon: <HowToRegIcon />
-    },
-    {
         name: "Logout",
         url: "/logout",
-        icon: <ExitToAppIcon /> 
+        icon: <ExitToAppIcon />
     },
 ]
 
@@ -61,7 +46,7 @@ export function NavBar() {
         setOpen(true)
     }
 
-    const navbarLinks = items.map((x) =>
+    const navbarLinks = items.filter(o => o.name != 'Logout').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit'>
                 {x.name}
@@ -96,11 +81,17 @@ export function NavBar() {
                         <MenuIcon />
 
                     </IconButton>
-                    <Typography variant="h6" style={{ flexGrow: 2 }}>
-                        Hello There Welcome
-                    </Typography>
+                    <Box style={{ flexGrow: 2 }}>
+                        {navbarLinks}
+                    </Box>
 
-                    {navbarLinks}
+
+
+                    <Link href={'/logout'}>
+                        <Button color='inherit'>
+                            {'Logout'}
+                        </Button>
+                    </Link>
 
                 </Toolbar>
             </AppBar>
