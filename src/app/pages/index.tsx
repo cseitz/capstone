@@ -29,7 +29,7 @@ function LandingPage() {
         </Box>
         <Box id="lading-content-container" style={{ textAlign: 'center' }}>
             <Typography variant="h4">{Subtitle}</Typography>
-            <Button variant="outlined" sx={{ m: 2 }}>
+            <Button variant="contained" color="secondary" sx={{ m: 2 }}>
                 <Typography variant="h6">Register Here</Typography>
             </Button>
         </Box>
