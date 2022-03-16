@@ -110,7 +110,7 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
 
 const queryClient = new QueryClient();
 function UserListComponent(props: {}) {
-    const { isLoading, error, data } = useQuery<{ users: UserData[] }>(['users'], () => (
+    const { isLoading, error, data, dataUpdatedAt } = useQuery<{ users: UserData[] }>(['users'], () => (
         fetch('/api/users').then(res => res.json())
     ));
     const [open, setOpen] = useState<string>(null)
@@ -121,7 +121,13 @@ function UserListComponent(props: {}) {
         feedback.success({
             message: 'Loaded ' + users.length + ' Users'
         })
-    }, [isLoading])
+    }, [isLoading]);
+    useEffect(() => {
+        if (isLoading) return;
+        feedback.info({
+            message: 'Refreshed at ' + dataUpdatedAt
+        })
+    }, [dataUpdatedAt])
     return <>
         <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
             <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
