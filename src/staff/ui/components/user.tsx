@@ -3,9 +3,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { UserData } from "lib/mongo/schema/user";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { useFeedback } from "./feedback";
 
 
 function UserCard(props: {
@@ -109,11 +110,24 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
 
 const queryClient = new QueryClient();
 function UserListComponent(props: {}) {
-    const { isLoading, error, data } = useQuery<{ users: UserData[] }>(['users'], () => (
+    const { isLoading, error, data, dataUpdatedAt } = useQuery<{ users: UserData[] }>(['users'], () => (
         fetch('/api/users').then(res => res.json())
     ));
     const [open, setOpen] = useState<string>(null)
     const { users } = data || { users: [] };
+    const feedback = useFeedback();
+    useEffect(() => {
+        if (isLoading) return;
+        feedback.success({
+            message: 'Loaded ' + users.length + ' Users'
+        })
+    }, [isLoading]);
+    useEffect(() => {
+        if (isLoading) return;
+        feedback.info({
+            message: 'Refreshed at ' + dataUpdatedAt
+        })
+    }, [dataUpdatedAt])
     return <>
         <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
             <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>

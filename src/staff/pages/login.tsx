@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button, Grid, TextField, Typography } from '@mui/material'
 import { Box } from '@mui/system';
 import { useRouter } from 'next/router';
+import { useFeedback } from 'ui/components/feedback';
 
 export default function LoginPage() {
     const [tab, setTab] = useState<'register' | 'login'>('login');
@@ -20,6 +21,7 @@ export default function LoginPage() {
 }
 
 function LoginView() {
+    const feedback = useFeedback();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [status, setStatus] = useState<string>(null);
@@ -41,6 +43,9 @@ function LoginView() {
         }).then(async res => {
             if (!res.ok) throw (await res.json())?.error;
             // alert('registered');
+            feedback.success({
+                message: 'Logged In'
+            })
             router.push('/');
         })
         .catch(err => {
@@ -62,6 +67,7 @@ function LoginView() {
 
 function RegisterView() {
     const router = useRouter();
+    const feedback = useFeedback();
     const [firstName, setFirstName] = useState<string>('');
     const [lastName, setLastName] = useState<string>('');
     const [email, setEmail] = useState<string>('');
@@ -96,6 +102,9 @@ function RegisterView() {
         }).then(async res => {
             if (!res.ok) throw (await res.json())?.error;
             // alert('registered');
+            feedback.success({
+                message: 'Registered Account'
+            });
             router.push('/');
         })
         .catch(err => {
