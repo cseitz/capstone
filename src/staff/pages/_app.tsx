@@ -2,6 +2,7 @@ import { createTheme, CssBaseline, useMediaQuery, ThemeProvider } from "@mui/mat
 import { AppProps } from "next/app";
 import { useMemo } from "react";
 import { QueryClient } from "react-query";
+import { Feedback } from "ui/components/feedback";
 import { NavBar } from "../ui/components/navbar";
 import '../ui/styles/global.scss';
 
@@ -29,6 +30,8 @@ export default function App({ Component, pageProps }: AppProps) {
     return <ThemeProvider theme={theme}>
         <CssBaseline />
         <NavBar />
-        <Component {...pageProps} />
+        <Feedback>
+            <Component {...pageProps} />
+        </Feedback>
     </ThemeProvider>
 }
