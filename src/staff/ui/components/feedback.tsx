@@ -85,11 +85,12 @@ export function FeedbackDisplay(props: {
 
 export function useFeedback() {
     const ctx = useContext(FeedbackContext);
+    type pF = (props: Parameters<typeof provideFeedback>[2]) => void;
     return {
-        success: provideFeedback.bind(null, ctx, 'success'),
-        info: provideFeedback.bind(null, ctx, 'info'),
-        warning: provideFeedback.bind(null, ctx, 'warning'),
-        error: provideFeedback.bind(null, ctx, 'error')
+        success: provideFeedback.bind(null, ctx, 'success') as pF,
+        info: provideFeedback.bind(null, ctx, 'info') as pF,
+        warning: provideFeedback.bind(null, ctx, 'warning') as pF,
+        error: provideFeedback.bind(null, ctx, 'error') as pF
     }
 }
 
