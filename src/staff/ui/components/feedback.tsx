@@ -26,12 +26,12 @@ export function Feedback(props: {
     const ctx: IFeedbackContext = {
         alerts: []
     }
-    provideFeedback(ctx, 'success', {
-        message: 'hi'
-    })
-    provideFeedback(ctx, 'error', {
-        message: 'oof'
-    })
+    // provideFeedback(ctx, 'success', {
+    //     message: 'hi'
+    // })
+    // provideFeedback(ctx, 'error', {
+    //     message: 'oof'
+    // })
     return <FeedbackContext.Provider value={ctx}>
         {props.children}
         <FeedbackDisplay {...restProps} />
@@ -49,13 +49,14 @@ export function FeedbackDisplay(props: {
     if (hasAlert) ref.current = alerts[0];
     const alert = ref.current;
     if (hasAlert && !open) setOpen(true);
+    const onClose = function() {
+        alerts.splice(alerts.findIndex(o => o.id == alert.id), 1);
+        setOpen(false);
+    };
     return <>
         {alert && (
-            <Snackbar open={open} {...snackbarProps}>
-                <Alert {...alert} {...alertProps} onClose={() => {
-                    alerts.splice(alerts.findIndex(o => o.id == alert.id), 1);
-                    setOpen(false);
-                }}>{alert.id} - {alert.message}</Alert>
+            <Snackbar open={open} {...snackbarProps} onClose={onClose}>
+                <Alert {...alert} {...alertProps} onClose={onClose}>{alert.message}</Alert>
             </Snackbar>
         )}
         

@@ -3,9 +3,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { UserData } from "lib/mongo/schema/user";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { useFeedback } from "./feedback";
 
 
 function UserCard(props: {
@@ -114,6 +115,13 @@ function UserListComponent(props: {}) {
     ));
     const [open, setOpen] = useState<string>(null)
     const { users } = data || { users: [] };
+    const feedback = useFeedback();
+    useEffect(() => {
+        if (isLoading) return;
+        feedback.success({
+            message: 'Loaded ' + users.length + ' Users'
+        })
+    }, [isLoading])
     return <>
         <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
             <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
