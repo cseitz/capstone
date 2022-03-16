@@ -1,4 +1,5 @@
 import { Alert, AlertColor, AlertProps, Snackbar, SnackbarProps } from "@mui/material";
+import { createRenderAuthority, RenderAuthority, useRenderAuthority } from "lib/hooks";
 import { uniqueId } from "lodash";
 import { createContext, useContext, useMemo, useRef, useState } from "react";
 
@@ -11,10 +12,12 @@ type IAlert = {
 
 interface IFeedbackContext {
     alerts: IAlert[]
+    authority: RenderAuthority;
 }
 
 const FeedbackGlobalContext = {
     alerts: [],
+    authority: createRenderAuthority(),
 }
 
 const FeedbackContext = createContext<IFeedbackContext>(FeedbackGlobalContext);
@@ -24,7 +27,8 @@ export function Feedback(props: {
 } & Parameters<typeof FeedbackDisplay>[0]) {
     const { children, ...restProps } = props;
     const ctx: IFeedbackContext = {
-        alerts: []
+        alerts: [],
+        authority: createRenderAuthority()
     }
     // provideFeedback(ctx, 'success', {
     //     message: 'hi'
@@ -43,16 +47,19 @@ export function FeedbackDisplay(props: {
 } & SnackbarProps) {
     const [open, setOpen] = useState(false);
     const { alert: alertProps, ...snackbarProps } = props;
-    const { alerts } = useContext(FeedbackContext);
+    const { alerts, authority } = useContext(FeedbackContext);
+    useRenderAuthority(authority);
     const hasAlert = alerts.length > 0;
     const ref = useRef(null);
     if (hasAlert) ref.current = alerts[0];
     const alert = ref.current;
     if (hasAlert && !open) setOpen(true);
     const onClose = function() {
+        console.log('closing')
         alerts.splice(alerts.findIndex(o => o.id == alert.id), 1);
         setOpen(false);
     };
+    console.log('do render', { alerts })
     return <>
         {alert && (
             <Snackbar open={open} {...snackbarProps} onClose={onClose}>
@@ -78,4 +85,5 @@ export function provideFeedback(context: IFeedbackContext, type: AlertColor, pro
     props.id = uniqueId('alert');
     props.severity = type;
     context.alerts.push(props as IAlert);
+    context.authority.render();
 }

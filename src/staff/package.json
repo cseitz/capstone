@@ -31,6 +31,7 @@
     "csstype": "^3.0.10",
     "lodash": "^4.17.21",
     "mongo": "file:lib/mongo",
+    "hooks": "file:lib/hooks",
     "auth": "file:lib/auth",
     "next": "12.0.8",
     "react": "^17.0.2",
