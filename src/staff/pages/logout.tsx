@@ -8,6 +8,7 @@ export default function Logout() {
     const feedback = useFeedback();
     const router = useRouter();
     useMemo(() => {
+        if (typeof window == 'undefined') return;
         fetch('/api/auth/logout').then(() => {
             feedback.success({ message: 'Logged Out' });
             router.push('/login');
