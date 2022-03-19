@@ -4,9 +4,10 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import { useState, useMemo, useEffect } from "react";
-import type { UserData } from "lib/mongo/schema/user";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { useFeedback } from "./feedback";
+import type { UserListResponse } from "pages/api/users";
+import type { UserResponse } from "pages/api/users/[id]";
 
 
 function UserCard(props: {
@@ -14,7 +15,7 @@ function UserCard(props: {
 } & CardProps) {
     const { user: id, ...cardProps } = props;
     const [mode, setMode] = useState<'view' | 'edit'>('view');
-    const { isLoading, error, data } = useQuery<{ user: UserData }>(['user', id], () => (
+    const { isLoading, error, data } = useQuery<UserResponse>(['user', id], () => (
         fetch('/api/users/' + id).then(res => res.json())
     ));
     const { user } = data || {};
@@ -79,7 +80,7 @@ function UserCard(props: {
 
 function UserListItem(props: { user: string, onClick?: (user: string) => void }) {
     const { onClick = (user: string) => { }, } = props;
-    const { isLoading, error, data } = useQuery<{ user: UserData }>(['user', props.user], () => (
+    const { isLoading, error, data } = useQuery<UserResponse>(['user', props.user], () => (
         fetch('/api/users/' + props.user).then(res => res.json())
     ));
     const { user } = data || {};
@@ -110,7 +111,7 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
 
 const queryClient = new QueryClient();
 function UserListComponent(props: {}) {
-    const { isLoading, error, data, dataUpdatedAt } = useQuery<{ users: UserData[] }>(['users'], () => (
+    const { isLoading, error, data, dataUpdatedAt } = useQuery<UserListResponse>(['users'], () => (
         fetch('/api/users').then(res => res.json())
     ));
     const [open, setOpen] = useState<string>(null)
