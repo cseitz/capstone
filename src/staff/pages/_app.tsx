@@ -2,6 +2,7 @@ import { createTheme, CssBaseline, useMediaQuery, ThemeProvider } from "@mui/mat
 import { AppProps } from "next/app";
 import { useMemo } from "react";
 import { QueryClient } from "react-query";
+import { AlertProvider } from "ui/components/alert";
 import { Feedback } from "ui/components/feedback";
 import { NavBar } from "../ui/components/navbar";
 import '../ui/styles/global.scss';
@@ -30,8 +31,11 @@ export default function App({ Component, pageProps }: AppProps) {
     return <ThemeProvider theme={theme}>
         <CssBaseline />
         <NavBar />
-        <Feedback autoHideDuration={6000}>
+        <AlertProvider>
             <Component {...pageProps} />
-        </Feedback>
+        </AlertProvider>
+        {/* <Feedback autoHideDuration={6000}>
+            <Component {...pageProps} />
+        </Feedback> */}
     </ThemeProvider>
 }

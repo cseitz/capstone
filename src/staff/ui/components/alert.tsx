@@ -41,7 +41,7 @@ function ConstructAlert(details?: AlertOrMessage, ...extra: AlertOrMessage[]): I
         details.id = uniqueId('alert');
     if (this)
         details.__proto__ = details;
-    details.color = details.type;
+    // details.color = details.type;
     return details as IAlert;
 }
 
@@ -98,7 +98,14 @@ function AlertDisplay() {
     const { alerts } = context;
     return <Box>
         {alerts.slice(-3).map(alert => (
-            <Alert {...alert} key={alert.id}>{alert.message}</Alert>
+            <AlertItemDisplay alert={alert} key={alert.id} />
         ))}
     </Box>
+}
+
+function AlertItemDisplay(props: { alert: IAlert }) {
+    const { message, id, context, type, ...alertProps } = props.alert;
+    return <Alert {...alertProps} color={type}>
+        {message}
+    </Alert>
 }
