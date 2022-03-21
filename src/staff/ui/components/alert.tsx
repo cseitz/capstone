@@ -102,18 +102,11 @@ function AlertDisplay() {
 
     context.alerts = context.alerts.filter(o => !o.stage || o.stage < 4);
     const { alerts } = context;
-    if (true) return (<>
+    return <>
         {alerts.slice(0, 3).map((alert, index) => (
             <AlertItemDisplay alert={alert} key={alert.id} />
         ))}
-    </>);
-    return <Box sx={{ position: 'fixed', bottom: '20px' }}>
-        <Stack>
-            {alerts.slice(0, 3).reverse().map((alert, index) => (
-                <AlertItemDisplay alert={alert} key={alert.id} index={index} />
-            ))}
-        </Stack>
-    </Box>
+    </>;
 }
 
 function AlertItemDisplay(props: { alert: IAlert }) {
@@ -134,17 +127,17 @@ function AlertItemDisplay(props: { alert: IAlert }) {
             setStage(1);
         }
         alert.offset = previousAlert ? previousAlert.offset + previousAlert.height + 0 : 0;
-        console.log(alert.id, alert.offset);
+        // console.log(alert.id, alert.offset);
     }, [previousAlert?.height, previousAlert?.offset]);
     useEffect(() => {
         alert.stage = stage;
-        console.log('do render');
+        // console.log('do render');
         if (stage >= 3) {
             alert.height = 0;
             const tmt = setTimeout(() => {
                 ++alert.stage;
                 renderAuthority.render();
-            }, 1000);
+            }, 100);
             renderAuthority.render();
             return () => clearTimeout(tmt);
         }
@@ -152,7 +145,7 @@ function AlertItemDisplay(props: { alert: IAlert }) {
     }, [stage]);
     alert.offset = previousAlert ? previousAlert.offset + previousAlert.height + 0 : 0;
 
-    const onClose = function(event, reason?) {
+    const onClose = function (event, reason?) {
         if (reason == 'clickaway') return;
         setStage(3);
     }
@@ -170,57 +163,10 @@ function AlertItemDisplay(props: { alert: IAlert }) {
     }}>
         <Alert {...mergeProps(alertProps, {
             onClose,
+            color: type
         })}>
             {message}, {id}
         </Alert>
     </Snackbar>
 }
 
-function OldAlertItemDisplay(props: { alert: IAlert, index: number }) {
-    const { alert, index } = props;
-    const { message, id, context, type, ...alertProps } = alert;
-    const [stage, setStage] = useState(1);
-    // return <Snackbar open sx={{
-    //     transition: 'margin-bottom 0.5s',
-    //     mb: props.index * 10,
-    // }}>
-
-    // </Snackbar>
-    useEffect(() => {
-        if (stage > 4) return;
-        let delay;
-        switch (stage) {
-            case 1: delay = 6000; break;
-            case 2: delay = 1000; break;
-            case 3: delay = 1000; break;
-            case 4: delay = 1000; break;
-        }
-        const timeout = setTimeout(() => setStage(stage + 1), delay)
-        return () => clearTimeout(timeout);
-    }, [stage]);
-    if (alert.stage != stage) alert.stage = stage;
-    if (true) return <>
-        <Snackbar open={stage <= 3} sx={{ mb: index * 10, transition: 'margin-bottom 0.25s' }} autoHideDuration={6000} onClose={(evt, reason) => reason != 'clickaway' && setStage(2)}>
-            <Collapse in={stage <= 3}>
-                <Slide direction="right" in={stage <= 2}>
-                    <Alert {...alertProps} color={type} onClose={() => setStage(3)}>
-                        {message}
-                    </Alert>
-                </Slide>
-            </Collapse>
-
-        </Snackbar>
-    </>;
-    return <>
-        <Box>
-            <Slide direction="right" in={true || stage <= 2}>
-                <Collapse in={stage <= 1}>
-
-                    <Alert {...alertProps} color={type}>
-                        {message}
-                    </Alert>
-                </Collapse>
-            </Slide>
-        </Box>
-    </>
-}
