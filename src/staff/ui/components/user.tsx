@@ -3,10 +3,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import { useState, useMemo, useEffect } from "react";
-import type { UserData } from "lib/mongo/schema/user";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
-import { useFeedback } from "./feedback";
+import type { UserListResponse } from "pages/api/users";
+import type { UserResponse } from "pages/api/users/[id]";
+import { useAlert } from "./alert";
 
 
 function UserCard(props: {
@@ -14,7 +15,7 @@ function UserCard(props: {
 } & CardProps) {
     const { user: id, ...cardProps } = props;
     const [mode, setMode] = useState<'view' | 'edit'>('view');
-    const { isLoading, error, data } = useQuery<{ user: UserData }>(['user', id], () => (
+    const { isLoading, error, data } = useQuery<UserResponse>(['user', id], () => (
         fetch('/api/users/' + id).then(res => res.json())
     ));
     const { user } = data || {};
@@ -79,7 +80,7 @@ function UserCard(props: {
 
 function UserListItem(props: { user: string, onClick?: (user: string) => void }) {
     const { onClick = (user: string) => { }, } = props;
-    const { isLoading, error, data } = useQuery<{ user: UserData }>(['user', props.user], () => (
+    const { isLoading, error, data } = useQuery<UserResponse>(['user', props.user], () => (
         fetch('/api/users/' + props.user).then(res => res.json())
     ));
     const { user } = data || {};
@@ -110,23 +111,27 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
 
 const queryClient = new QueryClient();
 function UserListComponent(props: {}) {
-    const { isLoading, error, data, dataUpdatedAt } = useQuery<{ users: UserData[] }>(['users'], () => (
+    const { isLoading, error, data, dataUpdatedAt } = useQuery<UserListResponse>(['users'], () => (
         fetch('/api/users').then(res => res.json())
     ));
     const [open, setOpen] = useState<string>(null)
     const { users } = data || { users: [] };
-    const feedback = useFeedback();
+    const alert = useAlert();
     useEffect(() => {
         if (isLoading) return;
-        feedback.success({
+        alert.success({
             message: 'Loaded ' + users.length + ' Users'
         })
     }, [isLoading]);
+    const firstLoad = useRef(true);
     useEffect(() => {
         if (isLoading) return;
-        feedback.info({
-            message: 'Refreshed at ' + dataUpdatedAt
-        })
+        if (!firstLoad.current)
+            alert.info({
+                message: 'Refreshed at ' + new Date(dataUpdatedAt).toLocaleTimeString('en-us', { timeStyle: 'medium' }),
+                duration: 1500
+            });
+        firstLoad.current = false;
     }, [dataUpdatedAt])
     return <>
         <Modal open={Boolean(open)} onClose={() => setOpen(null)}>

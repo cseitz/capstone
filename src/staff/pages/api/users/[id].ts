@@ -1,10 +1,10 @@
 import { isAuthenticated } from "lib/auth";
-import { UserDocument, UserModel } from "lib/mongo/schema/user";
+import { UserData, UserDocument, UserModel } from "lib/mongo/schema/user";
 import { Route, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export interface UserResponse {
-    user?: UserDocument
+    user?: UserData
 }
 
 const isStaff = isAuthenticated({
