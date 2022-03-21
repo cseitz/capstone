@@ -3,6 +3,21 @@ import { Button, Grid, TextField, Typography } from '@mui/material'
 import { Box } from '@mui/system';
 import { useRouter } from 'next/router';
 import { useFeedback } from 'ui/components/feedback';
+import { useAlert } from 'ui/components/alert';
+
+
+function AlertTester() {
+    const [count, setCount] = useState(0);
+    useEffect(() => {
+        return clearInterval.bind(null, setTimeout(function() {
+            setCount(count + 1);
+        }, 1000));
+    }, [count]);
+    useAlert({ type: 'info' }).error('hi, ' + count)
+    return <Box>
+        alert stuff {count}
+    </Box>
+}
 
 export default function LoginPage() {
     const [tab, setTab] = useState<'register' | 'login'>('login');
@@ -17,6 +32,7 @@ export default function LoginPage() {
                 </Typography>
             </a>
         </Box>
+        <AlertTester />
     </Box>
 }
 
