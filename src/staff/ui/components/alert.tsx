@@ -1,7 +1,7 @@
 import { Alert, AlertProps, Box, Collapse, Slide, Snackbar, Stack } from "@mui/material";
-import { createRenderAuthority, RenderAuthority, useRenderAuthority } from "lib/hooks";
+import { createRenderAuthority, mergeProps, RenderAuthority, useRenderAuthority } from "lib/hooks";
 import { uniqueId } from "lodash";
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, MutableRefObject, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 
 type AlertType = AlertProps['color'];
@@ -11,6 +11,9 @@ type IAlert = {
     message: string;
     context?: IAlertContext;
     stage?: number;
+    height?: number;
+    offset?: number;
+    ref?: MutableRefObject<HTMLDivElement>;
     __proto__?: Partial<IAlert>;
 } & AlertProps;
 type AlertOrMessage = Partial<IAlert> | string;
@@ -99,6 +102,11 @@ function AlertDisplay() {
 
     context.alerts = context.alerts.filter(o => !o.stage || o.stage <= 4);
     const { alerts } = context;
+    if (true) return (<>
+        {alerts.slice(0, 3).map((alert, index) => (
+            <AlertItemDisplay alert={alert} key={alert.id} />
+        ))}
+    </>);
     return <Box sx={{ position: 'fixed', bottom: '20px' }}>
         <Stack>
             {alerts.slice(0, 3).reverse().map((alert, index) => (
@@ -108,8 +116,53 @@ function AlertDisplay() {
     </Box>
 }
 
-function AlertItemDisplay(props: { alert: IAlert, index: number }) {
+function AlertItemDisplay(props: { alert: IAlert }) {
     const { alert } = props;
+    const { message, id, context, type, ...alertProps } = alert;
+    const { alerts, renderAuthority } = context;
+    const ref = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        alert.ref = ref;
+    }, [ref]);
+    const previousAlertIndex = alerts.findIndex(o => o.id == id) - 1;
+    const previousAlert = previousAlertIndex >= 0 ? alerts[previousAlertIndex] : null;
+    const [stage, setStage] = useState(alert?.stage || 0);
+    useLayoutEffect(() => {
+        alert.height = ref.current.offsetHeight;
+        alert.offset = previousAlert ? previousAlert.offset + previousAlert.height : 0;
+        console.log(alert.offset);
+        setStage(1);
+    }, []);
+    useEffect(() => {
+        renderAuthority.render();
+        alert.stage = stage;
+        console.log('do render');
+    }, [stage]);
+
+    const onClose = function(event, reason?) {
+        if (reason == 'clickaway') return;
+        setStage(3);
+    }
+
+
+    return <Snackbar {...{
+        ref,
+        open: stage <= 2,
+        onClose,
+        sx: {
+            mb: alert.offset + 'px'
+        }
+    }}>
+        <Alert {...mergeProps(alertProps, {
+            onClose,
+        })}>
+            {message}
+        </Alert>
+    </Snackbar>
+}
+
+function OldAlertItemDisplay(props: { alert: IAlert, index: number }) {
+    const { alert, index } = props;
     const { message, id, context, type, ...alertProps } = alert;
     const [stage, setStage] = useState(1);
     // return <Snackbar open sx={{
@@ -131,6 +184,18 @@ function AlertItemDisplay(props: { alert: IAlert, index: number }) {
         return () => clearTimeout(timeout);
     }, [stage]);
     if (alert.stage != stage) alert.stage = stage;
+    if (true) return <>
+        <Snackbar open={stage <= 3} sx={{ mb: index * 10, transition: 'margin-bottom 0.25s' }} autoHideDuration={6000} onClose={(evt, reason) => reason != 'clickaway' && setStage(2)}>
+            <Collapse in={stage <= 3}>
+                <Slide direction="right" in={stage <= 2}>
+                    <Alert {...alertProps} color={type} onClose={() => setStage(3)}>
+                        {message}
+                    </Alert>
+                </Slide>
+            </Collapse>
+
+        </Snackbar>
+    </>;
     return <>
         <Box>
             <Slide direction="right" in={true || stage <= 2}>
