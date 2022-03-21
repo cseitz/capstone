@@ -1,5 +1,5 @@
-import { AlertProps } from "@mui/material";
-import { createRenderAuthority, RenderAuthority } from "lib/hooks";
+import { Alert, AlertProps, Box } from "@mui/material";
+import { createRenderAuthority, RenderAuthority, useRenderAuthority } from "lib/hooks";
 import { uniqueId } from "lodash";
 import { createContext, useContext, useMemo, useRef } from "react";
 
@@ -56,6 +56,8 @@ export function createAlert(...args: Partial<AlertOrMessage>[]) {
     const details = ConstructAlert(...args)
     if (!details.context) details.context = AlertGlobalContext;
     console.log('alert', details);
+    details.context.alerts.push(details);
+    details.context.renderAuthority.render();
     return true;
 }
 
@@ -84,6 +86,19 @@ export function AlertProvider(props: Partial<IAlert> & { children: any }) {
         renderAuthority,
     };
     return <AlertContext.Provider value={ctx}>
-
+        {children}
+        <AlertDisplay />
     </AlertContext.Provider>
+}
+
+function AlertDisplay() {
+    const context = useContext(AlertContext);
+    useRenderAuthority(context);
+
+    const { alerts } = context;
+    return <Box>
+        {alerts.slice(-3).map(alert => (
+            <Alert {...alert} key={alert.id}>{alert.message}</Alert>
+        ))}
+    </Box>
 }
