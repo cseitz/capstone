@@ -100,7 +100,7 @@ function AlertDisplay() {
     const context = useContext(AlertContext);
     useRenderAuthority(context);
 
-    context.alerts = context.alerts.filter(o => !o.stage || o.stage <= 4);
+    context.alerts = context.alerts.filter(o => !o.stage || o.stage < 4);
     const { alerts } = context;
     if (true) return (<>
         {alerts.slice(0, 3).map((alert, index) => (
@@ -130,19 +130,27 @@ function AlertItemDisplay(props: { alert: IAlert }) {
     const [stage, setStage] = useState(alert?.stage || 0);
     useLayoutEffect(() => {
         if (stage == 0) {
-            alert.height = ref.current.offsetHeight;
+            alert.height = ref.current.offsetHeight + 10;
             setStage(1);
         }
-        alert.offset = previousAlert ? previousAlert.offset + previousAlert.height : 0;
+        alert.offset = previousAlert ? previousAlert.offset + previousAlert.height + 0 : 0;
         console.log(alert.id, alert.offset);
     }, [previousAlert?.height, previousAlert?.offset]);
     useEffect(() => {
         alert.stage = stage;
         console.log('do render');
-        if (stage >= 3) alert.height = 0;
+        if (stage >= 3) {
+            alert.height = 0;
+            const tmt = setTimeout(() => {
+                ++alert.stage;
+                renderAuthority.render();
+            }, 1000);
+            renderAuthority.render();
+            return () => clearTimeout(tmt);
+        }
         renderAuthority.render();
     }, [stage]);
-    alert.offset = previousAlert ? previousAlert.offset + previousAlert.height : 0;
+    alert.offset = previousAlert ? previousAlert.offset + previousAlert.height + 0 : 0;
 
     const onClose = function(event, reason?) {
         if (reason == 'clickaway') return;
