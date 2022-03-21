@@ -31,7 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
     return <ThemeProvider theme={theme}>
         <CssBaseline />
         <NavBar />
-        <AlertProvider action="hi">
+        <AlertProvider>
             <Component {...pageProps} />
         </AlertProvider>
         {/* <Feedback autoHideDuration={6000}>

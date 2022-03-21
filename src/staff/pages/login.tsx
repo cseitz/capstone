@@ -11,11 +11,12 @@ function AlertTester() {
     useEffect(() => {
         return clearInterval.bind(null, setTimeout(function() {
             setCount(count + 1);
-        }, 1000));
+        }, 3000 + (count % 3 == 0 ? 10000 : 0)));
     }, [count]);
-    useAlert({ type: 'info' }).error('hi, ' + count)
+    const alert = useAlert({ type: 'info' }); //.error('hi, ' + count)
     return <Box>
         alert stuff {count}
+        <Button onClick={() => alert.error('hi, ' + count)}>Alert</Button>
     </Box>
 }
 
