@@ -41,7 +41,8 @@ function ConstructAlert(details?: AlertOrMessage, ...extra: AlertOrMessage[]): I
         details.id = uniqueId('alert');
     if (this)
         details.__proto__ = details;
-    // details.color = details.type;
+    if (details?.context)
+        details = { ...(details.context?.base || {}), ...details };
     return details as IAlert;
 }
 
