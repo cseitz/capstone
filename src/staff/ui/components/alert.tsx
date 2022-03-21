@@ -1,7 +1,7 @@
-import { Alert, AlertProps, Box } from "@mui/material";
+import { Alert, AlertProps, Box, Collapse, Slide, Snackbar, Stack } from "@mui/material";
 import { createRenderAuthority, RenderAuthority, useRenderAuthority } from "lib/hooks";
 import { uniqueId } from "lodash";
-import { createContext, useContext, useMemo, useRef } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 
 type AlertType = AlertProps['color'];
@@ -10,6 +10,7 @@ type IAlert = {
     type?: AlertType;
     message: string;
     context?: IAlertContext;
+    stage?: number;
     __proto__?: Partial<IAlert>;
 } & AlertProps;
 type AlertOrMessage = Partial<IAlert> | string;
@@ -96,17 +97,50 @@ function AlertDisplay() {
     const context = useContext(AlertContext);
     useRenderAuthority(context);
 
+    context.alerts = context.alerts.filter(o => !o.stage || o.stage <= 4);
     const { alerts } = context;
-    return <Box>
-        {alerts.slice(-3).map(alert => (
-            <AlertItemDisplay alert={alert} key={alert.id} />
-        ))}
+    return <Box sx={{ position: 'fixed', bottom: '20px' }}>
+        <Stack>
+            {alerts.slice(0, 3).reverse().map((alert, index) => (
+                <AlertItemDisplay alert={alert} key={alert.id} index={index} />
+            ))}
+        </Stack>
     </Box>
 }
 
-function AlertItemDisplay(props: { alert: IAlert }) {
-    const { message, id, context, type, ...alertProps } = props.alert;
-    return <Alert {...alertProps} color={type}>
-        {message}
-    </Alert>
+function AlertItemDisplay(props: { alert: IAlert, index: number }) {
+    const { alert } = props;
+    const { message, id, context, type, ...alertProps } = alert;
+    const [stage, setStage] = useState(1);
+    // return <Snackbar open sx={{
+    //     transition: 'margin-bottom 0.5s',
+    //     mb: props.index * 10,
+    // }}>
+
+    // </Snackbar>
+    useEffect(() => {
+        if (stage > 4) return;
+        let delay;
+        switch (stage) {
+            case 1: delay = 6000; break;
+            case 2: delay = 1000; break;
+            case 3: delay = 1000; break;
+            case 4: delay = 1000; break;
+        }
+        const timeout = setTimeout(() => setStage(stage + 1), delay)
+        return () => clearTimeout(timeout);
+    }, [stage]);
+    if (alert.stage != stage) alert.stage = stage;
+    return <>
+        <Box>
+            <Slide direction="right" in={true || stage <= 2}>
+                <Collapse in={stage <= 1}>
+
+                    <Alert {...alertProps} color={type}>
+                        {message}
+                    </Alert>
+                </Collapse>
+            </Slide>
+        </Box>
+    </>
 }
