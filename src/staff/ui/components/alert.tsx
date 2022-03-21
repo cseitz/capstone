@@ -9,6 +9,7 @@ type IAlert = {
     id?: string;
     type?: AlertType;
     message: string;
+    duration?: number;
     context?: IAlertContext;
     stage?: number;
     height?: number;
@@ -54,7 +55,7 @@ function ConstructAlert(details?: AlertOrMessage, ...extra: AlertOrMessage[]): I
 export function useAlert(base?: Partial<IAlert>) {
     const context = useContext(AlertContext);
     if (base) return bindCreateAlert({ context, ...base });
-    return bindCreateAlert({ context });
+    return bindCreateAlert({ context }) as typeof createAlert;
 }
 
 export function createAlert(...args: Partial<AlertOrMessage>[]) {
@@ -66,17 +67,17 @@ export function createAlert(...args: Partial<AlertOrMessage>[]) {
     return true;
 }
 
-createAlert.success = createAlert.bind(null, { type: 'success' });
-createAlert.info = createAlert.bind(null, { type: 'info' });
-createAlert.warning = createAlert.bind(null, { type: 'warning' });
-createAlert.error = createAlert.bind(null, { type: 'error' });
+createAlert.success = createAlert.bind(null, { type: 'success' }) as typeof createAlert;
+createAlert.info = createAlert.bind(null, { type: 'info' }) as typeof createAlert;
+createAlert.warning = createAlert.bind(null, { type: 'warning' }) as typeof createAlert;
+createAlert.error = createAlert.bind(null, { type: 'error' }) as typeof createAlert;
 
 function bindCreateAlert(base: Partial<IAlert>) {
     const bound = createAlert.bind(null, base);
-    bound.success = (bound?.success || createAlert.success).bind(null, base);
-    bound.info = (bound?.info || createAlert.info).bind(null, base);
-    bound.warning = (bound?.warning || createAlert.warning).bind(null, base);
-    bound.error = (bound?.error || createAlert.error).bind(null, base);
+    bound.success = (bound?.success || createAlert.success).bind(null, base) as typeof createAlert;
+    bound.info = (bound?.info || createAlert.info).bind(null, base) as typeof createAlert;
+    bound.warning = (bound?.warning || createAlert.warning).bind(null, base) as typeof createAlert;
+    bound.error = (bound?.error || createAlert.error).bind(null, base) as typeof createAlert;
     return bound as typeof createAlert;
 }
 
@@ -85,11 +86,11 @@ export function AlertProvider(props: Partial<IAlert> & { children: any }) {
     const { children, ...base } = props;
     const renderAuthority = useRef(createRenderAuthority()).current;
     const alerts = useRef([]).current;
-    const ctx: IAlertContext = {
+    const ctx: IAlertContext = useMemo(() => ({
         base,
         alerts,
         renderAuthority,
-    };
+    }), []);
     return <AlertContext.Provider value={ctx}>
         {children}
         <AlertDisplay />
@@ -98,7 +99,7 @@ export function AlertProvider(props: Partial<IAlert> & { children: any }) {
 
 function AlertDisplay() {
     const context = useContext(AlertContext);
-    useRenderAuthority(context);
+    useRenderAuthority(context.renderAuthority);
 
     context.alerts = context.alerts.filter(o => !o.stage || o.stage < 4);
     const { alerts } = context;
@@ -155,7 +156,7 @@ function AlertItemDisplay(props: { alert: IAlert }) {
         ref,
         open: stage <= 2,
         onClose,
-        autoHideDuration: 6000,
+        autoHideDuration: alert?.duration || 6000,
         sx: {
             mb: alert.offset + 'px',
             transition: stage >= 1 ? 'margin-bottom 0.25s' : undefined,
@@ -165,7 +166,7 @@ function AlertItemDisplay(props: { alert: IAlert }) {
             onClose,
             color: type
         })}>
-            {message}, {id}
+            {message}
         </Alert>
     </Snackbar>
 }
