@@ -1,7 +1,7 @@
 import { AlertProps } from "@mui/material";
 import { createRenderAuthority, RenderAuthority } from "lib/hooks";
 import { uniqueId } from "lodash";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useMemo, useRef } from "react";
 
 
 type AlertType = AlertProps['color'];
@@ -16,12 +16,13 @@ type AlertOrMessage = Partial<IAlert> | string;
 
 interface IAlertContext {
     alerts: IAlert[]
-    authority: RenderAuthority;
+    renderAuthority: RenderAuthority;
+    base?: Partial<IAlert>;
 }
 
 const AlertGlobalContext = {
     alerts: [],
-    authority: createRenderAuthority(),
+    renderAuthority: createRenderAuthority(),
 }
 
 const AlertContext = createContext<IAlertContext>(AlertGlobalContext);
@@ -73,3 +74,16 @@ function bindCreateAlert(base: Partial<IAlert>) {
 }
 
 
+export function AlertProvider(props: Partial<IAlert> & { children: any }) {
+    const { children, ...base } = props;
+    const renderAuthority = useRef(createRenderAuthority()).current;
+    const alerts = useRef([]).current;
+    const ctx: IAlertContext = {
+        base,
+        alerts,
+        renderAuthority,
+    };
+    return <AlertContext.Provider value={ctx}>
+
+    </AlertContext.Provider>
+}
