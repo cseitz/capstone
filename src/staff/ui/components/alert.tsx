@@ -121,6 +121,7 @@ function AlertItemDisplay(props: { alert: IAlert }) {
     const { message, id, context, type, ...alertProps } = alert;
     const { alerts, renderAuthority } = context;
     const ref = useRef<HTMLDivElement>(null);
+    useRenderAuthority(renderAuthority);
     useEffect(() => {
         alert.ref = ref;
     }, [ref]);
@@ -128,16 +129,20 @@ function AlertItemDisplay(props: { alert: IAlert }) {
     const previousAlert = previousAlertIndex >= 0 ? alerts[previousAlertIndex] : null;
     const [stage, setStage] = useState(alert?.stage || 0);
     useLayoutEffect(() => {
-        alert.height = ref.current.offsetHeight;
+        if (stage == 0) {
+            alert.height = ref.current.offsetHeight;
+            setStage(1);
+        }
         alert.offset = previousAlert ? previousAlert.offset + previousAlert.height : 0;
-        console.log(alert.offset);
-        setStage(1);
-    }, []);
+        console.log(alert.id, alert.offset);
+    }, [previousAlert?.height, previousAlert?.offset]);
     useEffect(() => {
-        renderAuthority.render();
         alert.stage = stage;
         console.log('do render');
+        if (stage >= 3) alert.height = 0;
+        renderAuthority.render();
     }, [stage]);
+    alert.offset = previousAlert ? previousAlert.offset + previousAlert.height : 0;
 
     const onClose = function(event, reason?) {
         if (reason == 'clickaway') return;
@@ -149,14 +154,16 @@ function AlertItemDisplay(props: { alert: IAlert }) {
         ref,
         open: stage <= 2,
         onClose,
+        autoHideDuration: 6000,
         sx: {
-            mb: alert.offset + 'px'
+            mb: alert.offset + 'px',
+            transition: stage >= 1 ? 'margin-bottom 0.25s' : undefined,
         }
     }}>
         <Alert {...mergeProps(alertProps, {
             onClose,
         })}>
-            {message}
+            {message}, {id}
         </Alert>
     </Snackbar>
 }
