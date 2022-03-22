@@ -162,12 +162,16 @@ function AlertItemDisplay(props: { alert: IAlert }) {
             transition: stage >= 1 ? 'margin-bottom 0.25s' : undefined,
         }
     }}>
-        <Alert {...mergeProps(alertProps, {
-            onClose,
-            color: type
-        })}>
-            {message}
-        </Alert>
+        <Box>
+            <Slide in={stage >= 1} direction="right">
+                <Alert {...mergeProps(alertProps, {
+                    onClose,
+                    color: type
+                })}>
+                    {message}
+                </Alert>
+            </Slide>
+        </Box>
     </Snackbar>
 }
 
