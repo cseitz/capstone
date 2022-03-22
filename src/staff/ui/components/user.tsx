@@ -20,6 +20,13 @@ function UserCard(props: {
     ));
     const { user } = data || {};
     if (isLoading) return <Card {...cardProps} />;
+    const alert = useAlert();
+    useEffect(() => {
+        alert.success({
+            message: 'Loaded User ' + user?.email || "[Missing name]",
+            duration: 2000,
+        })
+    }, []);
     const hasName = Boolean(user?.info?.firstName?.trim() && user?.info?.lastName?.trim());
     const hasEmail = Boolean(user?.email.trim());
     return <Card {...cardProps}>
