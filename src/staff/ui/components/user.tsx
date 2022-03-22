@@ -99,7 +99,7 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
                 </>,
                 primaryTypographyProps: { color: !hasName && 'error.main', fontSize: 15 },
                 secondary: <>
-                    <Typography>Registered on {new Date(user.created).toLocaleString('en-us', {
+                    <Typography component="span">Registered on {new Date(user.created).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })}</Typography>
