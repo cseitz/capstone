@@ -10,14 +10,19 @@ type IAlert = {
     type?: AlertType;
     message: string;
     duration?: number;
+    unique?: string;
+} & IAltertInternal & AlertProps;
+type AlertOrMessage = Partial<IAlert> | string;
+
+type IAltertInternal = {
     context?: IAlertContext;
     stage?: number;
     height?: number;
     offset?: number;
     ref?: MutableRefObject<HTMLDivElement>;
     __proto__?: Partial<IAlert>;
-} & AlertProps;
-type AlertOrMessage = Partial<IAlert> | string;
+    [key: string]: any;
+}
 
 interface IAlertContext {
     alerts: IAlert[]
@@ -34,8 +39,8 @@ const AlertContext = createContext<IAlertContext>(AlertGlobalContext);
 
 function ConstructAlert(details?: AlertOrMessage, ...extra: AlertOrMessage[]): IAlert {
     if (typeof details == 'string')
-        details = { message: details };
-    extra = extra.map(o => typeof o == 'string' ? { message: o } : o);
+        details = { message: details } as any;
+    extra = extra.map(o => typeof o == 'string' ? { message: o } : o) as any;
     let combined = {};
     while (extra.length > 0) {
         Object.assign(combined, extra.pop())
@@ -62,6 +67,15 @@ export function createAlert(...args: Partial<AlertOrMessage>[]) {
     const details = ConstructAlert(...args)
     if (!details.context) details.context = AlertGlobalContext;
     console.log('alert', details);
+    if (details.unique) {
+        const uniques = details.context.alerts.filter(o => o.unique == details.unique);
+        let foundActive = false;
+        uniques.forEach(o => {
+            if ((o?.stage || 0) == 0) o.stage = 4;
+            else { o.stage = 3; foundActive = true; }
+        })
+        if (foundActive) details.noSlide = true;
+    }
     details.context.alerts.push(details);
     details.context.renderAuthority.render();
     return true;
@@ -112,7 +126,7 @@ function AlertDisplay() {
 
 function AlertItemDisplay(props: { alert: IAlert }) {
     const { alert } = props;
-    const { message, id, context, type, ...alertProps } = alert;
+    const { message, id, context, type, noSlide = false, duration = 6000, ...alertProps } = alert;
     const { alerts, renderAuthority } = context;
     const ref = useRef<HTMLDivElement>(null);
     useRenderAuthority(renderAuthority);
@@ -122,10 +136,14 @@ function AlertItemDisplay(props: { alert: IAlert }) {
     const previousAlertIndex = alerts.findIndex(o => o.id == id) - 1;
     const previousAlert = previousAlertIndex >= 0 ? alerts[previousAlertIndex] : null;
     const [stage, setStage] = useState(alert?.stage || 0);
+    if (alert.stage > stage) setStage(alert.stage);
     useLayoutEffect(() => {
         if (stage == 0) {
             alert.height = ref.current.offsetHeight + 10;
             setStage(1);
+            setTimeout(function() {
+                setStage(2);
+            }, 500)
         }
         alert.offset = previousAlert ? previousAlert.offset + previousAlert.height + 0 : 0;
         // console.log(alert.id, alert.offset);
@@ -152,22 +170,25 @@ function AlertItemDisplay(props: { alert: IAlert }) {
     }
 
 
+    const elem = <Alert {...mergeProps(alertProps, {
+        onClose,
+        color: type
+    })}>
+        {message}
+    </Alert>;
     return <Snackbar {...{
         ref,
         open: stage <= 2,
         onClose,
-        autoHideDuration: alert?.duration || 6000,
+        autoHideDuration: duration || 6000,
         sx: {
             mb: alert.offset + 'px',
-            transition: stage >= 1 ? 'margin-bottom 0.25s' : undefined,
+            transition: (!noSlide && stage >= 1) || (noSlide && stage >= 2) ? 'margin-bottom 0.25s' : undefined,
         }
     }}>
-        <Alert {...mergeProps(alertProps, {
-            onClose,
-            color: type
-        })}>
-            {message}
-        </Alert>
+        <Box>
+            {!alert.noSlide ? <Slide in={stage >= 1} direction="right">{elem}</Slide> : elem}
+        </Box>
     </Snackbar>
 }
 
