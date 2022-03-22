@@ -120,7 +120,7 @@ function UserListComponent(props: {}) {
     useEffect(() => {
         if (isLoading) return;
         alert.success({
-            message: 'Loaded ' + users.length + ' Users'
+            message: 'Loaded ' + users.length + ' Users',
         })
     }, [isLoading]);
     const firstLoad = useRef(true);
@@ -129,7 +129,8 @@ function UserListComponent(props: {}) {
         if (!firstLoad.current)
             alert.info({
                 message: 'Refreshed at ' + new Date(dataUpdatedAt).toLocaleTimeString('en-us', { timeStyle: 'medium' }),
-                duration: 1500
+                duration: 1500,
+                unique: 'userListRefreshedAt'
             });
         firstLoad.current = false;
     }, [dataUpdatedAt])
