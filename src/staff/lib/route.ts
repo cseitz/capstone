@@ -20,7 +20,7 @@ export interface RouteConfig {
 }
 
 export function Route<T>(handler: (req: NextApiRequest, res: NextApiResponse<T | RouteResponse>) => any, config?: RouteConfig) {
-    return function (req, res) {
+    return async function (req, res) {
         try {
             if (config) {
                 if ('methods' in config) {
@@ -28,13 +28,14 @@ export function Route<T>(handler: (req: NextApiRequest, res: NextApiResponse<T |
                         throw new StatusError(405, 'Method Not Allowed');
                 }
             }
-            Promise.resolve(handler(req, res)).catch(err => {
-                if (err instanceof StatusError) {
-                    res.status(err.statusCode).json({ error: err.message, ...err?.data });
-                } else {
-                    throw err;
-                }
-            })
+            await handler(req, res);
+            // Promise.resolve(handler(req, res)).catch(err => {
+            //     if (err instanceof StatusError) {
+            //         res.status(err.statusCode).json({ error: err.message, ...err?.data });
+            //     } else {
+            //         throw err;
+            //     }
+            // })
         } catch (err) {
             if (err instanceof StatusError) {
                 res.status(err.statusCode).json({ error: err.message, ...err?.data });
