@@ -11,6 +11,7 @@ import { randomUUID } from 'crypto';
 export interface AuthenticationToken {
     uuid: string;
     issued: string;
+    updated: string;
     user: string;
     id: string;
     role: UserDocument['role'];
@@ -18,10 +19,11 @@ export interface AuthenticationToken {
 
 
 
-export function createToken(user: UserDocument) {
+export function createToken(user: UserDocument, existingToken?: AuthenticationToken) {
     const data: AuthenticationToken = {
-        uuid: randomUUID(),
-        issued: new Date().toString(),
+        uuid: existingToken?.uuid || randomUUID(),
+        issued: existingToken?.uuid || new Date().toString(),
+        updated: new Date().toString(),
         user: user?.['name'] || user?.['email'],
         id: user._id.toString(),
         role: user.role,
@@ -50,13 +52,23 @@ export function verifyToken(token: string | any): Promise<AuthenticationToken> {
 }
 
 
+// export async function updateToken(token: string | AuthenticationToken | any) {
+//     if (!token) return;
+//     if (typeof token == 'string' || (typeof token == 'object' && 'headers' in token))
+//         return await verifyToken(token);
+//     const data: AuthenticationToken = token;
+//     const doc = await UserModel.findById(data.user);
+//     return createToken(doc, data);
+// }
+
+
 interface AuthCheckOptions {
     not?: boolean | AuthCheckOptions;
     role?: UserDocument['role'][];
 }
 
 
-function MatchesOptions(token: AuthenticationToken, opts: AuthCheckOptions) {
+function MatchesOptions(token: AuthenticationToken, opts: AuthCheckOptions): AuthenticationToken | false {
     let ok = true;
     if (opts?.role && !opts.role.includes(token.role)) ok = false;
     if (opts?.not && typeof opts.not == 'object') {
@@ -65,8 +77,11 @@ function MatchesOptions(token: AuthenticationToken, opts: AuthCheckOptions) {
     return ok ? token : false;
 }
 
-export function isAuthenticated(opts: AuthCheckOptions, token?: any) {
-    const check = function(token: any) {
+export function isAuthenticated(opts: AuthCheckOptions): (token: any) => (AuthenticationToken | false);
+export function isAuthenticated(opts: AuthCheckOptions, token: any): AuthenticationToken | false;
+export function isAuthenticated(...args: any[]) {
+    let [opts, token] = args;
+    const check = function (token: any) {
         if (!token) return false;
         if (typeof token != 'string') {
             return check(token?.['cookies']?.['auth'])
@@ -74,7 +89,7 @@ export function isAuthenticated(opts: AuthCheckOptions, token?: any) {
         try {
             const data: AuthenticationToken = jwt.verify(token, JWT_SECRET) as any;
             return MatchesOptions(data, opts);
-        } catch(e) {
+        } catch (e) {
             return false;
         }
     };
