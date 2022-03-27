@@ -156,8 +156,8 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
             const headers = req['headers'];
             obj = {
                 ...defaults,
-                action: headers?.['X-Audit-Log-Action'] || defaults?.['action'],
-                reason: headers?.['X-Audit-Log-Reason'] || defaults?.['reason'],
+                action: headers?.['x-audit-log-action'] || defaults?.['action'],
+                reason: headers?.['x-audit-log-reason'] || defaults?.['reason'],
             };
         }
         if (obj) {
