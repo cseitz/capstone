@@ -62,7 +62,7 @@ function MatchesOptions(token: AuthenticationToken, opts: AuthCheckOptions) {
     if (opts?.not && typeof opts.not == 'object') {
         if (MatchesOptions(token, opts.not)) ok = false;
     } else if (ok == Boolean(opts.not)) return false;
-    return ok;
+    return ok ? token : false;
 }
 
 export function isAuthenticated(opts: AuthCheckOptions, token?: any) {
