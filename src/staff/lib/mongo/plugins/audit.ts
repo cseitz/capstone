@@ -15,6 +15,7 @@ export interface AuditSchema<Data = {}> {
     commit(action: string, reason?: string, details?: Partial<AuditDetails<Data>>): void;
     commit(action: string, details?: Partial<AuditDetails<Data>>): void;
     commit(details?: Partial<AuditDetails<Data>>): void;
+    commitWith(req: { headers: IncomingHttpHeaders }, defaults: Partial<AuditDetails<Data>>);
     audit(details: Partial<AuditDetails<Data>>): void;
 }
 
@@ -149,6 +150,21 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
         this.$commit(details);
     })
 
+    schema.method('commitWith', function(req: any, defaults: Partial<AuditDetails<Data>>) {
+        let obj: Partial<AuditDetails<Data>>;
+        if ('headers' in req) {
+            const headers = req['headers'];
+            obj = {
+                ...defaults,
+                action: headers?.['X-Audit-Log-Action'] || defaults?.['action'],
+                reason: headers?.['X-Audit-Log-Reason'] || defaults?.['reason'],
+            };
+        }
+        if (obj) {
+            return this.commit(obj);
+        }
+    })
+
 
     schema.pre('validate', async function (next) {
         if (this?._audit?.ready) await this._audit.ready;
@@ -224,6 +240,8 @@ function differingPaths(A: any = {}, B: any = {}, depth: string[] = []) {
 // Schema for Audit Logs
 import { UserData, UserDocument, UserModel } from '../schema/user';
 import { TimestampData, TimestampOptions, TimestampPlugin } from "./timestamped";
+import { NextApiRequest } from "next";
+import { IncomingHttpHeaders } from "http";
 
 type AuditMethod = keyof typeof AuditMethodTypes;
 enum AuditMethodTypes {
