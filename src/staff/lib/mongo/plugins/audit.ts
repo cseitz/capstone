@@ -245,7 +245,6 @@ function differingPaths(A: any = {}, B: any = {}, depth: string[] = []) {
 // Schema for Audit Logs
 import { UserData, UserDocument, UserModel } from '../schema/user';
 import { TimestampData, TimestampOptions, TimestampPlugin } from "./timestamped";
-import { NextApiRequest } from "next";
 import { IncomingHttpHeaders } from "http";
 import getConfig from "next/config";
 
