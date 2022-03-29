@@ -301,4 +301,3 @@ interface QueryHelpers {
 
 export type AuditLogDocument = HydratedDocument<AuditLogSchema>;
 export const AuditLogModel = models?.['AuditLog'] || model<AuditLogSchema, Model<AuditLogSchema, QueryHelpers>>('AuditLog', schema);
-
