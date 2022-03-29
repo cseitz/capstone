@@ -40,7 +40,7 @@ export function Contact(){
             console.log(res);
             if (!res.ok) throw (await res.json())?.error;
             // alert('registered');
-            router.push('/');
+            // router.push('/');
         })
         .catch(err => {
             setSubmitting(false);
