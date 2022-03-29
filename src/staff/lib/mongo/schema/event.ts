@@ -4,28 +4,45 @@ import { AuditData, AuditPlugin, AuditSchema } from "../plugins/audit";
 import 'lib/mongo';
 import { IntegrationInstructionsRounded } from "@mui/icons-material";
 import { integerPropType } from "@mui/utils";
+import { UserData } from "./user"
 
 export interface EventData
-extends TimestampData, AuditData {
+    extends TimestampData, AuditData {
     id: string;
     // username: string;
-    eventname: string;
+    title: string;
     description: string;
-    signups: userid[];
+    startsAt: any;
+    endsAt: any;
+    type: string,
+    signups: (UserData | string)[];
 }
 
 const schema = new Schema<EventData>({
-    eventname: {
+    title: {
         type: String,
         required: true,
     },
     description: {
         type: String,
+    },
+    startsAt: {
+        type: Date,
         required: true,
     },
-    signups: {
-        
-    }
+    endsAt: {
+        type: Date,
+        required: true,
+    },
+    type: {
+        type: String,
+    },
+    signups: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        }
+    ]
 }, {
     ...TimestampOptions
 })
@@ -36,7 +53,7 @@ schema.set('toJSON', {
 
 //** Apply Plugins */
 interface EventSchema
-extends EventData, AuditSchema {}
+    extends EventData, AuditSchema { }
 
 schema.plugin(TimestampPlugin);
 schema.plugin(AuditPlugin);
