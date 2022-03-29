@@ -4,10 +4,12 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import { Typography } from '@mui/material'
 import { useRouter } from 'next/router';
+import { useFeedback } from '../../../staff/ui/components/feedback';
 
 export function Contact(){
     //Form Fields
     const router = useRouter();
+    const feedback = useFeedback();
     const [name, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [subject, setSubject] = useState("");
@@ -40,7 +42,10 @@ export function Contact(){
             console.log(res);
             if (!res.ok) throw (await res.json())?.error;
             // alert('registered');
-            // router.push('/');
+            feedback.success({
+                message: 'Message Submitted'
+            });
+            router.push('/');
         })
         .catch(err => {
             setSubmitting(false);
