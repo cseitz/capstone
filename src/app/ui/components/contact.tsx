@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import Box from '@mui/material/Box'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import { Typography } from '@mui/material'
+import { Button, CircularProgress, Grid, Paper, Step, StepContent, StepLabel, Stepper, TextField, Typography } from "@mui/material";
 import { useRouter } from 'next/router';
-import { useFeedback } from '../../../staff/ui/components/feedback';
-
+import CheckIcon from '@mui/icons-material/Check';
 
 export function Contact(){
     //Form Fields
     const router = useRouter();
-    const feedback = useFeedback();
     const [name, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [subject, setSubject] = useState("");
@@ -19,7 +15,7 @@ export function Contact(){
     const [errors, setErrors] = useState<{ [key: string]: string }>(null);
     const [status, setStatus] = useState<string>(null);
     const [submitting, setSubmitting] = useState(false);
-
+    const [doneSubmitting, setDoneSubmitting] = useState(false);
     function handleSubmit(e) {
         e.preventDefault();
         const err: typeof errors = {};
@@ -42,14 +38,11 @@ export function Contact(){
         }).then(async res => {
             console.log(res);
             if (!res.ok) throw (await res.json())?.error;
-            // alert('registered');
-            feedback.success({
-                message: 'Message Submitted'
-            });
-            router.push('/');
+            //router.push('/');
         })
         .catch(err => {
             setSubmitting(false);
+            setDoneSubmitting(false);
             //setStatus(err);
             console.log(err);
         })
@@ -58,6 +51,16 @@ export function Contact(){
     }
 
     return (
+    submitting ? 
+    <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50}}>
+        <CircularProgress />
+    </Box>
+    :
+    doneSubmitting ? 
+    <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50}}>
+        <CheckIcon />
+    </Box>
+    :
     <Box>
         <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center'}}>
             <Typography  variant="h3" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 25 }} >Contact Us</Typography>
