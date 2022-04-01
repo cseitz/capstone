@@ -14,7 +14,7 @@ export default Route<AuthenticationLoginResponse>(async (req, res) => {
     if (method != 'POST')
         throw new StatusError(405, 'Method Not Allowed');
     const { body: { email, username, password } } = req;
-    const user = await UserModel.findOne(email ? { email } : { username });
+    const user = await UserModel.findOne(email ? { email: email.toLowerCase().trim() } : { username: username.toLowerCase().trim() });
     if (user) {
         try {
             if (await compare(password, user.password)) {
@@ -23,6 +23,7 @@ export default Route<AuthenticationLoginResponse>(async (req, res) => {
                     token,
                 })
             }
+            throw new StatusError(500, 'Incorrect Password');
         } catch(e) {
             throw new StatusError(500, 'Incorrect Password');
         }

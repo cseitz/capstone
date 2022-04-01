@@ -1,5 +1,4 @@
 
-export { }
 
 function getCookie(name) {
     if (typeof window == 'undefined') return undefined;
@@ -20,8 +19,8 @@ function getCookie(name) {
     // because unescape has been deprecated, replaced with decodeURI
     //return unescape(dc.substring(begin + prefix.length, end));
     return decodeURI(dc.substring(begin + prefix.length, end));
-}
+} 
 
-export function isLoggedIn() {
-    return Boolean(getCookie('auth'))
+export function isAuthenticated() {
+    return getCookie('auth');
 }

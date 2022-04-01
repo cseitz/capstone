@@ -121,6 +121,9 @@ jobs:
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
             cd /root/capstone/src/app
+            git stash
+            git fetch
+            git pull
             npm install
             pm2 restart app
             exit
@@ -187,6 +190,9 @@ jobs:
           #passphrase: ${{ secrets.KEY_PASSPHRASE }}
           script: |
             cd /root/capstone/src/staff
+            git stash
+            git fetch
+            git pull
             npm install
             pm2 restart staff
             exit

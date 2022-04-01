@@ -16,11 +16,11 @@ export default Route<AuthenticationRegisterResponse>(async (req, res) => {
     if (await UserModel.findOne({ email }))
         throw new StatusError(500, 'Account already exists');
     const user = new UserModel({
-        email,
-        password,
+        email: email.toLowerCase().trim(),
+        password: password.trim(),
         info: {
-            firstName,
-            lastName
+            firstName: firstName.trim(),
+            lastName: lastName.trim()
         }
     });
     await user.audit({
