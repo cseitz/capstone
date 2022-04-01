@@ -1,10 +1,10 @@
 import { isAuthenticated } from "lib/auth";
-import { EventDocument, EventModel, EventData } from "lib/mongo/schema/event";
+import { EventModel, EventData } from "lib/mongo/schema/event";
 import { Route, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export interface EventResponse {
-    event?: EventDocument
+    event?: EventData
 }
 
 const isStaff = isAuthenticated({

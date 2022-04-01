@@ -1,11 +1,11 @@
 import { isAuthenticated } from "lib/auth";
-import { EventDocument, EventModel, EventData } from "lib/mongo/schema/event";
+import { EventModel, EventData } from "lib/mongo/schema/event";
 import { Route, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
 
 //Exports list of tickets
 export interface EventListResponse {
-    events: EventDocument[]
+    events: EventData[]
 }
 
 //makes sure the request is coming from an authenticated user
