@@ -2,6 +2,7 @@ import { HydratedDocument, Model, model, models, Schema, isValidObjectId, connec
 import { isEqual, isPlainObject, reduce, get } from "lodash";
 import { inspect } from 'util';
 import { relative } from 'path';
+import { TimestampOptions } from './timestamped'
 
 const DEBUG = false;
 
@@ -239,7 +240,7 @@ function differingPaths(A: any = {}, B: any = {}, depth: string[] = []) {
 
 // Schema for Audit Logs
 import { UserData, UserDocument, UserModel } from '../schema/user';
-import { TimestampData, TimestampOptions, TimestampPlugin } from "./timestamped";
+import { TimestampData, TimestampPlugin } from "./timestamped";
 import { NextApiRequest } from "next";
 import { IncomingHttpHeaders } from "http";
 
