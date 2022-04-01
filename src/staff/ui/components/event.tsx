@@ -1,11 +1,14 @@
-import { Box, Card, CardProps, Checkbox, List, ListItem, ListItemButton, ListItemText, Modal, Typography } from "@mui/material";
+import { Box, Card, CardHeader, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography } from "@mui/material";
 import { EventListResponse } from "pages/api/events";
 import { EventResponse } from "pages/api/events/[id]";
 import { useEffect, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { useAlert } from "./alert";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import TodayIcon from '@mui/icons-material/Today';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 
-function EventCard(props: {
+export function EventCard(props: {
     event: string;
 } & CardProps) {
     const { event: id, ...cardProps } = props;
@@ -14,20 +17,29 @@ function EventCard(props: {
         fetch('/api/events/' + id).then(res => res.json())
     ));
     const { event } = data || {};
-    if (isLoading) return <Card {...cardProps} />;
     const alert = useAlert();
     useEffect(() => {
+        if(!isLoading){return;}
         alert.success({
             message: 'Loaded Event ' + event?.title || "[Missing title]",
             duration: 2000,
         })
-    }, []);
+    }, [isLoading]);
+    if (isLoading) return <Card {...cardProps} />;
     return <>
-        <Card { ...cardProps }></Card>
+        <Card { ...cardProps }>
+            <CardHeader {...{
+                title: event.title
+            }} action={<IconButton>
+                <MoreVertIcon />
+            </IconButton>} />
+            
+
+        </Card>
     </>
 }
 
-function EventListItem(props: { event: string, onClick?: (event: string) => void }) {
+export function EventListItem(props: { event: string, onClick?: (event: string) => void }) {
     const { onClick = (event: string) => { }, } = props;
     const { isLoading, error, data } = useQuery<EventResponse>(['event', props.event], () => (
         fetch('/api/events/' + props.event).then(res => res.json())
