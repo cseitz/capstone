@@ -26,6 +26,11 @@ const items: {
             icon: <HomeIcon />
         },
         {
+            name: "Exports",
+            url: "/api/exports/users",
+            icon: <HomeIcon />
+        },
+        {
             name: "Logout",
             url: "/logout",
             placement: 'right',
