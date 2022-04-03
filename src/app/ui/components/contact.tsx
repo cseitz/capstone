@@ -42,7 +42,7 @@ export function Contact(){
         })
         .catch(err => {
             setSubmitting(false);
-            setDoneSubmitting(false);
+            setDoneSubmitting(true);
             //setStatus(err);
             console.log(err);
         })

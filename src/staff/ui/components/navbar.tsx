@@ -6,6 +6,7 @@ import MailIcon from '@mui/icons-material/Mail';
 import Box from '@mui/material/Box';
 import Link from 'next/link'
 import HomeIcon from '@mui/icons-material/Home';
+import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import LoginIcon from '@mui/icons-material/Login';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
@@ -24,6 +25,11 @@ const items: {
             name: "Home",
             url: "/",
             icon: <HomeIcon />
+        },
+        {
+            name: "Tickets",
+            url: "/tickets",
+            icon: <ContactSupportIcon />
         },
         {
             name: "Logout",
