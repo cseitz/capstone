@@ -1,5 +1,6 @@
 import { Button, CircularProgress, FormControl, FormHelperText, FormLabel, Grid, Paper, RadioGroup, Step, StepContent, StepLabel, Stepper, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
+import { uniqueId } from "lodash";
 import { cloneElement, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 
@@ -39,17 +40,17 @@ type RegistrationData = {
 };
 
 function RegisterForm() {
-    const data: RegistrationData = {
-        email: '',
-        firstName: '',
-        lastName: '',
-        password: '',
-        confirmPassword: '',
+    const data: Partial<RegistrationData> = {
+        // email: '',
+        // firstName: '',
+        // lastName: '',
+        // password: '',
+        // confirmPassword: '',
     }
     return {
         data,
         useState<T = string>(key: keyof RegistrationData) {
-            const [value, setValue] = useLocalState<T>('register.' + key, this.data[key]);
+            const [value, setValue] = useLocalState<T>('register.' + key, this.data[key], undefined);
             useEffect(() => {
                 this.data[key] = value;
             }, [value]);
@@ -165,6 +166,21 @@ function ValidatedInput(props: {
     </FormControl>
 }
 
+const ValidationContext = createContext({
+    validatiors: []
+})
+function useValidation<T>(value: T, validate: (value: T) => string) {
+    const id = useMemo(uniqueId, []);
+    const [count, setCount] = useState(0);
+    const isValid = useMemo(() => {
+
+        return validate(value)
+    }, [value, count])
+    useEffect(() => {
+
+    }, [value])
+    return [isValid, () => { setCount(count + 1); return validate(value) }];
+}
 
 steps.push({
     title: 'Account',
@@ -178,8 +194,11 @@ steps.push({
 
         const [issues, setIssues] = useState<any>({});
         const [isValid, setIsValid] = useState(false);
+        const fields = [firstName, lastName, email, password, confirmPassword];
         const validate = useCallback(() => {
             const issues = {};
+            console.log('validate', { firstName, lastName, email, password, confirmPassword })
+            if (!password) issues['password'] = REQUIRED_TEXT;
             if (password != confirmPassword) {
                 issues['confirmPassword'] = 'Password does not match!'
             }
@@ -190,7 +209,17 @@ steps.push({
             setIssues(issues);
             setIsValid(Object.keys(issues).length == 0);
             return issues;
-        }, [firstName, lastName, email, password, confirmPassword]);
+        }, fields);
+        console.log({ issues })
+        useEffect(() => {
+            validate();
+        }, fields);
+        const errors = useMemo(() => {
+            return Object.fromEntries(
+                Object.entries(issues).filter(o => form.data[o[0]] != undefined)
+            )
+        }, [issues]);
+        console.log(errors);
 
         return <>
             <Typography variant="h5">Account Registration</Typography>
@@ -198,11 +227,10 @@ steps.push({
             <br />
             <Grid container spacing={2}>
                 <Grid item xs={6}>
-                    {/* <TextField label="First Name" type="text" placeholder="First Name" value={firstName} onChange={({ target: { value } }) => setFirstName(value)} onBlur={() => firstName && validate()} fullWidth /> */}
-                    <ValidatedInput label="First Name" onChange={setFirstName} value={firstName} required>
+                    <TextField label="First Name" type="text" placeholder="First Name" value={firstName} onChange={({ target: { value } }) => setFirstName(value)} fullWidth />
+                    {/* <ValidatedInput label="First Name" onChange={setFirstName} value={firstName} required>
                         <TextField type="text" fullWidth />
-                        {/* <RadioGroup /> */}
-                    </ValidatedInput>
+                    </ValidatedInput> */}
                 </Grid>
                 <Grid item xs={6}>
                     <TextField label="Last Name" type="text" placeholder="Last Name" value={lastName} onChange={({ target: { value } }) => setLastName(value)} fullWidth />
