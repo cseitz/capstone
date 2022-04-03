@@ -8,6 +8,7 @@ import Link from 'next/link'
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
@@ -30,6 +31,11 @@ const items: {
             name: "FAQ",
             url: "/#faq",
             icon: <LiveHelpIcon />
+        },
+        {
+            name: "Contact",
+            url: "/contact",
+            icon: <ContactSupportIcon />
         },
         {
             name: "Login",

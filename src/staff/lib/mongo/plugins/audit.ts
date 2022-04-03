@@ -2,7 +2,7 @@ import { HydratedDocument, Model, model, models, Schema, isValidObjectId, connec
 import { isEqual, isPlainObject, reduce, get } from "lodash";
 import { inspect } from 'util';
 import { relative } from 'path';
-import { TimestampOptions } from './timestamped'
+import { TimestampOptions } from "./timestamped";
 
 const DEBUG = false;
 
@@ -45,6 +45,8 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
 
     // Create the discriminated audit log model
     let AuditLog: any;
+    let doInitialized;
+    const initialized = new Promise((resolve) => { doInitialized = resolve });
     const initalize = function () {
         let model: Model<typeof schema>;
         for (const key in models) {
@@ -53,7 +55,9 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
             }
         }
         if (!model) return setTimeout(initalize, 100);
-        AuditLog = AuditLogModel.discriminator<AuditLogData<Data>>(model.modelName + 'AuditLog', extendedSchema);
+        AuditLog = getConfig()?.serverRuntimeConfig?.[model.modelName + 'AuditLog'] || AuditLogModel.discriminator<AuditLogData<Data>>(model.modelName + 'AuditLog', extendedSchema);
+        getConfig().serverRuntimeConfig[model.modelName + 'AuditLog'] = AuditLog;
+        doInitialized();
     }
     if (connection.readyState === 1) initalize();
     connection.on('connected', initalize);
@@ -127,7 +131,8 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
 
     })
 
-    schema.method('audit', function (details: Details) {
+    schema.method('audit', async function (details: Details) {
+        await initialized;
         this.$initAudit();
         const prom = new Promise(async (resolve) => {
             if (this.isNew && details) details.method = 'create';
@@ -136,7 +141,7 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
             // console.log('deets', this._audit.details);
         });
         this._audit.ready = prom;
-        return prom;
+        return await prom;
     })
 
     schema.method('commit', function (...args: any[]) {
@@ -241,8 +246,8 @@ function differingPaths(A: any = {}, B: any = {}, depth: string[] = []) {
 // Schema for Audit Logs
 import { UserData, UserDocument, UserModel } from '../schema/user';
 import { TimestampData, TimestampPlugin } from "./timestamped";
-import { NextApiRequest } from "next";
 import { IncomingHttpHeaders } from "http";
+import getConfig from "next/config";
 
 type AuditMethod = keyof typeof AuditMethodTypes;
 enum AuditMethodTypes {
@@ -297,4 +302,3 @@ interface QueryHelpers {
 
 export type AuditLogDocument = HydratedDocument<AuditLogSchema>;
 export const AuditLogModel = models?.['AuditLog'] || model<AuditLogSchema, Model<AuditLogSchema, QueryHelpers>>('AuditLog', schema);
-
