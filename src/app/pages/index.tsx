@@ -3,6 +3,7 @@ import { alignProperty, convertLength } from "@mui/material/styles/cssUtils";
 import Card from '@mui/material/Card';
 import { Box } from "@mui/system";
 import { FAQ } from "ui/components/faq";
+import Link from "next/link";
 
 const Data = {
     Landing: {
@@ -29,15 +30,17 @@ function LandingPage() {
         </Box>
         <Box id="lading-content-container" style={{ textAlign: 'center' }}>
             <Typography variant="h4">{Subtitle}</Typography>
-            <Button variant="contained" color="secondary" sx={{ m: 2 }}>
-                <Typography variant="h6">Register Here</Typography>
-            </Button>
+            <Link href={'/register'}>
+                <Button variant="contained" color="secondary" sx={{ m: 2 }}>
+                    <Typography variant="h6">Register Here</Typography>
+                </Button>
+            </Link>
         </Box>
     </Box>
 }
 
 function AboutPage() {
-    const { About, Landing: { Title} } = Data;
+    const { About, Landing: { Title } } = Data;
     const { Info, Content, Image, BackgroundImage } = About;
     return <Box sx={{ backgroundColor: 'lightpink', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
         <Typography variant="h3" style={{ textAlign: 'left', padding: '20px' }}>{Title}</Typography>
@@ -53,7 +56,7 @@ function AboutPage() {
 }
 
 function FAQPage() {
-    return <Box id="faq" sx={{ backgroundColor: 'cornsilk',  width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", alignContent: 'center', textAlign: 'center', pt: 5 }}>
+    return <Box id="faq" sx={{ backgroundColor: 'cornsilk', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", alignContent: 'center', textAlign: 'center', pt: 5 }}>
         <Typography variant="h3">FAQ</Typography>
         <Box style={{ margin: 'auto', width: 'min(800px, 80vw)', paddingTop: '100px' }}>
             <FAQ />
