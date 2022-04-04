@@ -39,6 +39,7 @@ function RegisterForm() {
     const form = {
         data,
         errors: {},
+        continue: false,
         validate: (force: boolean = false) => { return {} },
         useState<T = string>(key: keyof RegistrationData | string) {
             const [value, setValue] = useLocalState<T>('register.' + key, form.data[key], undefined);
@@ -66,6 +67,8 @@ function RegisterForm() {
             form.reset(false);
         }
     }
+    // @ts-ignore
+    form.errors.untouched = 'untouched';
     return form;
 }
 
@@ -97,6 +100,7 @@ export default function RegisterPage() {
         .catch(err => {
             setSubmitting(false);
             setStatus(err);
+            form.reset(false);
         })
     }
 
@@ -116,7 +120,7 @@ export default function RegisterPage() {
                         <StepContent>
                             {S.content({ ...S, index, active: activeStep == index })}
                             <Box sx={isLast ? { maxWidth: '300px', mx: 'auto', mt: 2 } : { mt: 2 }}>
-                                <Button disabled={submitting || Object.keys(form.errors || {}).length != 0} variant="contained" onClick={() => Object.keys(form.validate(true) || {}).length == 0 && (activeStep == steps.length - 1 ? submit() : setActiveStep(activeStep + 1))} sx={{ mt: 1, float: 'right' }} fullWidth={isLast}>
+                                <Button disabled={submitting || Object.keys(form.errors || {}).length != 0 || !form.continue} variant="contained" onClick={() => Object.keys(form.validate(true) || {}).length == 0 && (activeStep == steps.length - 1 ? submit() : setActiveStep(activeStep + 1))} sx={{ mt: 1, float: 'right' }} fullWidth={isLast}>
                                     {isLast ? 'Register' : 'Continue'}
                                 </Button>
                                 <Button variant="text" onClick={() => setActiveStep(activeStep - 1)} disabled={index === 0} sx={{ mt: 1, float: 'left' }} fullWidth={isLast}>
@@ -167,6 +171,7 @@ steps.push({
             if (!lastName) issues['lastName'] = REQUIRED_TEXT;
             if (!email) issues['email'] = REQUIRED_TEXT;
             else if (!/\S+@\S+\.\S+/.test(email)) issues['email'] = 'Not a valid email!';
+            form.continue = Object.keys(issues).length == 0;
             if (!force) issues = Object.fromEntries(
                 Object.entries(issues).filter(o => form.data[o[0]] != undefined)
             );
@@ -176,16 +181,20 @@ steps.push({
         }, fields);
         // console.log({ issues })
         useEffect(() => {
+            if (step.active) {
+                form.errors = errors;
+                form.validate = validate;
+            }
             const timeout = setTimeout(validate, 500);
             return () => clearTimeout(timeout);
         }, fields);
-        if (step.active) {
-            form.errors = errors;
-            form.validate = validate;
-        }
+        
         
 
         console.log(errors);
+        if (step.active) {
+            form.continue = Object.keys(errors).length == 0;
+        }
 
         return <>
             <Typography variant="h5">Account Registration</Typography>
@@ -218,8 +227,11 @@ steps.push({
     content: (step) => {
         const form = useContext(RegisterContext);
         const { firstName, lastName, email, password } = form.data;
+
         form.errors = {};
+        form.continue = true;
         form.validate = (force = false) => ({});
+        
         return <>
             <Typography variant="h5">Review</Typography>
             <Typography>Please confirm all fields look correct.</Typography>
