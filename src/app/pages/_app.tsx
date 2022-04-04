@@ -7,7 +7,7 @@ import { NavBar } from "../ui/components/navbar";
 import '../ui/styles/global.scss';
 
 export default function App({ Component, pageProps }: AppProps) {
-    const prefersDarkMode = useMediaQuery(`(prefers-color-scheme: dark)`);
+    const prefersDarkMode = false; //useMediaQuery(`(prefers-color-scheme: dark)`);
     const theme = useMemo(() => {
         return createTheme({
             palette: {

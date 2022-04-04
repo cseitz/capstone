@@ -134,7 +134,7 @@ export function NavBar() {
     const isMobile = useMediaQuery('(max-width:600px)');
     return <>
         <HideOnScroll>
-            <AppBar position="sticky" style={{ backgroundColor: "black", color: "white", boxShadow: "0px 0px 0px 0px" }}>
+            <AppBar position="sticky" style={{ boxShadow: "0px 0px 0px 0px" }}>
                 <Toolbar>
                     <IconButton
                         onClick={handleDrawer}

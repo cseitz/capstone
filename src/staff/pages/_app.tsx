@@ -14,6 +14,9 @@ export default function App({ Component, pageProps }: AppProps) {
                 mode: prefersDarkMode ? 'dark' : 'light',
                 background: {
                     default: prefersDarkMode ? '#35363a' : 'white',
+                },
+                primary: {
+                    main: '#1976d2'
                 }
             },
             components: {
