@@ -1,13 +1,13 @@
-import { Button, CircularProgress, FormControl, FormHelperText, FormLabel, Grid, Paper, RadioGroup, Step, StepContent, StepLabel, Stepper, TextField, Typography } from "@mui/material";
+import { Button, CircularProgress, Grid, Paper, Step, StepContent, StepLabel, Stepper, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { uniqueId } from "lodash";
-import { cloneElement, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-
+import { cloneElement, createContext, useCallback, useContext, useEffect, useState } from "react";
+import type { RegistrationData } from 'schema/user';
 
 const steps: {
     title: string;
     optional?: boolean;
-    content: (step: (typeof steps[number]) & { index: number }) => JSX.Element
+    content: (step: (typeof steps[number]) & { index: number, active: boolean }) => JSX.Element
 }[] = [];
 
 
@@ -31,28 +31,18 @@ function useLocalState<T = string>(key: string, defaultValue: T, caster: (value:
 
 const RegisterContext = createContext<ReturnType<typeof RegisterForm>>(RegisterForm());
 
-type RegistrationData = {
-    email: string;
-    firstName: string;
-    lastName: string;
-    password: string;
-    confirmPassword: string;
-};
-
 function RegisterForm() {
     const data: Partial<RegistrationData> = {
-        // email: '',
-        // firstName: '',
-        // lastName: '',
-        // password: '',
-        // confirmPassword: '',
+
     }
-    return {
+    const form = {
         data,
-        useState<T = string>(key: keyof RegistrationData) {
-            const [value, setValue] = useLocalState<T>('register.' + key, this.data[key], undefined);
+        errors: {},
+        validate: (force: boolean = false) => { return {} },
+        useState<T = string>(key: keyof RegistrationData | string) {
+            const [value, setValue] = useLocalState<T>('register.' + key, form.data[key], undefined);
             useEffect(() => {
-                this.data[key] = value;
+                form.data[key] = value;
             }, [value]);
             return [value, setValue] as [T, typeof setValue]
         },
@@ -66,17 +56,22 @@ function RegisterForm() {
             }
             if (reload) location.reload();
         },
+        submitted: false,
         submit() {
-            console.log(this.data);
-            this.reset(false);
+            if (this.submitted) return;
+            this.submitted = true;
+            // fetch('/api/')
+            console.log('submit', form.data);
+            form.reset(false);
         }
     }
+    return form;
 }
 
 export default function RegisterPage() {
     const [activeStep, setActiveStep] = useState(0);
     const form = useContext(RegisterContext);
-    const { showReset } = form;
+    const { showReset, reset, submit } = form;
     return <Box sx={{ mb: 3, mt: 10 }}>
         <Box sx={{ margin: 'auto', width: 'min(500px, 90vw)', textAlign: 'center' }}>
             <Typography variant="h3" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 25, marginBottom: 25 }}>
@@ -90,9 +85,9 @@ export default function RegisterPage() {
                             {S.title}
                         </StepLabel>
                         <StepContent>
-                            {S.content({ ...S, index })}
+                            {S.content({ ...S, index, active: activeStep == index })}
                             <Box sx={isLast ? { maxWidth: '300px', mx: 'auto', mt: 2 } : { mt: 2 }}>
-                                <Button variant="contained" onClick={() => activeStep == steps.length - 1 ? form.submit() : setActiveStep(activeStep + 1)} sx={{ mt: 1, float: 'right' }} fullWidth={isLast}>
+                                <Button disabled={Object.keys(form.errors || {}).length != 0} variant="contained" onClick={() => Object.keys(form.validate(true) || {}).length == 0 && (activeStep == steps.length - 1 ? submit() : setActiveStep(activeStep + 1))} sx={{ mt: 1, float: 'right' }} fullWidth={isLast}>
                                     {isLast ? 'Register' : 'Continue'}
                                 </Button>
                                 <Button variant="text" onClick={() => setActiveStep(activeStep - 1)} disabled={index === 0} sx={{ mt: 1, float: 'left' }} fullWidth={isLast}>
@@ -109,7 +104,7 @@ export default function RegisterPage() {
                 ) : ''}
             </Stepper>
             {showReset && activeStep != steps.length - 0 ? <>
-                <Button onClick={() => form.reset(true)} sx={{ mt: 2, mb: 1 }}>
+                <Button onClick={() => reset(true)} sx={{ mt: 2, mb: 1 }}>
                     Reset Form
                 </Button>
             </> : ''}
@@ -117,70 +112,7 @@ export default function RegisterPage() {
     </Box>
 }
 
-
 const REQUIRED_TEXT = 'This field is required!';
-function ValidatedInput(props: {
-    children: any,
-    label?: string,
-    value?: any,
-    onChange?: any,
-    validate?: (value: any) => string,
-    required?: boolean,
-    enforced?: boolean,
-}) {
-    let { children, label, value, onChange, validate, required, enforced } = props;
-    if (required) {
-        validate = (value: string) => value ? (props.validate ? props.validate(value) : undefined) : REQUIRED_TEXT;
-    }
-    if (onChange) onChange = props.onChange ? ({ target }) => props.onChange((target as any).value) : undefined;
-    const [touched, setTouched] = useState(enforced);
-    if (enforced && !touched) setTouched(true);
-    let error = useMemo(() => validate(value), [value]);
-    if (!touched) error = undefined;
-    const isValid = !error || !touched;
-    useEffect(() => {
-        console.log('changed', value);
-        if (!touched && value) setTouched(true);
-    }, [value]);
-    const passed = {
-        label,
-        placeholder: label,
-        onChange,
-        value,
-        error: !isValid,
-        helperText: error
-    }
-    const failed = {}
-    for (const key in passed) {
-        if (!children?.type?.propTypes?.[key]) {
-            failed[key] = passed[key];
-            delete passed[key];
-        }
-    }
-    console.log({ failed })
-    const element = cloneElement(children, passed);
-    return <FormControl error={Boolean(error)}>
-        {label && failed?.['label'] ? <FormLabel>{label}</FormLabel> : ''}
-        {element}
-        {error && failed?.['helperText'] ? <FormHelperText>{error}</FormHelperText> : ''}
-    </FormControl>
-}
-
-const ValidationContext = createContext({
-    validatiors: []
-})
-function useValidation<T>(value: T, validate: (value: T) => string) {
-    const id = useMemo(uniqueId, []);
-    const [count, setCount] = useState(0);
-    const isValid = useMemo(() => {
-
-        return validate(value)
-    }, [value, count])
-    useEffect(() => {
-
-    }, [value])
-    return [isValid, () => { setCount(count + 1); return validate(value) }];
-}
 
 steps.push({
     title: 'Account',
@@ -192,12 +124,12 @@ steps.push({
         const [password, setPassword] = form.useState('password');
         const [confirmPassword, setConfirmPassword] = form.useState('confirmPassword');
 
-        const [issues, setIssues] = useState<any>({});
+        const [errors, setErrors] = useState<any>({});
         const [isValid, setIsValid] = useState(false);
         const fields = [firstName, lastName, email, password, confirmPassword];
-        const validate = useCallback(() => {
-            const issues = {};
-            console.log('validate', { firstName, lastName, email, password, confirmPassword })
+        const validate = useCallback((force: boolean = false) => {
+            let issues = {};
+            // console.log('validate', { firstName, lastName, email, password, confirmPassword })
             if (!password) issues['password'] = REQUIRED_TEXT;
             if (password != confirmPassword) {
                 issues['confirmPassword'] = 'Password does not match!'
@@ -206,19 +138,24 @@ steps.push({
             if (!lastName) issues['lastName'] = REQUIRED_TEXT;
             if (!email) issues['email'] = REQUIRED_TEXT;
             else if (!/\S+@\S+\.\S+/.test(email)) issues['email'] = 'Not a valid email!';
-            setIssues(issues);
+            if (!force) issues = Object.fromEntries(
+                Object.entries(issues).filter(o => form.data[o[0]] != undefined)
+            );
+            setErrors(issues);
             setIsValid(Object.keys(issues).length == 0);
             return issues;
         }, fields);
-        console.log({ issues })
+        // console.log({ issues })
         useEffect(() => {
-            validate();
+            const timeout = setTimeout(validate, 500);
+            return () => clearTimeout(timeout);
         }, fields);
-        const errors = useMemo(() => {
-            return Object.fromEntries(
-                Object.entries(issues).filter(o => form.data[o[0]] != undefined)
-            )
-        }, [issues]);
+        if (step.active) {
+            form.errors = errors;
+            form.validate = validate;
+        }
+        
+
         console.log(errors);
 
         return <>
@@ -227,22 +164,19 @@ steps.push({
             <br />
             <Grid container spacing={2}>
                 <Grid item xs={6}>
-                    <TextField label="First Name" type="text" placeholder="First Name" value={firstName} onChange={({ target: { value } }) => setFirstName(value)} fullWidth />
-                    {/* <ValidatedInput label="First Name" onChange={setFirstName} value={firstName} required>
-                        <TextField type="text" fullWidth />
-                    </ValidatedInput> */}
+                    <TextField label="First Name" type="text" placeholder="First Name" value={firstName} onChange={({ target: { value } }) => setFirstName(value)} fullWidth error={Boolean(errors?.firstName)} helperText={errors?.firstName} />
                 </Grid>
                 <Grid item xs={6}>
-                    <TextField label="Last Name" type="text" placeholder="Last Name" value={lastName} onChange={({ target: { value } }) => setLastName(value)} fullWidth />
+                    <TextField label="Last Name" type="text" placeholder="Last Name" value={lastName} onChange={({ target: { value } }) => setLastName(value)} fullWidth error={Boolean(errors?.lastName)} helperText={errors?.lastName} />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField fullWidth type="email" name="email" placeholder='Email' label="Email" value={email} onChange={({ target: { value } }) => setEmail(value)} />
+                    <TextField fullWidth type="email" name="email" placeholder='Email' label="Email" value={email} onChange={({ target: { value } }) => setEmail(value)} error={Boolean(errors?.email)} helperText={errors?.email} />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField fullWidth type="password" name="password" placeholder='Password' label="Password" value={password} onChange={({ target: { value } }) => setPassword(value)} />
+                    <TextField fullWidth type="password" name="password" placeholder='Password' label="Password" value={password} onChange={({ target: { value } }) => setPassword(value)} error={Boolean(errors?.password)} helperText={errors?.password} />
                 </Grid>
                 <Grid item xs={12}>
-                    <TextField fullWidth type="password" name="confirmPassword" placeholder='Confirm Password' label="Confirm Password" value={confirmPassword} onChange={({ target: { value } }) => setConfirmPassword(value)} />
+                    <TextField fullWidth type="password" name="confirmPassword" placeholder='Confirm Password' label="Confirm Password" value={confirmPassword} onChange={({ target: { value } }) => setConfirmPassword(value)} error={Boolean(errors?.confirmPassword)} helperText={errors?.confirmPassword} />
                 </Grid>
             </Grid>
         </>
@@ -251,32 +185,27 @@ steps.push({
 })
 
 steps.push({
-    title: 'Demographics',
-    content: (step) => {
-
-        return <>
-            <Typography variant="h5">Demographics</Typography>
-            <Typography>Please fill out the following fields.</Typography>
-        </>
-    }
-})
-
-steps.push({
-    title: 'Preferences',
-    content: (step) => {
-
-        return <>
-            <Typography variant="h5">Preferences</Typography>
-            <Typography>Please fill out the following fields.</Typography>
-        </>
-    }
-})
-
-steps.push({
     title: 'Review',
-    content: (step) => <>
-        <Typography variant="h5">Review</Typography>
-        <Typography>Please confirm all fields look correct.</Typography>
-        <Typography>(show fields)</Typography>
-    </>
+    content: (step) => {
+        const form = useContext(RegisterContext);
+        const { firstName, lastName, email, password } = form.data;
+        form.errors = {};
+        form.validate = (force = false) => ({});
+        return <>
+            <Typography variant="h5">Review</Typography>
+            <Typography>Please confirm all fields look correct.</Typography>
+            <br />
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                    <TextField disabled label="First Name" type="text" placeholder="First Name" value={firstName} fullWidth />
+                </Grid>
+                <Grid item xs={6}>
+                    <TextField disabled label="Last Name" type="text" placeholder="Last Name" value={lastName} fullWidth />
+                </Grid>
+                <Grid item xs={12}>
+                    <TextField disabled fullWidth type="email" name="email" placeholder='Email' label="Email" value={email} />
+                </Grid>
+            </Grid>
+        </>
+    }
 })
