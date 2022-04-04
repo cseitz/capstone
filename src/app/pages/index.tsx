@@ -60,8 +60,13 @@ function AboutPage() {
 function FAQPage() {
     return <Box id="faq" sx={{ backgroundColor: 'cornsilk', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", alignContent: 'center', textAlign: 'center', pt: 5 }}>
         <Typography variant="h3">FAQ</Typography>
-        <Box sx={{ margin: 'auto', width: 'min(800px, 80vw)', paddingTop: '100px' }}>
+        <Box sx={{ margin: 'auto', width: 'min(800px, 95vw)', mt: 2 }}>
             <FAQ />
+        </Box>
+        <Box sx={{ mt: 3 }}>
+            <Link href="/contact">
+                <Button variant="contained" color="inherit">Contact Us</Button>
+            </Link>
         </Box>
     </Box>
 }
