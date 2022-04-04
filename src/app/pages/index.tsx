@@ -10,7 +10,8 @@ const Data = {
         Title: "SAMPLE EVENT",
         Subtitle: "Feb 22nd 2022",
         BackgroundImage: "",
-        Logo: "http://divisqueeze.com/wp-content/uploads/2017/03/YourLogoHere.png",
+        // Logo: "http://divisqueeze.com/wp-content/uploads/2017/03/YourLogoHere.png",
+        Logo: '/assets/logo.png'
     },
     About: {
         Info: "Hey this is some info to put about the event here",
