@@ -4,7 +4,7 @@ import { Button, CircularProgress, Grid, Paper, Step, StepContent, StepLabel, St
 import { useRouter } from 'next/router';
 import CheckIcon from '@mui/icons-material/Check';
 
-export function Contact(){
+export function Contact() {
     //Form Fields
     const router = useRouter();
     const [name, setUsername] = useState("");
@@ -40,43 +40,43 @@ export function Contact(){
             if (!res.ok) throw (await res.json())?.error;
             //router.push('/');
         })
-        .catch(err => {
-            setSubmitting(false);
-            setDoneSubmitting(false);
-            //setStatus(err);
-            console.log(err);
-        })
+            .catch(err => {
+                setSubmitting(false);
+                setDoneSubmitting(false);
+                //setStatus(err);
+                console.log(err);
+            })
         console.log("name : " + name + "email: " + email)
         setStatus("Fill out the form")
     }
 
     return (
-    submitting ? 
-    <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50}}>
-        <CircularProgress />
-    </Box>
-    :
-    doneSubmitting ? 
-    <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50}}>
-        <CheckIcon />
-    </Box>
-    :
-    <Box>
-        <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center'}}>
-            <Typography  variant="h3" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 25 }} >Contact Us</Typography>
-            <Typography  variant="h6" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 15, marginBottom: 25 }} >If you have any questions, concerns, or problems, please do not hesitate to contact us. Someone will get back to you shortly.</Typography>
-            <TextField label="Name" type="text" name="name" fullWidth onChange={(e) => { setStatus(null); setUsername(e.target.value) }} placeholder="Name"/>
-            <br /><br />
-            <TextField label="Email" type="text" name="email" fullWidth onChange={(e) => { setStatus(null); setEmail(e.target.value) }}  placeholder="Email"/>
-            <br /><br />
-            <TextField label="Whats the topic?" type="text" name="subject" fullWidth onChange={(e) => { setStatus(null); setSubject(e.target.value) }} placeholder="Whats the topic?"/>
-            <br /><br />
-            <TextField label="Write your message here." type="text" name="message" fullWidth multiline minRows={2} onChange={(e) => { setStatus(null); setMessage(e.target.value) }} placeholder="Write your message here."/>
-            <br /><br />
-            <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Send</Button>
-            <br /><br />
-            {status ? <Typography id="errormessage" style={{ color: 'red', textAlign: 'center' }} >{status}</Typography> : ''}
-        </Box>
-    </Box>
+        submitting ? (
+            <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50 }}>
+                <CircularProgress />
+            </Box>
+        ) : (doneSubmitting ? (
+            <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50 }}>
+                <CheckIcon />
+            </Box>
+        ) : (
+            <Box>
+                <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center' }}>
+                    <Typography variant="h3" style={{ textAlign: 'center', fontWeight: 'bold', marginTop: 25 }} >Contact Us</Typography>
+                    <Typography style={{ textAlign: 'center', fontWeight: 'bold', marginTop: 15, marginBottom: 25 }} >If you have any questions, concerns, or problems, please do not hesitate to contact us. Someone will get back to you shortly.</Typography>
+                    <TextField label="Name" type="text" name="name" fullWidth onChange={(e) => { setStatus(null); setUsername(e.target.value) }} placeholder="Name" />
+                    <br /><br />
+                    <TextField label="Email" type="text" name="email" fullWidth onChange={(e) => { setStatus(null); setEmail(e.target.value) }} placeholder="Email" />
+                    <br /><br />
+                    <TextField label="Whats the topic?" type="text" name="subject" fullWidth onChange={(e) => { setStatus(null); setSubject(e.target.value) }} placeholder="Whats the topic?" />
+                    <br /><br />
+                    <TextField label="Write your message here." type="text" name="message" fullWidth multiline minRows={2} onChange={(e) => { setStatus(null); setMessage(e.target.value) }} placeholder="Write your message here." />
+                    <br /><br />
+                    <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Send</Button>
+                    <br /><br />
+                    {status ? <Typography sx={{ color: 'red', textAlign: 'center' }} >{status}</Typography> : ''}
+                </Box>
+            </Box>
+        ))
     )
 }

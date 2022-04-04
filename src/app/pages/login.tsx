@@ -25,9 +25,6 @@ export function LoginRegisterContainer(props: { variant: 'login' | 'register', c
     return <Box>
         <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center' }}>
             <Box sx={{ mb: 3, mt: 25 }}>
-                {/* <Typography variant="h3" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 25, marginBottom: 25 }}>
-                    {page == 'login' ? 'Login' : 'Register'}
-                </Typography> */}
                 <ButtonGroup fullWidth>
                     <Button variant={page == 'login' ? 'contained' : 'outlined'} onClick={() => setPage('login')}>
                         <Typography variant="h6">Login</Typography>
@@ -87,7 +84,7 @@ export default function LoginPage() {
             <br /><br />
             <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Log In</Button>
 
-            {status ? <Typography id="errormessage" sx={{ color: 'red', textAlign: 'center', mt: '1em' }} >{status}</Typography> : ''}
+            {status ? <Typography sx={{ color: 'red', textAlign: 'center', mt: '1em' }} >{status}</Typography> : ''}
             <a onClick={() => router.push({ pathname: 'register' })}>
                 <Typography sx={{ cursor: 'pointer', textAlign: 'center', mt: 2 }}>
                     Create Account
