@@ -3,6 +3,7 @@ import { Box } from "@mui/system";
 import { uniqueId } from "lodash";
 import { cloneElement, createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { RegistrationData } from 'schema/user';
+import { useAlert } from "ui/components/alert";
 
 const steps: {
     title: string;
@@ -72,6 +73,32 @@ export default function RegisterPage() {
     const [activeStep, setActiveStep] = useState(0);
     const form = useContext(RegisterContext);
     const { showReset, reset, submit } = form;
+
+    const alert = useAlert();
+    const [submitting, setSubmitting] = useState(false);
+    const [status, setStatus] = useState(null);
+    form.submit = function() {
+        fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(form.data),
+        }).then(async res => {
+            if (!res.ok) throw (await res.json())?.error;
+            // alert('registered');
+            alert.success({
+                message: 'Registered Account'
+            });
+            // router.push('/');
+        })
+        .catch(err => {
+            setSubmitting(false);
+            setStatus(err);
+        })
+    }
+
+
     return <Box sx={{ mb: 3, mt: 10 }}>
         <Box sx={{ margin: 'auto', width: 'min(500px, 90vw)', textAlign: 'center' }}>
             <Typography variant="h3" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 25, marginBottom: 25 }}>
@@ -87,7 +114,7 @@ export default function RegisterPage() {
                         <StepContent>
                             {S.content({ ...S, index, active: activeStep == index })}
                             <Box sx={isLast ? { maxWidth: '300px', mx: 'auto', mt: 2 } : { mt: 2 }}>
-                                <Button disabled={Object.keys(form.errors || {}).length != 0} variant="contained" onClick={() => Object.keys(form.validate(true) || {}).length == 0 && (activeStep == steps.length - 1 ? submit() : setActiveStep(activeStep + 1))} sx={{ mt: 1, float: 'right' }} fullWidth={isLast}>
+                                <Button disabled={submitting || Object.keys(form.errors || {}).length != 0} variant="contained" onClick={() => Object.keys(form.validate(true) || {}).length == 0 && (activeStep == steps.length - 1 ? submit() : setActiveStep(activeStep + 1))} sx={{ mt: 1, float: 'right' }} fullWidth={isLast}>
                                     {isLast ? 'Register' : 'Continue'}
                                 </Button>
                                 <Button variant="text" onClick={() => setActiveStep(activeStep - 1)} disabled={index === 0} sx={{ mt: 1, float: 'left' }} fullWidth={isLast}>
