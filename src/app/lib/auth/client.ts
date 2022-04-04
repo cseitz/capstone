@@ -1,7 +1,6 @@
 import type { UserData } from "schema/user";
-import type { UserResponse } from "api/users/me";
 import { QueryClient, useQuery } from "react-query";
-import type { AuthenticationToken } from "staff/lib/auth";
+// import type { AuthenticationToken } from "staff/lib/auth";
 
 export { }
 
@@ -40,13 +39,13 @@ function parseJwt(token) {
     return JSON.parse(jsonPayload);
 };
 
-export function getToken(): AuthenticationToken {
+export function getToken(): any {
     if (isAuthenticated()) return parseJwt(getCookie('auth'));
 }
 
 export function useUser(): UserData & { ready: boolean } {
     const token = getToken() as any;
-    const { isLoading, error, data } = useQuery<UserResponse>('loggedInUser', () => 
+    const { isLoading, error, data } = useQuery<{ user: UserData }>('loggedInUser', () => 
         fetch('/api/users/me').then(res => res.json())
     );
     if (!isAuthenticated() || error) return;

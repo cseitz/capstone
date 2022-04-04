@@ -1,5 +1,5 @@
 import type { UserData } from "lib/mongo/schema/user";
-import type { UserResponse } from "pages/api/users/me";
+import type { UserResponse } from "pages/api/users/[id]";
 import { QueryClient, useQuery } from "react-query";
 import type { AuthenticationToken } from ".";
 
