@@ -6,6 +6,6 @@ import { UserList } from "ui/components/user";
 export default function Homepage() {
     return <Box sx={{ p: 2 }}>
         <Typography variant="h4">Users</Typography>
-        <UserList />
+        <UserList showCount />
     </Box>
 }
