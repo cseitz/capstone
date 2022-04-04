@@ -1,11 +1,13 @@
 import { createTheme, CssBaseline, useMediaQuery, ThemeProvider } from "@mui/material";
 import { AppProps } from "next/app";
 import { useMemo } from "react";
+import { AlertProvider } from "ui/components/alert";
 import { NavBar } from "../ui/components/navbar";
+
 import '../ui/styles/global.scss';
 
 export default function App({ Component, pageProps }: AppProps) {
-    const prefersDarkMode = useMediaQuery(`(prefers-color-scheme: dark)`);
+    const prefersDarkMode = false; //useMediaQuery(`(prefers-color-scheme: dark)`);
     const theme = useMemo(() => {
         return createTheme({
             palette: {
@@ -28,6 +30,8 @@ export default function App({ Component, pageProps }: AppProps) {
     return <ThemeProvider theme={theme}>
         <CssBaseline />
         <NavBar />
-        <Component {...pageProps} />
+        <AlertProvider>
+            <Component {...pageProps} />
+        </AlertProvider>
     </ThemeProvider>
 }

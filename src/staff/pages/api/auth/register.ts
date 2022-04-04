@@ -12,15 +12,16 @@ export default Route<AuthenticationRegisterResponse>(async (req, res) => {
     const { method } = req;
     if (method != 'POST')
         throw new StatusError(405, 'Method Not Allowed');
-    const { firstName, lastName, email, password } = req.body;
+    const { email, password, confirmPassword, firstName, lastName, ...info } = req.body;
     if (await UserModel.findOne({ email }))
         throw new StatusError(500, 'Account already exists');
     const user = new UserModel({
         email: email.toLowerCase().trim(),
         password: password.trim(),
         info: {
-            firstName: firstName.trim(),
-            lastName: lastName.trim()
+            firstName: firstName?.trim(),
+            lastName: lastName?.trim(),
+            ...info,
         }
     });
     await user.audit({
