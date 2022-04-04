@@ -26,10 +26,10 @@ function LandingPage() {
     const { Title, Subtitle, BackgroundImage, Logo } = Landing;
     return <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
         <Box id="logo-container" sx={{ textAlign: 'center', mt: 10 }}>
-            <img src={Logo} style={{ padding: '20px', width: '300px', maxWidth: '90vw' }}></img>
+            <img src={Logo} style={{ padding: '20px', width: '300px', maxWidth: '90vw' }} />
             <Typography variant="h2">{Title}</Typography>
         </Box>
-        <Box id="lading-content-container" style={{ textAlign: 'center' }}>
+        <Box id="lading-content-container" sx={{ textAlign: 'center' }}>
             <Typography variant="h4">{Subtitle}</Typography>
             <Link href={'/register'}>
                 <Button variant="contained" color="primary" sx={{ m: 2 }}>
@@ -44,12 +44,12 @@ function AboutPage() {
     const { About, Landing: { Title } } = Data;
     const { Info, Content, Image, BackgroundImage } = About;
     return <Box sx={{ backgroundColor: 'lightpink', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
-        <Typography variant="h3" style={{ textAlign: 'left', padding: '20px' }}>{Title}</Typography>
-        <Typography variant="h4" style={{ textAlign: 'right', padding: '30px' }}>{Info}</Typography>
-        <Box style={{ width: '50%', margin: 'auto' }}>
+        <Typography variant="h3" sx={{ textAlign: 'left', padding: '20px' }}>{Title}</Typography>
+        <Typography variant="h4" sx={{ textAlign: 'right', padding: '30px' }}>{Info}</Typography>
+        <Box sx={{ width: '50%', m: 'auto' }}>
             <Card>
                 <CardContent>
-                    <Typography style={{ textAlign: 'center' }}>{Content}</Typography>
+                    <Typography sx={{ textAlign: 'center' }}>{Content}</Typography>
                 </CardContent>
             </Card>
         </Box>
@@ -59,7 +59,7 @@ function AboutPage() {
 function FAQPage() {
     return <Box id="faq" sx={{ backgroundColor: 'cornsilk', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", alignContent: 'center', textAlign: 'center', pt: 5 }}>
         <Typography variant="h3">FAQ</Typography>
-        <Box style={{ margin: 'auto', width: 'min(800px, 80vw)', paddingTop: '100px' }}>
+        <Box sx={{ margin: 'auto', width: 'min(800px, 80vw)', paddingTop: '100px' }}>
             <FAQ />
         </Box>
     </Box>
@@ -79,7 +79,7 @@ export default function Homepage() {
         <Box height='100vh' display="flex" flexDirection="column">
             <AboutPage />
         </Box>
-        <Box height='100vh' display="flex" flexDirection="column" style={{ alignContent: 'center' }}>
+        <Box height='100vh' display="flex" flexDirection="column" sx={{ alignContent: 'center' }}>
             <FAQPage />
         </Box>
         <Footer />
