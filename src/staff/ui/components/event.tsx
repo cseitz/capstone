@@ -1,4 +1,4 @@
-import { Box, Card, CardHeader, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography } from "@mui/material";
+import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button } from "@mui/material";
 import { EventListResponse } from "pages/api/events";
 import { EventResponse } from "pages/api/events/[id]";
 import { useEffect, useRef, useState } from "react";
@@ -29,12 +29,22 @@ export function EventCard(props: {
     return <>
         <Card { ...cardProps }>
             <CardHeader {...{
-                title: event.title
+                title: <Box component="span" sx={{ }}>
+                {event.title}
+            </Box>,
+                subtitle: <Box component="span" sx={{ }}>
+                {event.startsAt + " - " + event?.endsAt}
+            </Box>
             }} action={<IconButton>
                 <MoreVertIcon />
             </IconButton>} />
-            
-
+            <CardContent>
+                <Typography variant="h6">Description</Typography>
+                
+            </CardContent>
+            <CardActions>
+                <Button>EDIT</Button>
+            </CardActions>
         </Card>
     </>
 }
@@ -49,7 +59,20 @@ export function EventListItem(props: { event: string, onClick?: (event: string) 
     const { title, description, startsAt, endsAt, type } = event;
     return <ListItem secondaryAction={<Checkbox edge="start" />} disablePadding onClick={() => onClick(event?.id)}>
         <ListItemButton dense>
-            
+        <ListItemText {...{
+                primary: <>
+                    {title}
+                    <Typography component="span" sx={{ color: 'text.disabled', m: 1 }}>-</Typography>
+                    <Typography component="span" sx={{  }}>{event.startsAt} - </Typography>
+                </>,
+                primaryTypographyProps: { fontSize: 15 },
+                secondary: <>
+                    <Typography component="span">Created on {new Date(event.created).toLocaleString('en-us', {
+                        dateStyle: 'short',
+                        timeStyle: 'short'
+                    })} by </Typography>
+                </>
+            }} />
         </ListItemButton>
     </ListItem>
 }
