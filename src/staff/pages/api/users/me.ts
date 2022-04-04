@@ -14,7 +14,7 @@ export default Route<UserResponse>(async (req, res) => {
     const { method, headers, query } = req;
     const client = isLoggedIn(req);
     if (!client) throw new StatusError(403, 'Unauthorized');
-    const user = await UserModel.findById(client.id);
+    const user = await UserModel.findOne({ email: client.user });
     if (method == 'GET') {
         return res.json({
             user
