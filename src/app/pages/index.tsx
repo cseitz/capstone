@@ -4,6 +4,7 @@ import Card from '@mui/material/Card';
 import { Box } from "@mui/system";
 import { FAQ } from "ui/components/faq";
 import Link from "next/link";
+import { useUser } from "lib/auth/client";
 
 const Data = {
     Landing: {
