@@ -1,4 +1,4 @@
-import { Button, CircularProgress, Grid, Paper, Step, StepContent, StepLabel, Stepper, TextField, Typography } from "@mui/material";
+import { Button, CircularProgress, Grid, Paper, Step, StepContent, StepLabel, Stepper, TextField, Typography, useMediaQuery } from "@mui/material";
 import { Box } from "@mui/system";
 import { uniqueId } from "lodash";
 import { cloneElement, createContext, useCallback, useContext, useEffect, useState } from "react";
@@ -74,6 +74,8 @@ export default function RegisterPage() {
     const form = useContext(RegisterContext);
     const { showReset, reset, submit } = form;
 
+    const isMobile = useMediaQuery('(max-width:600px)');
+
     const alert = useAlert();
     const [submitting, setSubmitting] = useState(false);
     const [status, setStatus] = useState(null);
@@ -99,9 +101,9 @@ export default function RegisterPage() {
     }
 
 
-    return <Box sx={{ mb: 3, mt: 10 }}>
+    return <Box sx={{ mb: 3, mt: isMobile ? 4 : 10 }}>
         <Box sx={{ margin: 'auto', width: 'min(500px, 90vw)', textAlign: 'center' }}>
-            <Typography variant="h3" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 25, marginBottom: 25 }}>
+            <Typography variant={!isMobile ? 'h3' : 'h4'} style={{ textAlign: 'center', fontWeight: 'bold', marginTop: 25, marginBottom: 25 }}>
                 Register
             </Typography>
             <Stepper activeStep={activeStep} orientation="vertical">
