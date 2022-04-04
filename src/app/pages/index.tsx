@@ -25,14 +25,14 @@ function LandingPage() {
     const { Landing } = Data;
     const { Title, Subtitle, BackgroundImage, Logo } = Landing;
     return <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
-        <Box id="logo-container" style={{ textAlign: 'center' }}>
+        <Box id="logo-container" sx={{ textAlign: 'center', mt: 10 }}>
             <img src={Logo} style={{ padding: '20px', width: '300px', maxWidth: '90vw' }}></img>
             <Typography variant="h2">{Title}</Typography>
         </Box>
         <Box id="lading-content-container" style={{ textAlign: 'center' }}>
             <Typography variant="h4">{Subtitle}</Typography>
             <Link href={'/register'}>
-                <Button variant="contained" color="secondary" sx={{ m: 2 }}>
+                <Button variant="contained" color="primary" sx={{ m: 2 }}>
                     <Typography variant="h6">Register Here</Typography>
                 </Button>
             </Link>
