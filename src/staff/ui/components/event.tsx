@@ -1,4 +1,4 @@
-import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button, ListItemIcon } from "@mui/material";
+import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button, ListItemIcon, TextField } from "@mui/material";
 import { EventListResponse } from "pages/api/events";
 import { EventResponse } from "pages/api/events/[id]";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -8,6 +8,9 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import PeopleIcon from '@mui/icons-material/People';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DateTimePicker from '@mui/lab/DateTimePicker';
 import type { EventData } from "lib/mongo/schema/event";
 
 export function EventCard(props: {
@@ -38,17 +41,18 @@ export function EventCard(props: {
         })
     }, [isLoading]);
     if (isLoading) return <Card {...cardProps} />;
+    const [startsAt, setStartsAt] = useState(event?.startsAt);
     return <>
         <Card {...cardProps}>
             <CardHeader {...{
-                title: <Box component="span" sx={{}}>
+                title: !isCreate ? (<Box component="span" sx={{}}>
                     {event.title} {event.type && <>
                         - <Typography component="span" sx={{}}>
                             {event.type}
                         </Typography>
                     </>}
-                </Box>,
-                subheader: <Box component="span" sx={{}}>
+                </Box>) : 'Create Event',
+                subheader: !isCreate && <Box component="span" sx={{}}>
                     {new Date(event.startsAt).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
@@ -59,36 +63,11 @@ export function EventCard(props: {
             }} action={<IconButton>
                 <MoreVertIcon />
             </IconButton>} />
-            <CardContent>
-                <Typography variant="h6">Description:</Typography>
-                <Typography>{event.description}</Typography>
-                <List subheader={"Details"} dense>
-                    <ListItem>
-                        <ListItemIcon>
-                            <TodayIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Registered" secondary={new Date(event.created).toLocaleString('en-us', {
-                            dateStyle: 'short',
-                            timeStyle: 'short'
-                        })} />
-                    </ListItem>
-                    <ListItem>
-                        <ListItemIcon>
-                            <ScheduleIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Updated" secondary={new Date(event.updated).toLocaleString('en-us', {
-                            dateStyle: 'short',
-                            timeStyle: 'short'
-                        })} />
-                    </ListItem>
-                    <ListItem>
-                        <ListItemIcon>
-                            <PeopleIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Last Edited By:" secondary={"PLACE HOLDER NAME"} />
-                    </ListItem>
-                </List>
-            </CardContent>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <CardContent>
+                    <DateTimePicker renderInput={(props) => <TextField {...props} />} value={startsAt} onChange={setStartsAt} />
+                </CardContent>
+            </LocalizationProvider>
             <CardActions>
                 {isViewing && <Button onClick={() => setMode('edit')}>Edit</Button>}
                 {isEditing && !isCreate && <Button onClick={() => setMode('view')}>Discard Changes</Button>}
