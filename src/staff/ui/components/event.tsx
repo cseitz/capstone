@@ -1,4 +1,4 @@
-import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button } from "@mui/material";
+import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button, ListItemIcon } from "@mui/material";
 import { EventListResponse } from "pages/api/events";
 import { EventResponse } from "pages/api/events/[id]";
 import { useEffect, useRef, useState } from "react";
@@ -7,6 +7,7 @@ import { useAlert } from "./alert";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import PeopleIcon from '@mui/icons-material/People';
 
 export function EventCard(props: {
     event: string;
@@ -17,6 +18,7 @@ export function EventCard(props: {
         fetch('/api/events/' + id).then(res => res.json())
     ));
     const { event } = data || {};
+    const hasType = Boolean(event?.type);
     const alert = useAlert();
     useEffect(() => {
         if(!isLoading){return;}
@@ -30,17 +32,51 @@ export function EventCard(props: {
         <Card { ...cardProps }>
             <CardHeader {...{
                 title: <Box component="span" sx={{ }}>
-                {event.title}
-            </Box>,
-                subtitle: <Box component="span" sx={{ }}>
-                {event.startsAt + " - " + event?.endsAt}
-            </Box>
+                { event.title } - <Typography component="span" sx={{ }}>
+                { hasType ? event.type : "no type" }
+            </Typography>
+            </Box>, 
+                subheader: <Box component="span" sx={{ }}>
+                { new Date(event.startsAt).toLocaleString('en-us', {
+                        dateStyle: 'short',
+                        timeStyle: 'short'
+                    }) + " - " + new Date(event.endsAt).toLocaleString('en-us', {
+                        dateStyle: 'short',
+                        timeStyle: 'short'
+                    })}</Box>
             }} action={<IconButton>
                 <MoreVertIcon />
             </IconButton>} />
             <CardContent>
-                <Typography variant="h6">Description</Typography>
-                
+                <Typography variant="h6">Description:</Typography>
+                <Typography>{event.description}</Typography>
+                <hr/>
+                <List subheader={"Details"} dense>
+                <ListItem>
+                    <ListItemIcon>
+                        <TodayIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Registered" secondary={new Date(event.created).toLocaleString('en-us', {
+                        dateStyle: 'short',
+                        timeStyle: 'short'
+                    })} />
+                </ListItem>
+                <ListItem>
+                    <ListItemIcon>
+                        <ScheduleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Updated" secondary={new Date(event.updated).toLocaleString('en-us', {
+                        dateStyle: 'short',
+                        timeStyle: 'short'
+                    })} />
+                </ListItem>
+                <ListItem>
+                    <ListItemIcon>
+                        <PeopleIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Last Edited By:" secondary={"PLACE HOLDER NAME"} />
+                </ListItem>
+            </List>
             </CardContent>
             <CardActions>
                 <Button>EDIT</Button>
@@ -57,20 +93,24 @@ export function EventListItem(props: { event: string, onClick?: (event: string) 
     const { event } = data || {};
     if (isLoading) return <ListItem disablePadding />;
     const { title, description, startsAt, endsAt, type } = event;
-    return <ListItem secondaryAction={<Checkbox edge="start" />} disablePadding onClick={() => onClick(event?.id)}>
+    const hasType = Boolean(event.type);
+    return <ListItem disablePadding onClick={() => onClick(event?.id)}>
         <ListItemButton dense>
         <ListItemText {...{
                 primary: <>
                     {title}
                     <Typography component="span" sx={{ color: 'text.disabled', m: 1 }}>-</Typography>
-                    <Typography component="span" sx={{  }}>{event.startsAt} - </Typography>
+                    <Typography component="span" sx={{  }}>{ hasType ? event.type : "no type" } </Typography>
                 </>,
                 primaryTypographyProps: { fontSize: 15 },
                 secondary: <>
-                    <Typography component="span">Created on {new Date(event.created).toLocaleString('en-us', {
+                    <Typography component="span" sx={{  }}>{new Date(startsAt).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
-                    })} by </Typography>
+                    })} - {new Date(endsAt).toLocaleString('en-us', {
+                        dateStyle: 'short',
+                        timeStyle: 'short'
+                    })} </Typography>
                 </>
             }} />
         </ListItemButton>
