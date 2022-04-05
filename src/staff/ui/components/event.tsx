@@ -15,7 +15,9 @@ export function EventCard(props: {
 } & CardProps) {
     const { event: id, ...cardProps } = props;
     const isCreate = id == 'create';
-    const [mode, setMode] = useState<'view' | 'edit'>('view');
+    const [mode, setMode] = useState<'view' | 'edit'>(isCreate ? 'edit' : 'view');
+    const isEditing = mode == 'edit';
+    const isViewing = mode == 'view';
     const { isLoading, error, data } = useQuery<EventResponse>(['event', id], () => {
         if (isCreate) return {};
         return fetch('/api/events/' + id).then(res => res.json())
@@ -29,7 +31,7 @@ export function EventCard(props: {
     const hasType = Boolean(event?.type);
     const alert = useAlert();
     useEffect(() => {
-        if(!isLoading){return;}
+        if (!isLoading) { return; }
         alert.success({
             message: 'Loaded Event ' + event?.title || "[Missing title]",
             duration: 2000,
@@ -37,15 +39,17 @@ export function EventCard(props: {
     }, [isLoading]);
     if (isLoading) return <Card {...cardProps} />;
     return <>
-        <Card { ...cardProps }>
+        <Card {...cardProps}>
             <CardHeader {...{
-                title: <Box component="span" sx={{ }}>
-                { event.title } - <Typography component="span" sx={{ }}>
-                { hasType ? event.type : "no type" }
-            </Typography>
-            </Box>, 
-                subheader: <Box component="span" sx={{ }}>
-                { new Date(event.startsAt).toLocaleString('en-us', {
+                title: <Box component="span" sx={{}}>
+                    {event.title} {event.type && <>
+                        - <Typography component="span" sx={{}}>
+                            {event.type}
+                        </Typography>
+                    </>}
+                </Box>,
+                subheader: <Box component="span" sx={{}}>
+                    {new Date(event.startsAt).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
                     }) + " - " + new Date(event.endsAt).toLocaleString('en-us', {
@@ -58,36 +62,40 @@ export function EventCard(props: {
             <CardContent>
                 <Typography variant="h6">Description:</Typography>
                 <Typography>{event.description}</Typography>
-                <hr/>
                 <List subheader={"Details"} dense>
-                <ListItem>
-                    <ListItemIcon>
-                        <TodayIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Registered" secondary={new Date(event.created).toLocaleString('en-us', {
-                        dateStyle: 'short',
-                        timeStyle: 'short'
-                    })} />
-                </ListItem>
-                <ListItem>
-                    <ListItemIcon>
-                        <ScheduleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Updated" secondary={new Date(event.updated).toLocaleString('en-us', {
-                        dateStyle: 'short',
-                        timeStyle: 'short'
-                    })} />
-                </ListItem>
-                <ListItem>
-                    <ListItemIcon>
-                        <PeopleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Last Edited By:" secondary={"PLACE HOLDER NAME"} />
-                </ListItem>
-            </List>
+                    <ListItem>
+                        <ListItemIcon>
+                            <TodayIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Registered" secondary={new Date(event.created).toLocaleString('en-us', {
+                            dateStyle: 'short',
+                            timeStyle: 'short'
+                        })} />
+                    </ListItem>
+                    <ListItem>
+                        <ListItemIcon>
+                            <ScheduleIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Updated" secondary={new Date(event.updated).toLocaleString('en-us', {
+                            dateStyle: 'short',
+                            timeStyle: 'short'
+                        })} />
+                    </ListItem>
+                    <ListItem>
+                        <ListItemIcon>
+                            <PeopleIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Last Edited By:" secondary={"PLACE HOLDER NAME"} />
+                    </ListItem>
+                </List>
             </CardContent>
             <CardActions>
-                <Button>EDIT</Button>
+                {isViewing && <Button onClick={() => setMode('edit')}>Edit</Button>}
+                {isEditing && !isCreate && <Button onClick={() => setMode('view')}>Discard Changes</Button>}
+                {isEditing && isCreate && <>
+                    <Button onClick={() => alert('Not Yet Implemented')}>Create Event</Button>
+                    <Button onClick={() => alert('Not Yet Implemented')}>Cancel</Button>
+                </>}
             </CardActions>
         </Card>
     </>
@@ -104,15 +112,15 @@ export function EventListItem(props: { event: string, onClick?: (event: string) 
     const hasType = Boolean(event.type);
     return <ListItem disablePadding onClick={() => onClick(event?.id)}>
         <ListItemButton dense>
-        <ListItemText {...{
+            <ListItemText {...{
                 primary: <>
                     {title}
-                    <Typography component="span" sx={{ color: 'text.disabled', m: 1 }}>-</Typography>
-                    <Typography component="span" sx={{  }}>{ hasType ? event.type : "no type" } </Typography>
+                    {event?.type && <Typography component="span" sx={{ color: 'text.disabled', m: 1 }}>-</Typography>}
+                    {event?.type && <Typography component="span" sx={{}}>{event.type} </Typography>}
                 </>,
                 primaryTypographyProps: { fontSize: 15 },
                 secondary: <>
-                    <Typography component="span" sx={{  }}>{new Date(startsAt).toLocaleString('en-us', {
+                    <Typography component="span" sx={{}}>{new Date(startsAt).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })} - {new Date(endsAt).toLocaleString('en-us', {
@@ -129,7 +137,7 @@ const queryClient = new QueryClient();
 function EventListComponent(props: { showCreate?: boolean, onClose?: () => void }) {
     const {
         showCreate = false,
-        onClose: onCloseListener = () => {}
+        onClose: onCloseListener = () => { }
     } = props;
     const { isLoading, error, data, dataUpdatedAt } = useQuery<EventListResponse>(['events'], () => (
         fetch('/api/events').then(res => res.json())
