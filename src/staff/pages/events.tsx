@@ -37,6 +37,6 @@ export default function EventPage() {
         </Box>
         <Typography>hi</Typography>
 
-        <EventList showCreate={showCreate} />
+        <EventList showCreate={showCreate} onClose={() => setShowCreate(false)} />
     </Box>
 }

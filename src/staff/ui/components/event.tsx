@@ -1,26 +1,31 @@
 import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button, ListItemIcon } from "@mui/material";
 import { EventListResponse } from "pages/api/events";
 import { EventResponse } from "pages/api/events/[id]";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { useAlert } from "./alert";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
 import PeopleIcon from '@mui/icons-material/People';
+import type { EventData } from "lib/mongo/schema/event";
 
 export function EventCard(props: {
     event: string;
 } & CardProps) {
     const { event: id, ...cardProps } = props;
+    const isCreate = id == 'create';
     const [mode, setMode] = useState<'view' | 'edit'>('view');
     const { isLoading, error, data } = useQuery<EventResponse>(['event', id], () => {
-        if (id == 'create') {
-            return {};
-        }
+        if (isCreate) return {};
         return fetch('/api/events/' + id).then(res => res.json())
     });
-    const { event } = data || {};
+    const creating: Partial<EventData> = useMemo(() => {
+        return {
+
+        }
+    }, [])
+    const { event } = !isCreate ? (data || {}) : { event: creating };
     const hasType = Boolean(event?.type);
     const alert = useAlert();
     useEffect(() => {
@@ -121,11 +126,19 @@ export function EventListItem(props: { event: string, onClick?: (event: string) 
 }
 
 const queryClient = new QueryClient();
-function EventListComponent(props: {}) {
+function EventListComponent(props: { showCreate?: boolean, onClose?: () => void }) {
+    const {
+        showCreate = false,
+        onClose: onCloseListener = () => {}
+    } = props;
     const { isLoading, error, data, dataUpdatedAt } = useQuery<EventListResponse>(['events'], () => (
         fetch('/api/events').then(res => res.json())
     ));
-    const [open, setOpen] = useState<string>(null)
+    const [open, setOpen] = useState<string>(null);
+    useEffect(() => {
+        if (showCreate && open != 'create') setOpen('create');
+        if (!showCreate && open == 'create') setOpen(null);
+    }, [showCreate])
     const { events } = data || { events: [] };
     const alert = useAlert();
     useEffect(() => {
@@ -146,7 +159,7 @@ function EventListComponent(props: {}) {
         firstLoad.current = false;
     }, [dataUpdatedAt])
     return <>
-        <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
+        <Modal open={Boolean(open)} onClose={() => { setOpen(null); onCloseListener() }}>
             <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
                 {open && <EventCard event={open} />}
             </Box>
