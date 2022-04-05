@@ -8,7 +8,9 @@ import Collapse from '@mui/material/Collapse';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Stack, Paper } from '@mui/material';
+import AssignmentIcon from '@mui/icons-material/AssignmentOutlined';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import { Box, Stack, Paper, Button } from '@mui/material';
 import { FavoriteBorder } from '@mui/icons-material';
 import { QueryClient } from 'react-query';
 
@@ -17,7 +19,7 @@ const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     padding: theme.spacing(1),
     color: theme.palette.text.secondary,
-  }));
+}));
 
 interface ExpandMoreProps extends IconButtonProps {
     expand: boolean;
@@ -59,46 +61,46 @@ export default function Eventpage() {
             <br /><br />
             <Box id="events-container" sx={{ backgroundColor: '', width: '50%', height: '75%', margin: 'auto' }}>
                 <Stack spacing={2}>
-                        <Card>
-                            <CardHeader title={Title} subheader={Subtitle} action={
-                                <IconButton aria-label="Sign-Up">
-                                    Interested <FavoriteBorder />
-                                </IconButton>
-                            } />
+                    <Card>
+                        <CardHeader title={Title} subheader={Subtitle} action={
+                            <Button size="large" startIcon={<AssignmentIcon />}>
+                                Sign Up
+                            </Button>
+                        } />
+                        <CardContent>
+                            <Typography variant="body1">{Preview}</Typography>
+                        </CardContent>
+                        <CardActions disableSpacing>
+                            <ExpandMore expand={expanded} onClick={handleExpandClick} aria-expanded={expanded} aria-label="show more">
+                                <ExpandMoreIcon />
+                            </ExpandMore>
+                        </CardActions>
+                        <Collapse in={expanded} timeout="auto" unmountOnExit>
                             <CardContent>
-                                <Typography variant="body1">{Preview}</Typography>
+                                <Typography paragraph>{Description}</Typography>
                             </CardContent>
-                            <CardActions disableSpacing>
-                                <ExpandMore expand={expanded} onClick={handleExpandClick} aria-expanded={expanded} aria-label="show more">
-                                    <ExpandMoreIcon />
-                                </ExpandMore>
-                            </CardActions>
-                            <Collapse in={expanded} timeout="auto" unmountOnExit>
-                                <CardContent>
-                                    <Typography paragraph>{Description}</Typography>
-                                </CardContent>
-                            </Collapse>
-                        </Card>
-                        <Card>
-                            <CardHeader title={Title} subheader={Subtitle} action={
-                                <IconButton aria-label="Sign-Up">
-                                    Interested <FavoriteBorder />
-                                </IconButton>
-                            } />
+                        </Collapse>
+                    </Card>
+                    <Card>
+                        <CardHeader title={Title} subheader={Subtitle} action={
+                            <Button size="large" variant="contained" startIcon={<AssignmentTurnedInIcon />}>
+                                Registered
+                            </Button>
+                        } />
+                        <CardContent>
+                            <Typography variant="body1">{Preview}</Typography>
+                        </CardContent>
+                        <CardActions disableSpacing>
+                            <ExpandMore expand={expanded} onClick={handleExpandClick} aria-expanded={expanded} aria-label="show more">
+                                <ExpandMoreIcon />
+                            </ExpandMore>
+                        </CardActions>
+                        <Collapse in={expanded} timeout="auto" unmountOnExit>
                             <CardContent>
-                                <Typography variant="body1">{Preview}</Typography>
+                                <Typography paragraph>{Description}</Typography>
                             </CardContent>
-                            <CardActions disableSpacing>
-                                <ExpandMore expand={expanded} onClick={handleExpandClick} aria-expanded={expanded} aria-label="show more">
-                                    <ExpandMoreIcon />
-                                </ExpandMore>
-                            </CardActions>
-                            <Collapse in={expanded} timeout="auto" unmountOnExit>
-                                <CardContent>
-                                    <Typography paragraph>{Description}</Typography>
-                                </CardContent>
-                            </Collapse>
-                        </Card>
+                        </Collapse>
+                    </Card>
                 </Stack>
             </Box>
         </Box>
