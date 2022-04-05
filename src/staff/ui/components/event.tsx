@@ -14,9 +14,12 @@ export function EventCard(props: {
 } & CardProps) {
     const { event: id, ...cardProps } = props;
     const [mode, setMode] = useState<'view' | 'edit'>('view');
-    const { isLoading, error, data } = useQuery<EventResponse>(['event', id], () => (
-        fetch('/api/events/' + id).then(res => res.json())
-    ));
+    const { isLoading, error, data } = useQuery<EventResponse>(['event', id], () => {
+        if (id == 'create') {
+            return {};
+        }
+        return fetch('/api/events/' + id).then(res => res.json())
+    });
     const { event } = data || {};
     const hasType = Boolean(event?.type);
     const alert = useAlert();
