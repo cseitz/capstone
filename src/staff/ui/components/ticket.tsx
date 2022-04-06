@@ -151,7 +151,6 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
     ));
     const [open, setOpen] = useState<string>(null)
     const { tickets } = data || { tickets: [] };
-    if (props.setCount) props.setCount(tickets.length);
     const alert = useAlert();
     useEffect(() => {
         if (isLoading) return;
@@ -180,6 +179,8 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
     if (tickets.length == 0) return <>
         <Typography variant="h5" sx={{ textAlign: 'center', mt: 10 }}>No Tickets</Typography>
     </>;
+
+    if (props.setCount) props.setCount(tickets.length);
 
     return <>
         <Box>
