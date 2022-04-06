@@ -30,6 +30,7 @@ export default function TicketsPage() {
         status,
     }
     if (status == 'all') delete filter.status;
+    const [count, setCount] = useState(0);
     return <Box sx={{ p: 2 }}>
         <Box sx={{ ...sx.container }}>
             <Typography variant="h4" sx={{ ...sx.title }}>Tickets</Typography>
@@ -39,9 +40,9 @@ export default function TicketsPage() {
                 <ToggleButton value="assigned">Assigned</ToggleButton>
                 <ToggleButton value="closed">Closed</ToggleButton>
             </ToggleButtonGroup>
-            <Typography sx={{ ...sx.counter }}>Showing 5 tickets</Typography>
+            <Typography sx={{ ...sx.counter }}>Showing {count} tickets</Typography>
         </Box>
         <br />
-        <TicketList filter={filter} />
+        <TicketList filter={filter} setCount={setCount} />
     </Box>
 }

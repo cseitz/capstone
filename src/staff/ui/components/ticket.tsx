@@ -106,18 +106,21 @@ function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => v
     </Card>
 }
 const queryClient = new QueryClient();
-function TicketListComponent(props: { filter?: any }) {
+function TicketListComponent(props: { filter?: any, setCount?: any }) {
     const query = new URLSearchParams(props.filter || {}).toString();
     const { isLoading, error, data, dataUpdatedAt } = useQuery<TicketListResponse>(['users', query], () => (
         fetch('/api/tickets?' + query).then(res => res.json())
     ));
     const [open, setOpen] = useState<string>(null)
     const { tickets } = data || { tickets: [] };
+    if (props.setCount) props.setCount(tickets.length);
     const alert = useAlert();
     useEffect(() => {
         if (isLoading) return;
         alert.success({
             message: 'Loaded ' + tickets.length + ' Tickets',
+            duration: 2000,
+            unique: 'ticketsLoaded'
         })
     }, [isLoading]);
     const firstLoad = useRef(true);
@@ -127,7 +130,7 @@ function TicketListComponent(props: { filter?: any }) {
             alert.info({
                 message: 'Refreshed at ' + new Date(dataUpdatedAt).toLocaleTimeString('en-us', { timeStyle: 'medium' }),
                 duration: 1500,
-                unique: 'userListRefreshedAt'
+                unique: 'ticketListRefreshedAt'
             });
         firstLoad.current = false;
     }, [dataUpdatedAt])
@@ -137,7 +140,7 @@ function TicketListComponent(props: { filter?: any }) {
         </Box>
     </>;
     if (tickets.length == 0) return <>
-        <Typography>No Tickets</Typography>
+        <Typography variant="h5" sx={{ textAlign: 'center', mt: 10 }}>No Tickets</Typography>
     </>;
 
     return <>
