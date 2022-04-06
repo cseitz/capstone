@@ -8,16 +8,19 @@ import Link from 'next/link'
 import HomeIcon from '@mui/icons-material/Home';
 import LoginIcon from '@mui/icons-material/Login';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
 import { isAuthenticated } from 'lib/auth/client';
+import { EventNote } from '@mui/icons-material';
 
 const title = 'Event Name 2022';
 const items: {
     name: string;
     url: string;
     icon: any;
+    showIcon?: 'left' | 'right';
     placement?: 'left' | 'right';
     visible?: (section?: 'navbar' | 'drawer') => boolean;
 }[] = [
@@ -27,9 +30,19 @@ const items: {
             icon: <HomeIcon />
         },
         {
+            name: "Events",
+            url: "/events",
+            icon: <EventNote />,
+        },
+        {
             name: "FAQ",
             url: "/#faq",
             icon: <LiveHelpIcon />
+        },
+        {
+            name: "Contact",
+            url: "/contact",
+            icon: <ContactSupportIcon />
         },
         {
             name: "Login",
@@ -53,6 +66,7 @@ const items: {
             name: "Logout",
             url: "/logout",
             placement: 'right',
+            showIcon: 'right',
             icon: <ExitToAppIcon />,
             visible() {
                 return Boolean(isAuthenticated());
@@ -99,7 +113,7 @@ export function NavBar() {
 
     const navbarLinksLeft = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement != 'right').map((x) =>
         <Link href={x.url} key={x.url}>
-            <Button color='inherit'>
+            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
                 {x.name}
             </Button>
         </Link>
@@ -107,7 +121,7 @@ export function NavBar() {
 
     const navbarLinksRight = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement == 'right').map((x) =>
         <Link href={x.url} key={x.url}>
-            <Button color='inherit'>
+            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
                 {x.name}
             </Button>
         </Link>
@@ -128,7 +142,7 @@ export function NavBar() {
     const isMobile = useMediaQuery('(max-width:600px)');
     return <>
         <HideOnScroll>
-            <AppBar position="sticky" style={{ backgroundColor: "black", color: "white", boxShadow: "0px 0px 0px 0px" }}>
+            <AppBar position="sticky" style={{ boxShadow: "0px 0px 0px 0px" }}>
                 <Toolbar>
                     <IconButton
                         onClick={handleDrawer}

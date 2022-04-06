@@ -2,7 +2,7 @@ import { HydratedDocument, Model, model, models, Schema, isValidObjectId, connec
 import { isEqual, isPlainObject, reduce, get } from "lodash";
 import { inspect } from 'util';
 import { relative } from 'path';
-import { TimestampOptions } from './timestamped';
+import { TimestampOptions } from "./timestamped";
 
 const DEBUG = false;
 
@@ -302,4 +302,3 @@ interface QueryHelpers {
 
 export type AuditLogDocument = HydratedDocument<AuditLogSchema>;
 export const AuditLogModel = models?.['AuditLog'] || model<AuditLogSchema, Model<AuditLogSchema, QueryHelpers>>('AuditLog', schema);
-

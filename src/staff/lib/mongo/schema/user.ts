@@ -10,10 +10,18 @@ extends TimestampData, AuditData {
     email: string;
     password: string;
     role: 'pending' | 'user' | 'banned' | 'staff' | 'admin';
-    info: {
-        firstName: string;
-        lastName: string;
-    }
+    info: UserInfo;
+}
+
+export interface UserInfo {
+    firstName: string;
+    lastName: string;
+}
+
+export type RegistrationData = UserInfo & {
+    email: string;
+    password: string;
+    confirmPassword: string;
 }
 
 

@@ -18,7 +18,11 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "paths": {
+      "staff/*": ["../staff/*"],
+      "api/*": ["../pages/api/*"],
+    }
   },
   "include": [
     "next-env.d.ts",
