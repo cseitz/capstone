@@ -1,9 +1,10 @@
+import { Box, Typography } from "@mui/material";
 import { TicketList } from "ui/components/ticket";
 
 
 export default function Homepage() {
-    return <div>
-        <h1>Tickets</h1>
+    return <Box sx={{ p: 2 }}>
+        <Typography variant="h4">Tickets</Typography>
         <TicketList />
-    </div>
+    </Box>
 }
