@@ -38,6 +38,8 @@ export function Contact() {
         }).then(async res => {
             console.log(res);
             if (!res.ok) throw (await res.json())?.error;
+            setSubmitting(false);
+            setDoneSubmitting(true);
             //router.push('/');
         })
             .catch(err => {
