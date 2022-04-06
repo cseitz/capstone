@@ -107,8 +107,9 @@ function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => v
 }
 const queryClient = new QueryClient();
 function TicketListComponent(props: { filter?: any }) {
-    const { isLoading, error, data, dataUpdatedAt } = useQuery<TicketListResponse>(['users'], () => (
-        fetch('/api/tickets?' + new URLSearchParams(props.filter).toString()).then(res => res.json())
+    const query = new URLSearchParams(props.filter || {}).toString();
+    const { isLoading, error, data, dataUpdatedAt } = useQuery<TicketListResponse>(['users', query], () => (
+        fetch('/api/tickets?' + query).then(res => res.json())
     ));
     const [open, setOpen] = useState<string>(null)
     const { tickets } = data || { tickets: [] };
