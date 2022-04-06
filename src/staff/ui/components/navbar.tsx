@@ -36,6 +36,11 @@ const items: {
             placement: 'right',
             icon: <ExitToAppIcon />
         },
+        {
+            name: "Audit Log Exports",
+            url: "/api/exports/logs",
+            icon: <HomeIcon />
+        },
     ];
 
 
