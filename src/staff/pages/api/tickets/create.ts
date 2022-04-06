@@ -23,5 +23,5 @@ export default Route<TicketListResponse>(async (req, res) => {
         process: 'system'
     })
     await ticket.save();
-    return res.json({})
+    return res.json({ticket});
 });

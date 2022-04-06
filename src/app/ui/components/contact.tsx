@@ -38,11 +38,12 @@ export function Contact(){
         }).then(async res => {
             console.log(res);
             if (!res.ok) throw (await res.json())?.error;
+            setSubmitting(false);
+            setDoneSubmitting(true);
             //router.push('/');
         })
         .catch(err => {
             setSubmitting(false);
-            setDoneSubmitting(true);
             //setStatus(err);
             console.log(err);
         })
@@ -52,13 +53,15 @@ export function Contact(){
 
     return (
     submitting ? 
-    <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50}}>
-        <CircularProgress />
+    <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center'}}>
+        <CircularProgress style={{color: 'white', textAlign: 'center', marginTop: 25, fontSize: 40}}/>
     </Box>
     :
     doneSubmitting ? 
-    <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50}}>
-        <CheckIcon />
+    <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center'}}>
+        <CheckIcon style={{color: 'white', textAlign: 'center', marginTop: 25, fontSize: 40}}/>
+        <Typography  variant="h6" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 20 }} >Message succesfully sent</Typography>
+        <Typography  variant="h6" style={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginTop: 15 }} >Someone will be back with you shortly</Typography>
     </Box>
     :
     <Box>

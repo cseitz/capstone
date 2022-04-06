@@ -13,10 +13,13 @@ const isStaff = isAuthenticated({
 
 export default Route<TicketResponse>(async (req, res) => {
     const user = isStaff(req);
+    const { method, headers, query } = req;
     if (!user) throw new StatusError(403, 'Unauthorized');
     const ticket = await TicketModel.findById(req.query.id);
-    ticket.assignee = user.id;
-    res.json({
-        ticket
-    })
+    //ticket.assignee = user.id;
+    if (method == 'GET') {
+        return res.json({
+            ticket
+        })
+    }
 });
