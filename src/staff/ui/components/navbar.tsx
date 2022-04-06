@@ -11,6 +11,7 @@ import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
+import { EventNote } from '@mui/icons-material';
 
 const title = 'Staff Portal';
 const items: {
@@ -25,6 +26,11 @@ const items: {
             name: "Home",
             url: "/",
             icon: <HomeIcon />
+        },
+        {
+            name: "Events",
+            url: "/events",
+            icon: <EventNote />,
         },
         {
             name: "Exports",
