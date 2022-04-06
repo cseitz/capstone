@@ -8,7 +8,7 @@ export const FillableTextData = {
         title: "NEVER FORGET",
         subtitle: "Sep 11th 2001",
         backgroundImage: "",
-        logo: "http://divisqueeze.com/wp-content/uploads/2017/03/YourLogoHere.png",
+        logo: "/assets/logo.png",
     },
     about: {
         info: "No Maidens?",
