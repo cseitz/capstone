@@ -1,4 +1,4 @@
-import { TicketList } from "ui/components/ticketView";
+import { TicketList } from "ui/components/ticket";
 
 
 export default function Homepage() {

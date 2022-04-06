@@ -45,8 +45,8 @@ function TicketCard(props: {
         </IconButton>} />
         <CardContent>
             <Typography variant="h6">Details</Typography>
-                <Typography>Subject: {hasSubject ? ticket.subject : 'No Subject'}</Typography>
-                <Typography>Message: {hasMessage ? ticket.message : 'No Message'}</Typography>
+            <Typography>Subject: {hasSubject ? ticket.subject : 'No Subject'}</Typography>
+            <Typography>Message: {hasMessage ? ticket.message : 'No Message'}</Typography>
             <List subheader={"Details"} dense>
                 <ListItem>
                     <ListItemText primary="Created" secondary={new Date(ticket.created).toLocaleString('en-us', {
@@ -55,7 +55,7 @@ function TicketCard(props: {
                     })} />
                 </ListItem>
                 <ListItem>
-                   
+
                     <ListItemText primary="Updated" secondary={new Date(ticket.updated).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
@@ -68,7 +68,7 @@ function TicketCard(props: {
                 <MenuItem value={'assigned'}>Assigned</MenuItem>
             </Select>
         </CardContent>
-        
+
     </Card>
 }
 function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => void }) {
@@ -84,14 +84,14 @@ function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => v
     const name = !hasName ? 'Missing Name' : ticket.name;
     const email = !hasEmail ? 'No Email' : ticket.email;
     const subject = !hasSubject ? 'No Subject' : ticket.subject;
-    return <Card sx={{ margin: 'auto', width: 'min(300px, 80vw)', marginBottom: '15px'}} onClick={() => onClick(ticket?.id)}>
+    return <Card sx={{ margin: 'auto', width: 'min(300px, 80vw)', marginBottom: '15px' }} onClick={() => onClick(ticket?.id)}>
         <ListItemButton dense>
             <ListItemText {...{
                 primary: <>
                     {name}
                     <Typography component="span" sx={{ color: 'text.disabled', m: 1 }}>-</Typography>
                     <Typography component="span" sx={{ color: hasEmail ? 'text.secondary' : 'error.main' }}>{email}</Typography>
-                    <Typography  sx={{ color: hasSubject ? 'text.secondary' : 'error.main' }}>{subject}</Typography>
+                    <Typography sx={{ color: hasSubject ? 'text.secondary' : 'error.main' }}>{subject}</Typography>
                 </>,
                 primaryTypographyProps: { color: !hasName && 'error.main', fontSize: 15 },
                 secondary: <>
@@ -134,29 +134,29 @@ function TicketListComponent(props: {}) {
         firstLoad.current = false;
     }, [dataUpdatedAt])
     return (
-    isLoading ? 
-   <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50}}>
-        <CircularProgress />
-    </Box>
-    :
-    (tickets.length == 0) ?
-    <Box>
-       <Card sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center'}}>
-        No Tickets To Display
-        </Card>
-    </Box>
-    :
-    <Box>
-    <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
-            <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
-                {open && <TicketCard ticket={open} />}
+        isLoading ? (
+            <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50 }}>
+                <CircularProgress />
             </Box>
-        </Modal>  
-    <Grid container spacing={2}>
-            {tickets.map(({ id }) => <TicketListItem key={id} ticket={id} onClick={setOpen} />)}
-    </Grid>
-    </Box>)
-    
+        ) : (tickets.length == 0 ? (
+            <Box>
+                <Card sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center' }}>
+                    No Tickets To Display
+                </Card>
+            </Box>
+        ) : (
+            < Box >
+                <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
+                    <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
+                        {open && <TicketCard ticket={open} />}
+                    </Box>
+                </Modal>
+                <Grid container spacing={2}>
+                    {tickets.map(({ id }) => <TicketListItem key={id} ticket={id} onClick={setOpen} />)}
+                </Grid>
+            </Box >
+        ))
+    )
 }
 export function TicketList(props: (Parameters<typeof TicketListComponent>)[0]) {
     return <QueryClientProvider client={queryClient}>
