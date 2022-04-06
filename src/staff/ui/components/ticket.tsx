@@ -10,6 +10,8 @@ import type { TicketListResponse } from "pages/api/tickets";
 import type { TicketResponse } from "pages/api/tickets/[id]";
 import { TicketData } from 'lib/mongo/schema/ticket';
 
+const queryClient = new QueryClient();
+
 function TicketCard(props: {
     ticket: string;
 } & CardProps) {
@@ -19,7 +21,6 @@ function TicketCard(props: {
         fetch('/api/tickets/' + id).then(res => res.json())
     ));
     const { ticket } = data || {};
-    if (isLoading) return <Card {...cardProps} />;
     const alert = useAlert();
     useEffect(() => {
         alert.success({
@@ -40,8 +41,33 @@ function TicketCard(props: {
 
     useEffect(() => {
         if (isLoading) return;
+        if (!status) return;
         if (ticket.status == status) return;
-        console.log('gotta update ticket')
+        console.log('gotta update ticket');
+        const originalStatus = ticket.status;
+        fetch('/api/tickets/' + id, {
+            method: 'PATCH',
+            headers: {
+                'x-audit-action': 'Updated Status to ' + status[0].toUpperCase() + status.substr(1),
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                status,
+            })
+        }).then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            alert.success({
+                message: 'Updated Ticket',
+                duration: 2000,
+            })
+            setTimeout(() => {
+                queryClient.refetchQueries({ queryKey: 'tickets' })
+            }, 2000)
+        }).catch(err => {
+            alert.error({
+                message: 'Failed to update Ticket',
+            })
+        })
     }, [status])
 
     return <Card {...cardProps}>
@@ -58,18 +84,18 @@ function TicketCard(props: {
         </IconButton>} />
         <CardContent>
             <Typography variant="h6">Details</Typography>
-            <Typography>Subject: {hasSubject ? ticket.subject : 'No Subject'}</Typography>
-            <Typography>Message: {hasMessage ? ticket.message : 'No Message'}</Typography>
+            <Typography>Subject: {hasSubject ? ticket?.subject : 'No Subject'}</Typography>
+            <Typography>Message: {hasMessage ? ticket?.message : 'No Message'}</Typography>
             <List subheader={"Details"} dense>
                 <ListItem>
-                    <ListItemText primary="Created" secondary={new Date(ticket.created).toLocaleString('en-us', {
+                    <ListItemText primary="Created" secondary={new Date(ticket?.created).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })} />
                 </ListItem>
                 <ListItem>
 
-                    <ListItemText primary="Updated" secondary={new Date(ticket.updated).toLocaleString('en-us', {
+                    <ListItemText primary="Updated" secondary={new Date(ticket?.updated).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })} />
@@ -86,7 +112,7 @@ function TicketCard(props: {
 }
 function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => void }) {
     const { onClick = (ticket: string) => { }, } = props;
-    const { isLoading, error, data } = useQuery<TicketResponse>(['ticket', props.ticket], () => (
+    const { isLoading, error, data } = useQuery<TicketResponse>(['tickets', props.ticket], () => (
         fetch('/api/tickets/' + props.ticket).then(res => res.json())
     ));
     const { ticket } = data || {};
@@ -117,10 +143,10 @@ function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => v
         </ListItemButton>
     </Card>
 }
-const queryClient = new QueryClient();
+
 function TicketListComponent(props: { filter?: any, setCount?: any }) {
     const query = new URLSearchParams(props.filter || {}).toString();
-    const { isLoading, error, data, dataUpdatedAt } = useQuery<TicketListResponse>(['users', query], () => (
+    const { isLoading, error, data, dataUpdatedAt } = useQuery<TicketListResponse>(['tickets', query], () => (
         fetch('/api/tickets?' + query).then(res => res.json())
     ));
     const [open, setOpen] = useState<string>(null)
