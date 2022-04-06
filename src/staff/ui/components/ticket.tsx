@@ -32,6 +32,18 @@ function TicketCard(props: {
     const hasSubject = Boolean(ticket?.subject.trim());
     const hasMessage = Boolean(ticket?.message.trim());
 
+    const [status, setStatus] = useState<TicketData['status']>(null);
+    useEffect(() => {
+        if (isLoading) return;
+        setStatus(ticket.status);
+    }, [isLoading]);
+
+    useEffect(() => {
+        if (isLoading) return;
+        if (ticket.status == status) return;
+        console.log('gotta update ticket')
+    }, [status])
+
     return <Card {...cardProps}>
         <CardHeader {...{
             title: <Box component="span" sx={{ color: !hasName && 'error.main' }}>
@@ -63,7 +75,7 @@ function TicketCard(props: {
                     })} />
                 </ListItem>
             </List>
-            <Select value={ticket.status} onChange={({ target }) => { ticket.status = target.value as any; }}>
+            <Select value={status} onChange={({ target }) => { setStatus(target.value as any) }}>
                 <MenuItem value={'closed'}>Closed</MenuItem>
                 <MenuItem value={'open'}>Open</MenuItem>
                 <MenuItem value={'assigned'}>Assigned</MenuItem>

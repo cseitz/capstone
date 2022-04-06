@@ -1,11 +1,12 @@
 import { isAuthenticated } from "lib/auth";
-import { TicketDocument, TicketModel } from "lib/mongo/schema/ticket";
+import { TicketData, TicketModel } from "lib/mongo/schema/ticket";
 import { Route, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export interface TicketResponse {
-    ticket?: TicketDocument
+    ticket?: TicketData
 }
+
 
 const isStaff = isAuthenticated({
     role: ['pending', 'user', 'staff', 'admin']

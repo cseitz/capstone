@@ -1,11 +1,11 @@
 import { isAuthenticated } from "lib/auth";
-import { TicketDocument, TicketModel } from "lib/mongo/schema/ticket";
+import { TicketData, TicketModel } from "lib/mongo/schema/ticket";
 import { Route, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
 
 //Exports list of tickets
 export interface TicketListResponse {
-    ticket: TicketDocument
+    ticket: TicketData
 }
 
 export default Route<TicketListResponse>(async (req, res) => {
