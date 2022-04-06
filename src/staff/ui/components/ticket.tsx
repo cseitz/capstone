@@ -8,6 +8,7 @@ import { useAlert } from 'ui/components/alert';
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import type { TicketListResponse } from "pages/api/tickets";
 import type { TicketResponse } from "pages/api/tickets/[id]";
+import { TicketData } from 'lib/mongo/schema/ticket';
 
 function TicketCard(props: {
     ticket: string;
@@ -84,7 +85,7 @@ function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => v
     const name = !hasName ? 'Missing Name' : ticket.name;
     const email = !hasEmail ? 'No Email' : ticket.email;
     const subject = !hasSubject ? 'No Subject' : ticket.subject;
-    return <Card sx={{ margin: 'auto', width: 'min(300px, 80vw)', marginBottom: '15px' }} onClick={() => onClick(ticket?.id)}>
+    return <Card sx={{ margin: 'auto', width: 'min(300px, 80vw)' }} onClick={() => onClick(ticket?.id)}>
         <ListItemButton dense>
             <ListItemText {...{
                 primary: <>
@@ -105,13 +106,9 @@ function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => v
     </Card>
 }
 const queryClient = new QueryClient();
-function TicketListComponent(props: {}) {
-    const [errors, setErrors] = useState<{ [key: string]: string }>(null);
-    const [status, setStatus] = useState<string>(null);
-    const [submitting, setSubmitting] = useState(false);
-    const [doneSubmitting, setDoneSubmitting] = useState(false);
+function TicketListComponent(props: { filter?: any }) {
     const { isLoading, error, data, dataUpdatedAt } = useQuery<TicketListResponse>(['users'], () => (
-        fetch('/api/tickets').then(res => res.json())
+        fetch('/api/tickets?' + new URLSearchParams(props.filter).toString()).then(res => res.json())
     ));
     const [open, setOpen] = useState<string>(null)
     const { tickets } = data || { tickets: [] };
@@ -133,30 +130,29 @@ function TicketListComponent(props: {}) {
             });
         firstLoad.current = false;
     }, [dataUpdatedAt])
-    return (
-        isLoading ? (
-            <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50 }}>
-                <CircularProgress />
-            </Box>
-        ) : (tickets.length == 0 ? (
-            <Box>
-                <Card sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center' }}>
-                    No Tickets To Display
-                </Card>
-            </Box>
-        ) : (
-            < Box >
-                <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
-                    <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
-                        {open && <TicketCard ticket={open} />}
-                    </Box>
-                </Modal>
-                <Grid container spacing={2}>
-                    {tickets.map(({ id }) => <TicketListItem key={id} ticket={id} onClick={setOpen} />)}
-                </Grid>
-            </Box >
-        ))
-    )
+    if (isLoading) return <>
+        <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center', mt: '30vh' }}>
+            <CircularProgress size={50} />
+        </Box>
+    </>;
+    if (tickets.length == 0) return <>
+        <Typography>No Tickets</Typography>
+    </>;
+
+    return <>
+        <Box>
+            <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
+                <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
+                    {open && <TicketCard ticket={open} />}
+                </Box>
+            </Modal>
+            <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
+                {tickets.map(({ id }) => <Grid item key={id}>
+                    <TicketListItem ticket={id} onClick={setOpen} />
+                </Grid>)}
+            </Grid>
+        </Box>
+    </>
 }
 export function TicketList(props: (Parameters<typeof TicketListComponent>)[0]) {
     return <QueryClientProvider client={queryClient}>
