@@ -11,7 +11,7 @@ const queryClient = new QueryClient();
 
 function LandingPage() {
     const { isLoading, error, data } = useQuery(['details', 'landing'], () => {
-        return fetch('/api/details/landing')
+        return fetch('http://localhost:5000/api/details/landing')
             .then(response => response.json())
     })
     if (isLoading) return <Box />;
@@ -34,7 +34,7 @@ function LandingPage() {
 
 function AboutPage() {
     const { isLoading, error, data } = useQuery(['details', 'about'], () => {
-        return fetch('/api/details/about')
+        return fetch('http://localhost:5000/api/details/about')
             .then(response => response.json())
     })
     if (isLoading) return <Box />;
