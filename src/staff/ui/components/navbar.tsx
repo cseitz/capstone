@@ -33,10 +33,13 @@ const items: {
             name: "Events",
             url: "/events",
             icon: <EventNote />,
+        },
+        {
             name: "Tickets",
             url: "/tickets",
             icon:<ContactSupportIcon />
-        }, {
+        }, 
+        {
        
             name: "Exports",
             url: "/api/exports/users",
