@@ -19,6 +19,7 @@ const items: {
     name: string;
     url: string;
     icon: any;
+    showIcon?: 'left' | 'right';
     placement?: 'left' | 'right';
     visible?: (section?: 'navbar' | 'drawer') => boolean;
 }[] = [
@@ -59,6 +60,7 @@ const items: {
             name: "Logout",
             url: "/logout",
             placement: 'right',
+            showIcon: 'right',
             icon: <ExitToAppIcon />,
             visible() {
                 return Boolean(isAuthenticated());
@@ -105,7 +107,7 @@ export function NavBar() {
 
     const navbarLinksLeft = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement != 'right').map((x) =>
         <Link href={x.url} key={x.url}>
-            <Button color='inherit'>
+            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
                 {x.name}
             </Button>
         </Link>
@@ -113,7 +115,7 @@ export function NavBar() {
 
     const navbarLinksRight = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement == 'right').map((x) =>
         <Link href={x.url} key={x.url}>
-            <Button color='inherit'>
+            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
                 {x.name}
             </Button>
         </Link>
@@ -134,7 +136,7 @@ export function NavBar() {
     const isMobile = useMediaQuery('(max-width:600px)');
     return <>
         <HideOnScroll>
-            <AppBar position="sticky" style={{ backgroundColor: "black", color: "white", boxShadow: "0px 0px 0px 0px" }}>
+            <AppBar position="sticky" style={{ boxShadow: "0px 0px 0px 0px" }}>
                 <Toolbar>
                     <IconButton
                         onClick={handleDrawer}

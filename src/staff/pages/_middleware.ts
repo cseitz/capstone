@@ -14,8 +14,8 @@ const isStaff = isAuthenticated({
 
 export default function handler(req: NextRequest, ev: NextFetchEvent) {
     const { nextUrl: { pathname }, cookies: { auth } } = req;
-    if (pathname == '/logout2')
-        return NextResponse.rewrite('/api/auth/logout');
+    if (pathname.startsWith('/assets'))
+        return NextResponse.next();
     if (pathname.includes('/api'))
         return NextResponse.next();
     if (pathname == '/login') {

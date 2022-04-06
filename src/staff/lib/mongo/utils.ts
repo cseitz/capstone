@@ -38,9 +38,9 @@ export function UpdateDocument<T = Document>(doc: T & Document, payload: Partial
     return doc;
 }
 
-(async function () {
-    (await UserModel.findById('hi')).update()
-    UpdateDocument(await UserModel.findById('hi'), {
+// (async function () {
+//     (await UserModel.findById('hi')).update()
+//     UpdateDocument(await UserModel.findById('hi'), {
         
-    })
-})();
+//     })
+// })();
