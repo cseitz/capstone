@@ -38,6 +38,11 @@ const items: {
             icon: <ExitToAppIcon />,
             showIcon: 'right',
         },
+        {
+            name: "Audit Log Exports",
+            url: "/api/exports/logs",
+            icon: <HomeIcon />
+        },
     ];
 
 
