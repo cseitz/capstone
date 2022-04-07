@@ -4,11 +4,18 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { Details } from "lib/mongo/schema/details";
 
-const Landing = Details<{
+export interface LandingDetails {
     title: string;
     subtitle: string;
     logo: string;
-}>('landing', {
+}
+
+export interface AboutDetails {
+    info: string;
+    content: string;
+}
+
+const Landing = Details<LandingDetails>('landing', {
     title: {
         type: String,
         default: 'Never Forget'
@@ -24,10 +31,7 @@ const Landing = Details<{
 })
 
 
-const About = Details<{
-    info: string;
-    content: string;
-}>('about', {
+const About = Details<AboutDetails>('about', {
     info: {
         type: String,
         default: 'No Maidens'
@@ -38,14 +42,14 @@ const About = Details<{
     }
 })
 
-export const FillableTextData = new Promise(async (resolve) => {
-    resolve ({
-        landing: await Landing,
-        about: await About
-    })
-})
+export async function FillableTextData() {
+    return {
+        landing: await (await Landing)(),
+        about: await (await About)()
+    }
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.json(await FillableTextData)
+    res.json(await FillableTextData())
 }

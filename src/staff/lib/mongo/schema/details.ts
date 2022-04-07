@@ -46,7 +46,7 @@ type DetailsBaseModelType = Model<DetailsBaseSchema, QueryHelpers>;
 export type DetailsBaseDocument = HydratedDocument<DetailsBaseSchema>;
 export const DetailsBaseModel = (models?.['Details'] || model<DetailsBaseSchema, DetailsBaseModelType>('Details', schema)) as DetailsBaseModelType;
 
-export async function Details<Fields = { name: string }>(name: string, fields: SchemaDefinition<SchemaDefinitionType<Fields>>) { // Schema<Fields>
+export async function Details<Fields = { name: string }>(name: string, fields?: SchemaDefinition<SchemaDefinitionType<Fields>>) { // Schema<Fields>
     let doInitialized;
     const initialized = new Promise((resolve) => { doInitialized = resolve });
     const initalize = function () {
@@ -76,7 +76,11 @@ export async function Details<Fields = { name: string }>(name: string, fields: S
         await details.save();
     }
     console.log({ details })
-    return details;
+    const func = async function(): Promise<HydratedDocument<SpecificSchema>> {
+        return await specificDetails.findOne({ name });
+    };
+    func.__proto__ = details as SpecificData;
+    return func;
 }
 
 // new Schema<{
