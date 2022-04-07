@@ -39,10 +39,10 @@ const About = Details<{
 })
 
 export const FillableTextData = new Promise(async (resolve) => {
-    return {
+    resolve ({
         landing: await Landing,
         about: await About
-    }
+    })
 })
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
