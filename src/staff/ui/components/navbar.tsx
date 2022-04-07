@@ -13,6 +13,7 @@ import HowToRegIcon from '@mui/icons-material/HowToReg';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
 import { EventNote } from '@mui/icons-material';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
 const title = 'Staff Portal';
 const items: {
@@ -38,6 +39,11 @@ const items: {
             name: "Tickets",
             url: "/tickets",
             icon:<ContactSupportIcon />
+        }, 
+        {
+            name: "Details",
+            url: "/details",
+            icon:<DriveFileRenameOutlineIcon />
         }, 
         {
        
