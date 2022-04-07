@@ -63,7 +63,7 @@ export async function Details<Fields = { name: string }>(name: string, fields: S
     })
     // schema.plugin(TimestampPlugin);
     // schema.plugin(AuditPlugin);
-    const specificDetails = DetailsBaseModel.discriminator<SpecificSchema>(name, schema);
+    const specificDetails = DetailsBaseModel.discriminators?.[name] || DetailsBaseModel.discriminator<SpecificSchema>(name, schema);
     type SpecificDetailsDocument = HydratedDocument<SpecificSchema>;
     let details = await specificDetails.findOne({ name });
     if (!details) {
