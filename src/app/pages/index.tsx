@@ -45,7 +45,7 @@ function AboutPage() {
         <Box sx={{ width: '50%', m: 'auto' }}>
             <Card>
                 <CardContent>
-                    <Typography sx={{ textAlign: 'center' }}>{content}</Typography>
+                    <Typography component="pre" sx={{ textAlign: 'center' }}>{content}</Typography>
                 </CardContent>
             </Card>
         </Box>
