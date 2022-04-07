@@ -63,7 +63,7 @@ export function AboutDetailsPage() {
     return <Box>
         <Typography>About Page Text: </Typography>
         <TextField value={info} onChange={(event) => setInfo(event.target.value)} placeholder="Info" />
-        <TextField value={content} onChange={(event) => setContent(event.target.value)} placeholder="Content" />
+        <TextField value={content} onChange={(event) => setContent(event.target.value)} placeholder="Content" multiline minRows={2}/>
         <Button onClick={submit}>Save Changes</Button>
     </Box>
 }
