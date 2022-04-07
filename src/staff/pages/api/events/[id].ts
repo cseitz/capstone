@@ -13,7 +13,10 @@ const isStaff = isAuthenticated({
 
 export default Route<EventResponse>(async (req, res) => {
     const user = isStaff(req);
-    if (!user) throw new StatusError(403, 'Unauthorized');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    // if (!user) throw new StatusError(403, 'Unauthorized');
     const event = await EventModel.findById(req.query.id);
     res.json({
         event
