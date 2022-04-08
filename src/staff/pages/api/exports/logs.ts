@@ -25,7 +25,7 @@ export default Route(async (req, res) => {
     const lines = [];
     // Creates the headers for CSV
     // Below pushes each auditlog data point in each column then a new line is created to start another row
-    lines.push("Method,Kind,User,Process,Action,Reason,Source,Payload,Changes,Document")
+    lines.push("Method,Kind,User,Process,Action,Reason,Changes,Source,Payload,Document")
     for (const AuditLog of AuditLogs){
         lines.push([
             AuditLog.method,
@@ -34,13 +34,12 @@ export default Route(async (req, res) => {
             AuditLog.process,
             AuditLog.action,
             AuditLog.reason,
+            AuditLog.changes && `"${stringifyChanges(AuditLog.changes)?.replace(/\"/g, "\"\"")}"`,
             AuditLog.source,
-            `"${JSON.stringify(AuditLog?.payload)?.replace(/\"/g, "\"\"")}"`,
-            `"${stringifyChanges(AuditLog.changes)?.replace(/\"/g, "\"\"")}"`,
+            AuditLog?.payload && `"${JSON.stringify(AuditLog?.payload)?.replace(/\"/g, "\"\"")}"`,
             AuditLog.document
         ].join(","))
     }
-    console.log(lines);
     res.setHeader("Content-Disposition", "attachment; filename=\"logs.csv\"")
     res.send(lines.join("\r\n"))
 });
