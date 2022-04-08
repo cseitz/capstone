@@ -27,7 +27,7 @@ const items: {
         },
         {
             name: "Exports",
-            url: "/api/exports/users",
+            url: "/exports",
             icon: <HomeIcon />
         },
         {
@@ -35,11 +35,6 @@ const items: {
             url: "/logout",
             placement: 'right',
             icon: <ExitToAppIcon />
-        },
-        {
-            name: "Audit Log Exports",
-            url: "/api/exports/logs",
-            icon: <HomeIcon />
         },
     ];
 
