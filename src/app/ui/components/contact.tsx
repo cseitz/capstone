@@ -38,6 +38,8 @@ export function Contact() {
         }).then(async res => {
             console.log(res);
             if (!res.ok) throw (await res.json())?.error;
+            setSubmitting(false);
+            setDoneSubmitting(true);
             //router.push('/');
         })
             .catch(err => {
@@ -50,7 +52,42 @@ export function Contact() {
         setStatus("Fill out the form")
     }
 
-    return (
+    if (submitting) return <>
+        <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center' }}>
+            <CircularProgress style={{ textAlign: 'center', marginTop: 25, fontSize: 40 }} />
+        </Box>
+    </>;
+
+    if (doneSubmitting) return <>
+        <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center', mt: '25vh' }}>
+            <CheckIcon style={{ textAlign: 'center', marginTop: 25, fontSize: 40 }} />
+            <Typography variant="h5" style={{ textAlign: 'center', marginTop: 20 }} >Message Delivered!</Typography>
+            <Typography variant="h6" style={{ textAlign: 'center', marginTop: 15 }} >We'll get back to you soon!</Typography>
+            <Typography sx={{ mt: 2 }}>Updates will be sent to {email}</Typography>
+        </Box>
+    </>;
+
+    return <>
+        <Box>
+            <Box sx={{ mx: 'auto', width: 'min(500px, 90vw)', textAlign: 'center', mt: 10 }}>
+                <Typography variant="h4" style={{ textAlign: 'center', fontWeight: 'bold', marginTop: 25 }} >Contact Us</Typography>
+                <Typography style={{ textAlign: 'center', marginTop: 15, marginBottom: 25 }} >If you have any questions, concerns, or problems, please do not hesitate to contact us. Someone will get back to you shortly.</Typography>
+                <TextField label="Name" type="text" name="name" fullWidth onChange={(e) => { setStatus(null); setUsername(e.target.value) }} placeholder="Name" />
+                <br /><br />
+                <TextField label="Email" type="text" name="email" fullWidth onChange={(e) => { setStatus(null); setEmail(e.target.value) }} placeholder="Email" />
+                <br /><br />
+                <TextField label="Whats the topic?" type="text" name="subject" fullWidth onChange={(e) => { setStatus(null); setSubject(e.target.value) }} placeholder="Whats the topic?" />
+                <br /><br />
+                <TextField label="Write your message here." type="text" name="message" fullWidth multiline minRows={2} onChange={(e) => { setStatus(null); setMessage(e.target.value) }} placeholder="Write your message here." />
+                <br /><br />
+                <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Send</Button>
+                <br /><br />
+                {status ? <Typography id="errormessage" style={{ color: 'red', textAlign: 'center' }} >{status}</Typography> : ''}
+            </Box>
+        </Box>
+    </>
+
+    /*return (
         submitting ? (
             <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', text_align: 'center', marginTop: 50 }}>
                 <CircularProgress />
@@ -78,5 +115,5 @@ export function Contact() {
                 </Box>
             </Box>
         ))
-    )
+    )*/
 }

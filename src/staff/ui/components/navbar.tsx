@@ -6,11 +6,14 @@ import MailIcon from '@mui/icons-material/Mail';
 import Box from '@mui/material/Box';
 import Link from 'next/link'
 import HomeIcon from '@mui/icons-material/Home';
+import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import LoginIcon from '@mui/icons-material/Login';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
+import { EventNote } from '@mui/icons-material';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
 const title = 'Staff Portal';
 const items: {
@@ -27,8 +30,25 @@ const items: {
             icon: <HomeIcon />
         },
         {
+
+            name: "Events",
+            url: "/events",
+            icon: <EventNote />,
+        },
+        {
+            name: "Tickets",
+            url: "/tickets",
+            icon:<ContactSupportIcon />
+        }, 
+        {
+            name: "Details",
+            url: "/details",
+            icon:<DriveFileRenameOutlineIcon />
+        }, 
+        {
+       
             name: "Exports",
-            url: "/api/exports/users",
+            url: "/exports",
             icon: <HomeIcon />
         },
         {
@@ -37,11 +57,6 @@ const items: {
             placement: 'right',
             icon: <ExitToAppIcon />,
             showIcon: 'right',
-        },
-        {
-            name: "Audit Log Exports",
-            url: "/api/exports/logs",
-            icon: <HomeIcon />
         },
     ];
 

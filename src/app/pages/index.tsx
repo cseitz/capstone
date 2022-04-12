@@ -4,34 +4,25 @@ import Card from '@mui/material/Card';
 import { Box } from "@mui/system";
 import { FAQ } from "ui/components/faq";
 import Link from "next/link";
-import { useUser } from "lib/auth/client";
+import { useMemo } from "react";
+import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 
-const Data = {
-    Landing: {
-        Title: "SAMPLE EVENT",
-        Subtitle: "Feb 22nd 2022",
-        BackgroundImage: "",
-        // Logo: "http://divisqueeze.com/wp-content/uploads/2017/03/YourLogoHere.png",
-        Logo: '/assets/logo.png'
-    },
-    About: {
-        Info: "Hey this is some info to put about the event here",
-        Content: "This is more information to be put into another box",
-        Image: "",
-        BackgroundImage: ""
-    }
-}
+const queryClient = new QueryClient();
 
 function LandingPage() {
-    const { Landing } = Data;
-    const { Title, Subtitle, BackgroundImage, Logo } = Landing;
-    return <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
+    const { isLoading, error, data } = useQuery(['details', 'landing'], () => {
+        return fetch('/api/details/landing')
+            .then(response => response.json())
+    })
+    if (isLoading) return <Box />;
+    const { title, subtitle, backgroundImage, logo } = data;
+    return <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", textAlign: 'center' }}>
         <Box id="logo-container" sx={{ textAlign: 'center', mt: 10 }}>
-            <img src={Logo} style={{ padding: '20px', width: '300px', maxWidth: '90vw' }} />
-            <Typography variant="h2">{Title}</Typography>
+            <img src={logo} style={{ padding: '20px', width: '300px', maxWidth: '90vw' }} />
+            <Typography variant="h2">{title}</Typography>
         </Box>
         <Box id="lading-content-container" sx={{ textAlign: 'center' }}>
-            <Typography variant="h4">{Subtitle}</Typography>
+            <Typography variant="h4">{subtitle}</Typography>
             <Link href={'/register'}>
                 <Button variant="contained" color="primary" sx={{ m: 2 }}>
                     <Typography variant="h6">Register Here</Typography>
@@ -42,15 +33,19 @@ function LandingPage() {
 }
 
 function AboutPage() {
-    const { About, Landing: { Title } } = Data;
-    const { Info, Content, Image, BackgroundImage } = About;
-    return <Box sx={{ backgroundColor: 'lightpink', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
-        <Typography variant="h3" sx={{ textAlign: 'left', padding: '20px' }}>{Title}</Typography>
-        <Typography variant="h4" sx={{ textAlign: 'right', padding: '30px' }}>{Info}</Typography>
+    const { isLoading, error, data } = useQuery(['details', 'about'], () => {
+        return fetch('/api/details/about')
+            .then(response => response.json())
+    })
+    if (isLoading) return <Box />;
+    const { title, subtitle, info, content } = data;
+    return <Box sx={{ backgroundColor: 'lightpink', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", textAlign: 'center' }}>
+        <Typography variant="h3" sx={{ textAlign: 'left', padding: '20px' }}>{title}</Typography>
+        <Typography variant="h4" sx={{ textAlign: 'right', padding: '30px' }}>{info}</Typography>
         <Box sx={{ width: '50%', m: 'auto' }}>
             <Card>
                 <CardContent>
-                    <Typography sx={{ textAlign: 'center' }}>{Content}</Typography>
+                    <Typography component="pre" sx={{ textAlign: 'center' }}>{content}</Typography>
                 </CardContent>
             </Card>
         </Box>
@@ -78,16 +73,18 @@ function Footer() {
 }
 
 export default function Homepage() {
-    return <Box>
-        <Box height='100vh' display="flex" flexDirection="column">
-            <LandingPage />
+    return <QueryClientProvider client={queryClient}>
+        <Box>
+            <Box height='100vh' display="flex" flexDirection="column">
+                <LandingPage />
+            </Box>
+            <Box height='100vh' display="flex" flexDirection="column">
+                <AboutPage />
+            </Box>
+            <Box height='100vh' display="flex" flexDirection="column" sx={{ alignContent: 'center' }}>
+                <FAQPage />
+            </Box>
+            <Footer />
         </Box>
-        <Box height='100vh' display="flex" flexDirection="column">
-            <AboutPage />
-        </Box>
-        <Box height='100vh' display="flex" flexDirection="column" sx={{ alignContent: 'center' }}>
-            <FAQPage />
-        </Box>
-        <Footer />
-    </Box>
+    </QueryClientProvider>
 }
