@@ -20,7 +20,14 @@ export function EventListItem(props: { event: string }) {
     const hasType = Boolean(event.type);
     return <ListItem disablePadding>
         <Card>
-            <CardHeader title={title + " - " + type} subheader={startsAt + " - " + endsAt} action={
+            <CardHeader title={title + " - " + type} subheader={new Date(event.startsAt).toLocaleString('en-us', {
+                                            dateStyle: 'short',
+                                            timeStyle: 'short'
+                                        }) + " - " + new Date(event.endsAt).toLocaleString('en-us', {
+                                            dateStyle: 'short',
+                                            timeStyle: 'short'
+                                        })
+                                    } action={
                 <Button size="large" startIcon={<AssignmentIcon />}>
                     Sign Up
                 </Button>
