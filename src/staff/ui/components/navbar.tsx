@@ -6,17 +6,21 @@ import MailIcon from '@mui/icons-material/Mail';
 import Box from '@mui/material/Box';
 import Link from 'next/link'
 import HomeIcon from '@mui/icons-material/Home';
+import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import LoginIcon from '@mui/icons-material/Login';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { useRouter } from 'next/router';
+import { EventNote } from '@mui/icons-material';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
 const title = 'Staff Portal';
 const items: {
     name: string;
     url: string;
     icon: any;
+    showIcon?: 'left' | 'right';
     placement?: 'left' | 'right';
     visible?: (section?: 'navbar' | 'drawer') => boolean;
 }[] = [
@@ -26,6 +30,23 @@ const items: {
             icon: <HomeIcon />
         },
         {
+
+            name: "Events",
+            url: "/events",
+            icon: <EventNote />,
+        },
+        {
+            name: "Tickets",
+            url: "/tickets",
+            icon:<ContactSupportIcon />
+        }, 
+        {
+            name: "Details",
+            url: "/details",
+            icon:<DriveFileRenameOutlineIcon />
+        }, 
+        {
+       
             name: "Exports",
             url: "/exports",
             icon: <HomeIcon />
@@ -34,7 +55,8 @@ const items: {
             name: "Logout",
             url: "/logout",
             placement: 'right',
-            icon: <ExitToAppIcon />
+            icon: <ExitToAppIcon />,
+            showIcon: 'right',
         },
     ];
 
@@ -88,7 +110,7 @@ export function NavBar() {
 
     const navbarLinksLeft = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement != 'right').map((x) =>
         <Link href={x.url} key={x.url}>
-            <Button color='inherit'>
+            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
                 {x.name}
             </Button>
         </Link>
@@ -96,7 +118,7 @@ export function NavBar() {
 
     const navbarLinksRight = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement == 'right').map((x) =>
         <Link href={x.url} key={x.url}>
-            <Button color='inherit'>
+            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
                 {x.name}
             </Button>
         </Link>
@@ -117,7 +139,7 @@ export function NavBar() {
     const isMobile = useMediaQuery('(max-width:600px)');
     return visible && <>
         <HideOnScroll>
-            <AppBar position="sticky" style={{ backgroundColor: "black", color: "white", boxShadow: "0px 0px 0px 0px" }}>
+            <AppBar position="sticky" style={{ boxShadow: "0px 0px 0px 0px" }}>
                 <Toolbar>
                     <IconButton
                         onClick={handleDrawer}

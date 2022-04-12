@@ -96,7 +96,7 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
     const hasEmail = Boolean(user?.email.trim());
     const name = !hasName ? 'Missing Name' : user.info.firstName + ' ' + user.info.lastName;
     const email = !hasEmail ? 'No Email' : user.email;
-    return <ListItem secondaryAction={<Checkbox edge="start" />} disablePadding onClick={() => onClick(user?.id)}>
+    return <ListItem /*secondaryAction={<Checkbox edge="start" />}*/ disablePadding onClick={() => onClick(user?.id)}>
         <ListItemButton dense>
             <ListItemText {...{
                 primary: <>
@@ -117,7 +117,10 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
 }
 
 const queryClient = new QueryClient();
-function UserListComponent(props: {}) {
+function UserListComponent(props: { showCount?: boolean }) {
+    const {
+        showCount = false,
+    } = props;
     const { isLoading, error, data, dataUpdatedAt } = useQuery<UserListResponse>(['users'], () => (
         fetch('/api/users').then(res => res.json())
     ));
@@ -147,6 +150,9 @@ function UserListComponent(props: {}) {
                 {open && <UserCard user={open} />}
             </Box>
         </Modal>
+        {showCount && !isLoading && <Typography color="text.secondary">
+            Showing {users.length} users.
+        </Typography>}
         <List>
             {users.map(({ id }) => <UserListItem key={id} user={id} onClick={setOpen} />)}
         </List>
