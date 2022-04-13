@@ -202,7 +202,7 @@ export function EventListItem(props: { event: string, onClick?: (event: string) 
     if (isLoading) return <ListItem disablePadding />;
     const { title, description, startsAt, endsAt, type } = event;
     const hasType = Boolean(event.type);
-    return <ListItem disablePadding onClick={() => onClick(event?.id)}>
+    return <ListItem disablePadding onClick={() => onClick(event?.id)} sx={{ width: '100%' }}>
         <ListItemButton dense>
             <ListItemText {...{
                 primary: <>
@@ -265,7 +265,7 @@ function EventListComponent(props: { showCreate?: boolean, onClose?: () => void 
                 {open && <EventCard event={open} exit={exit} />}
             </Box>
         </Modal>
-        <List>
+        <List sx={{ width: '100%' }}>
             {events.map(({ id }) => <EventListItem key={id} event={id} onClick={setOpen} />)}
         </List>
     </>

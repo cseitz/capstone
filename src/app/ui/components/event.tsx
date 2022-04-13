@@ -36,7 +36,7 @@ export function EventListItem(props: { event: string }) {
   const hasType = Boolean(event.type);
   return (
     <ListItem disablePadding>
-      <Card>
+      <Card sx={{ width: '100%' }}>
         <CardHeader
           title={title + " - " + type}
           subheader={
