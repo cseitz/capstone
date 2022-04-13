@@ -16,6 +16,7 @@ export function Contact() {
     const [status, setStatus] = useState<string>(null);
     const [submitting, setSubmitting] = useState(false);
     const [doneSubmitting, setDoneSubmitting] = useState(false);
+    //Function checks if fields are filled in first
     function handleSubmit(e) {
         e.preventDefault();
         const err: typeof errors = {};
@@ -24,6 +25,7 @@ export function Contact() {
         if (!subject) err.subject = 'Required';
         if (!message) err.body = 'Required';
         setSubmitting(true);
+        //Pushes the fields to the API route to create the ticket
         fetch('../../../api/tickets/create', {
             method: 'POST',
             headers: {
@@ -34,30 +36,31 @@ export function Contact() {
                 email,
                 subject,
                 message
-            })
+            }) 
         }).then(async res => {
             console.log(res);
+            //Checks if error
+            //If error send error, if not show submitted feedback
             if (!res.ok) throw (await res.json())?.error;
             setSubmitting(false);
             setDoneSubmitting(true);
-            //router.push('/');
         })
+        //Catches the error
             .catch(err => {
                 setSubmitting(false);
                 setDoneSubmitting(false);
-                //setStatus(err);
                 console.log(err);
             })
         console.log("name : " + name + "email: " + email)
         setStatus("Fill out the form")
     }
-
+    //While subbmitting returns loading spinner
     if (submitting) return <>
         <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center' }}>
             <CircularProgress style={{ textAlign: 'center', marginTop: 25, fontSize: 40 }} />
         </Box>
     </>;
-
+    //After submission returns a feedback page
     if (doneSubmitting) return <>
         <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center', mt: '25vh' }}>
             <CheckIcon style={{ textAlign: 'center', marginTop: 25, fontSize: 40 }} />
@@ -66,7 +69,7 @@ export function Contact() {
             <Typography sx={{ mt: 2 }}>Updates will be sent to {email}</Typography>
         </Box>
     </>;
-
+    //By default returns the contact form
     return <>
         <Box>
             <Box sx={{ mx: 'auto', width: 'min(500px, 90vw)', textAlign: 'center', mt: 10 }}>
