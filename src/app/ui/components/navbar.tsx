@@ -15,6 +15,9 @@ import { useRouter } from 'next/router';
 import { isAuthenticated } from 'lib/auth/client';
 import { EventNote } from '@mui/icons-material';
 
+//creates item list to hold reference to each button information including name, link, and icon
+//These will be called soon later in the functions below
+//all of these are inlcuded in the side bar and the navigation bar.
 const title = 'Event Name 2022';
 const items: {
     name: string;
@@ -93,6 +96,7 @@ function HideOnScroll(props: {
     );
 }
 
+//This function creates the navebar model and shows it on the top of the screen
 export function NavBar() {
     const [open, setOpen] = useState(false)
     const [anchor, setAnchor] = useState('left');
@@ -110,7 +114,7 @@ export function NavBar() {
     const handleDrawer = () => {
         setOpen(true)
     }
-
+    //Creates the shift of nav bar buttons to the left
     const navbarLinksLeft = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement != 'right').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
@@ -118,7 +122,7 @@ export function NavBar() {
             </Button>
         </Link>
     );
-
+    //Creates the shift of tghe nav bar buttons to the right
     const navbarLinksRight = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement == 'right').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
@@ -127,7 +131,7 @@ export function NavBar() {
         </Link>
     );
 
-
+    //Creates the side bar buttons using the item list data that for each name link and button.
     const drawerLinks = items.filter(o => !o?.visible || o?.visible('drawer')).map((x) =>
         <Link href={x.url} key={x.url}>
             <ListItem button>
@@ -138,7 +142,7 @@ export function NavBar() {
             </ListItem>
         </Link>
     );
-
+    //This sets the max width to 600 pix of the screen only for mobile devices.
     const isMobile = useMediaQuery('(max-width:600px)');
     return <>
         <HideOnScroll>
@@ -165,7 +169,7 @@ export function NavBar() {
                 </Toolbar>
             </AppBar>
         </HideOnScroll>
-
+    
         <Drawer
             anchor='left'
             open={open}

@@ -9,7 +9,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 const isStaff = isAuthenticated({
     role: ['pending', 'user', 'staff', 'admin']
 })
-
+//
 function stringifyChanges(changes) {
     const results = [];
     for (const key in changes) {
@@ -25,6 +25,7 @@ export default Route(async (req, res) => {
     const lines = [];
     // Creates the headers for CSV
     // Below pushes each auditlog data point in each column then a new line is created to start another row
+    // Uses data from the Mongo Database in each row.
     lines.push("Method,Kind,User,Process,Action,Reason,Changes,Source,Payload,Document")
     for (const AuditLog of AuditLogs){
         lines.push([

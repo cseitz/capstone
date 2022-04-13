@@ -14,6 +14,8 @@ export default Route(async (req, res) => {
     const users = await UserModel.find()
     const lines = []
     //Creates the headers for each column in the CSV file
+    // Below pushes each user data point in each column then a new line is created to start another row
+    // Uses data from the Mongo Database in each row.
     lines.push("Email,Role,FirstName,LastName,Created")
     for (const user of users){
         lines.push([

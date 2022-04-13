@@ -15,6 +15,10 @@ import { useRouter } from 'next/router';
 import { EventNote } from '@mui/icons-material';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
+
+//creates item list to hold reference to each button information including name, link, and icon
+//These will be called soon later in the functions below
+//all of these are inlcuded in the side bar and the navigation bar.
 const title = 'Staff Portal';
 const items: {
     name: string;
@@ -107,7 +111,7 @@ export function NavBar() {
     const handleDrawer = () => {
         setOpen(true)
     }
-
+    //Creates the shift of nav bar buttons to the left
     const navbarLinksLeft = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement != 'right').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
@@ -115,7 +119,7 @@ export function NavBar() {
             </Button>
         </Link>
     );
-
+    //Creates the shift of nav bar buttons to the right
     const navbarLinksRight = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement == 'right').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
@@ -124,7 +128,7 @@ export function NavBar() {
         </Link>
     );
 
-
+    //Creates the side bar buttons using the item list data that for each name link and button.
     const drawerLinks = items.filter(o => !o?.visible || o?.visible('drawer')).map((x) =>
         <Link href={x.url} key={x.url}>
             <ListItem button>
@@ -135,7 +139,8 @@ export function NavBar() {
             </ListItem>
         </Link>
     );
-
+    
+    //This sets the max width to 600 pix of the screen only for mobile devices.
     const isMobile = useMediaQuery('(max-width:600px)');
     return visible && <>
         <HideOnScroll>
