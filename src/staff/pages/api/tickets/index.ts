@@ -12,7 +12,6 @@ export interface TicketListResponse {
 const isStaff = isAuthenticated({
     role: ['pending', 'user', 'staff', 'admin']
 })
-
 export default Route<TicketListResponse>(async (req, res) => {
     if (!isStaff(req)) throw new StatusError(403, 'Unauthorized');
     let { status } = req.query;

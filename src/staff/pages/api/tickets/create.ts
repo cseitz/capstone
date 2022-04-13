@@ -7,9 +7,10 @@ import { NextApiRequest, NextApiResponse } from "next";
 export interface TicketListResponse {
     ticket: TicketData
 }
-
+//Create model, audit, save and return it
 export default Route<TicketListResponse>(async (req, res) => {
     const { method } = req;
+    //If POST is not used throw error
     if (method != 'POST')
         throw new StatusError(405, 'Method Not Allowed');
     const {name, email, subject, message} = req.body;
