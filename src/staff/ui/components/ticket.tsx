@@ -11,7 +11,7 @@ import type { TicketResponse } from "pages/api/tickets/[id]";
 import { TicketData } from 'lib/mongo/schema/ticket';
 
 const queryClient = new QueryClient();
-
+//Individual ticket once clicked on
 function TicketCard(props: {
     ticket: string;
 } & CardProps) {
@@ -22,12 +22,14 @@ function TicketCard(props: {
     ));
     const { ticket } = data || {};
     const alert = useAlert();
+    //Displays loaded feedback
     useEffect(() => {
         alert.success({
             message: 'Loaded Ticket ' + ticket?.email || "[Missing name]",
             duration: 2000,
         })
     }, []);
+    
     const hasName = Boolean(ticket?.name?.trim());
     const hasEmail = Boolean(ticket?.email.trim());
     const hasSubject = Boolean(ticket?.subject.trim());
@@ -38,7 +40,7 @@ function TicketCard(props: {
         if (isLoading) return;
         setStatus(ticket.status);
     }, [isLoading]);
-
+    //Updates the ticket when attribute is changed
     useEffect(() => {
         if (isLoading) return;
         if (!status) return;
@@ -54,6 +56,7 @@ function TicketCard(props: {
             body: JSON.stringify({
                 status,
             })
+            //Checks error and gives feedback
         }).then(async (res) => {
             if (!res.ok) throw (await res.json())?.error;
             alert.success({
@@ -110,6 +113,7 @@ function TicketCard(props: {
 
     </Card>
 }
+//Individual small ticket
 function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => void }) {
     const { onClick = (ticket: string) => { }, } = props;
     const { isLoading, error, data } = useQuery<TicketResponse>(['tickets', props.ticket], () => (
@@ -117,12 +121,14 @@ function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => v
     ));
     const { ticket } = data || {};
     if (isLoading) return <ListItem disablePadding />;
+    //If ticket does not have attribute, that is displayed
     const hasName = Boolean(ticket?.name?.trim());
     const hasEmail = Boolean(ticket?.email.trim());
     const hasSubject = Boolean(ticket?.subject.trim());
     const name = !hasName ? 'Missing Name' : ticket.name;
     const email = !hasEmail ? 'No Email' : ticket.email;
     const subject = !hasSubject ? 'No Subject' : ticket.subject;
+    //Returns the card displaying ticket attributes
     return <Card sx={{ margin: 'auto', width: 'min(300px, 80vw)' }} onClick={() => onClick(ticket?.id)}>
         <ListItemButton dense>
             <ListItemText {...{
@@ -143,7 +149,7 @@ function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => v
         </ListItemButton>
     </Card>
 }
-
+//Row full of tickets
 function TicketListComponent(props: { filter?: any, setCount?: any }) {
     const query = new URLSearchParams(props.filter || {}).toString();
     const { isLoading, error, data, dataUpdatedAt } = useQuery<TicketListResponse>(['tickets', query], () => (
@@ -161,6 +167,7 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
         })
     }, [isLoading]);
     const firstLoad = useRef(true);
+    //Displays when the page was refreshed
     useEffect(() => {
         if (isLoading) return;
         if (!firstLoad.current)
@@ -171,17 +178,20 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
             });
         firstLoad.current = false;
     }, [dataUpdatedAt])
+    //If loading returns a spinner
     if (isLoading) return <>
         <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center', mt: '30vh' }}>
             <CircularProgress size={50} />
         </Box>
     </>;
+    //If no tickets to display, it displays "No Tickets"
     if (tickets.length == 0) return <>
         <Typography variant="h5" sx={{ textAlign: 'center', mt: 10 }}>No Tickets</Typography>
     </>;
 
     if (props.setCount) props.setCount(tickets.length);
-
+    //Returns a grid where each ticket is mapped to a card
+    //On click opens the TicketCard
     return <>
         <Box>
             <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
