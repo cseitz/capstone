@@ -22,7 +22,7 @@ export default function Eventpage() {
                 <Typography variant="h1"    >Upcoming Events</Typography>
             </Box>
             <br />
-            <Box id="events-container" sx={{ backgroundColor: '', width: '50%', height: '75%', margin: 'auto', border: 2, borderRadius: 1}}>
+            <Box id="events-container" sx={{ backgroundColor: '', width: '50%', height: '75%', margin: 'auto'}}>
                 <EventList />
             </Box>
         </Box>
