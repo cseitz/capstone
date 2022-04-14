@@ -30,14 +30,14 @@ const items: {
             icon: <HomeIcon />
         },
         {
-            name: "Events",
-            url: "/events",
-            icon: <EventNote />,
-        },
-        {
             name: "FAQ",
             url: "/#faq",
             icon: <LiveHelpIcon />
+        },
+        {
+            name: "Events",
+            url: "/events",
+            icon: <EventNote />,
         },
         {
             name: "Contact",
