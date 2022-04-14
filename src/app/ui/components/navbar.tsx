@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { AppBar, Button, IconButton, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Slide, useScrollTrigger, useMediaQuery } from "@mui/material";
+import { AppBar, Button, IconButton, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Slide, useScrollTrigger, useMediaQuery, Divider } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
@@ -15,7 +15,7 @@ import { useRouter } from 'next/router';
 import { isAuthenticated } from 'lib/auth/client';
 import { EventNote } from '@mui/icons-material';
 
-const title = 'Event Name 2022';
+const title = 'Website Title';
 const items: {
     name: string;
     url: string;
@@ -111,9 +111,20 @@ export function NavBar() {
         setOpen(true)
     }
 
+    const styles = {
+        button: {
+            px: 2,
+            mx: 0.5
+        },
+        drawer: {
+            width: '100%',
+            pl: 8
+        }
+    }
+
     const navbarLinksLeft = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement != 'right').map((x) =>
         <Link href={x.url} key={x.url}>
-            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
+            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon} sx={{ ...styles.button }}>
                 {x.name}
             </Button>
         </Link>
@@ -121,23 +132,35 @@ export function NavBar() {
 
     const navbarLinksRight = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement == 'right').map((x) =>
         <Link href={x.url} key={x.url}>
-            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon}>
+            <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon} sx={{ ...styles.button }}>
                 {x.name}
             </Button>
         </Link>
     );
 
-
-    const drawerLinks = items.filter(o => !o?.visible || o?.visible('drawer')).map((x) =>
+    const [transitionStep, setTransitionStep] = useState(0);
+    const drawerLinks = items.filter(o => !o?.visible || o?.visible('drawer')).map((x, index) =>
         <Link href={x.url} key={x.url}>
-            <ListItem button>
-                <ListItemIcon>
-                    {x.icon}
-                </ListItemIcon>
-                <ListItemText primary={x.name} />
-            </ListItem>
+            <Slide in={open && transitionStep > index} direction="right" timeout={200}>
+                <ListItem button sx={{ ...styles.drawer }}>
+                    <ListItemIcon>
+                        {x.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={x.name} />
+                </ListItem>
+            </Slide>
         </Link>
     );
+
+    useEffect(() => {
+        if (!open) return setTransitionStep(0);
+        if (transitionStep <= drawerLinks.length) {
+            const tmt = setTimeout(function() {
+                setTransitionStep(transitionStep + 1);
+            }, (transitionStep == 0 ? 50 : 0) + 30);
+            return () => clearTimeout(tmt);
+        }
+    }, [transitionStep, open]);
 
     const isMobile = useMediaQuery('(max-width:600px)');
     return <>
@@ -171,10 +194,9 @@ export function NavBar() {
             open={open}
             onClose={() => setOpen(false)}
         >
-            <Box
-                sx={{ p: 5 }}>
-
-                <h3> Welcome</h3>
+            <Box sx={{ width: 250, mt: 5 }}>
+                <Typography variant="h6" sx={{ textAlign: 'center', mb: 3 }}>Navigation</Typography>
+                <Divider orientation='horizontal' />
                 <List>
                     {drawerLinks}
                 </List>
