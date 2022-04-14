@@ -155,7 +155,7 @@ export function NavBar() {
     useEffect(() => {
         if (!open) return setTransitionStep(0);
         if (transitionStep <= drawerLinks.length) {
-            const tmt = setTimeout(function() {
+            const tmt = setTimeout(function () {
                 setTransitionStep(transitionStep + 1);
             }, (transitionStep == 0 ? 50 : 0) + 30);
             return () => clearTimeout(tmt);
@@ -203,8 +203,6 @@ export function NavBar() {
             </Box>
 
         </Drawer>
-
-
 
     </>;
 }
