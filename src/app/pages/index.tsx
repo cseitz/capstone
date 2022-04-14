@@ -7,14 +7,16 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import Image from "next/image";
+import { hostname } from "os";
 
 const queryClient = new QueryClient();
 
 export async function getServerSideProps({ req }) {
-    const { 
+    let { 
         origin = req.headers['host']
     } = new URL(req.headers?.['referer'] || 'http://' + req.headers?.['host']);
-    console.log({ origin })
+    if (hostname() == 'capstone') origin = 'https://capstone.lol';
+    // console.log({ origin })
     const { landing, about } = await (await fetch(origin + '/api/details')).json();
     return {
         props: {
