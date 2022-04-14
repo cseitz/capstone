@@ -11,8 +11,10 @@ import Image from "next/image";
 const queryClient = new QueryClient();
 
 export async function getServerSideProps({ req }) {
-    console.log(req.headers['referer'])
-    const { landing, about } = await (await fetch(req.headers['referer'] + 'api/details')).json();
+    const { 
+        origin = req.headers['host']
+    } = new URL(req.headers?.['referer'] || 'http://' + req.headers?.['host']);
+    const { landing, about } = await (await fetch(origin + '/api/details')).json();
     return {
         props: {
             landing,
