@@ -14,7 +14,10 @@ const isStaff = isAuthenticated({
 })
 
 export default Route<EventListResponse>(async (req, res) => {
-    if (!isStaff(req)) throw new StatusError(403, 'Unauthorized');
+    // if (!isStaff(req)) throw new StatusError(403, 'Unauthorized');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
     const events = await EventModel.find()
     res.json({
         events

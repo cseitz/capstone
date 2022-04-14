@@ -22,7 +22,8 @@
     "paths": {
       "api/*": ["../staff/pages/api/*"],
       "staff/*": ["../staff/*"],
-      "schema/*": ["../staff/lib/mongo/schema/*"]
+      "schema/*": ["../staff/lib/mongo/schema/*"],
+      "lib/*": ["lib/*", "../staff/lib/*"]
     }
   },
   "include": [

@@ -30,8 +30,10 @@ services:
       - NGINX_HOST_API=http://staff:5000
       - NGINX_HOST_WEB=http://app:5001
       - NGINX_HOST_NAME=capstone.lol
+      - NGINX_MONGO_PORT=27017
     ports:
       - 80:80
+      - 27017:27017
     links:
       - mongo:mongo
       - app:app
