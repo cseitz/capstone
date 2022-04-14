@@ -25,7 +25,7 @@ export default function Eventpage() {
             </Box>
             <br />
             {/* Events container that holds the eventlist component that is pull from ui/componenets/event */}
-            <Box id="events-container" sx={{ backgroundColor: '', width: '700px', maxWidth: '90vw', margin: 'auto', border: 2, borderRadius: 1}}>
+            <Box id="events-container" sx={{ backgroundColor: '', width: '700px', maxWidth: '95vw', margin: 'auto' }}>
                 <EventList />
             </Box>
         </Box>

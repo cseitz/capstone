@@ -40,10 +40,10 @@ export function EventListItem(props: { event: string }) {
     const { title, description, startsAt, endsAt, type } = event;
     const hasType = Boolean(event.type);
     return (
-        <ListItem disablePadding>
+        <ListItem disablePadding sx={{ mb: 2 }}>
             <Card sx={{ width: '100%' }}>
                 <CardHeader
-                    title={title + " - " + type}
+                    title={title + (type ? " - " + type : '')}
                     subheader={
                         new Date(event.startsAt).toLocaleString("en-us", {
                             dateStyle: "short",
@@ -87,21 +87,6 @@ function EventListComponent(props: {}) {
         });
     }, [isLoading]);
     const firstLoad = useRef(true);
-    // Alert for when the page refreshes
-    useEffect(() => {
-        if (isLoading) return;
-        if (!firstLoad.current)
-            alert.info({
-                message:
-                    "Refreshed at " +
-                    new Date(dataUpdatedAt).toLocaleTimeString("en-us", {
-                        timeStyle: "medium",
-                    }),
-                duration: 1500,
-                unique: "eventListRefreshedAt",
-            });
-        firstLoad.current = false;
-    }, [dataUpdatedAt]);
     // List of events
     return (
         <>
