@@ -5,8 +5,8 @@ import { useAlert } from "./alert";
 import { useEffect,  useRef } from "react";
 import AssignmentIcon from '@mui/icons-material/AssignmentOutlined';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import type{ EventResponse } from 'api/events/[id]';
-import type{ EventListResponse } from 'api/events'
+import type { EventResponse } from 'api/events/[id]';
+import type { EventListResponse } from 'api/events'
 
 const queryClient = new QueryClient();
 
