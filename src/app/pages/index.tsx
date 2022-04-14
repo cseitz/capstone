@@ -6,15 +6,26 @@ import { FAQ } from "ui/components/faq";
 import Link from "next/link";
 import { useMemo } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import Image from "next/image";
 
 const queryClient = new QueryClient();
 
-function LandingPage() {
-    const { isLoading, error, data } = useQuery(['details', 'landing'], () => {
+export async function getServerSideProps({ req }) {
+    console.log(req.headers['referer'])
+    const { landing, about } = await (await fetch(req.headers['referer'] + 'api/details')).json();
+    return {
+        props: {
+            landing,
+            about,
+        }
+    }
+}
+
+function LandingPage(props: { data }) {
+    const { isLoading, error, data = props.data } = useQuery(['details', 'landing'], () => {
         return fetch('/api/details/landing')
             .then(response => response.json())
     })
-    if (isLoading) return <Box />;
     const { title, subtitle, backgroundImage, logo } = data;
     return <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", textAlign: 'center' }}>
         <Box id="logo-container" sx={{ textAlign: 'center', mt: 10 }}>
@@ -32,12 +43,11 @@ function LandingPage() {
     </Box>
 }
 
-function AboutPage() {
-    const { isLoading, error, data } = useQuery(['details', 'about'], () => {
+function AboutPage(props: { data }) {
+    const { isLoading, error, data = props.data } = useQuery(['details', 'about'], () => {
         return fetch('/api/details/about')
             .then(response => response.json())
     })
-    if (isLoading) return <Box />;
     const { title, subtitle, info, content } = data;
     return <Box sx={{ backgroundColor: 'lightpink', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", textAlign: 'center' }}>
         <Typography variant="h3" sx={{ textAlign: 'left', padding: '20px' }}>{title}</Typography>
@@ -72,14 +82,14 @@ function Footer() {
     </Box>
 }
 
-export default function Homepage() {
+export default function Homepage({ landing, about }) {
     return <QueryClientProvider client={queryClient}>
         <Box>
             <Box height='100vh' display="flex" flexDirection="column">
-                <LandingPage />
+                <LandingPage data={landing} />
             </Box>
             <Box height='100vh' display="flex" flexDirection="column">
-                <AboutPage />
+                <AboutPage data={about} />
             </Box>
             <Box height='100vh' display="flex" flexDirection="column" sx={{ alignContent: 'center' }}>
                 <FAQPage />
