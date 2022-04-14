@@ -14,6 +14,7 @@ export async function getServerSideProps({ req }) {
     const { 
         origin = req.headers['host']
     } = new URL(req.headers?.['referer'] || 'http://' + req.headers?.['host']);
+    console.log({ origin })
     const { landing, about } = await (await fetch(origin + '/api/details')).json();
     return {
         props: {
