@@ -16,13 +16,13 @@ import { QueryClient } from 'react-query';
 import { EventList } from 'ui/components/event';
 
 export default function Eventpage() {
-    return <Box height='100vh' display="flex" flexDirection="column">
-        <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", text_align: 'center' }}>
+    return <Box height='100vh' display="flex">
+        <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", textAlign: 'center', pt: 4 }}>
             <Box style={{ textAlign: 'center' }}>
-                <Typography variant="h1"    >Upcoming Events</Typography>
+                <Typography variant="h3">Upcoming Events</Typography>
             </Box>
             <br />
-            <Box id="events-container" sx={{ backgroundColor: '', width: '50%', height: '75%', margin: 'auto', border: 2, borderRadius: 1}}>
+            <Box id="events-container" sx={{ backgroundColor: '', width: '700px', maxWidth: '90vw', margin: 'auto', border: 2, borderRadius: 1}}>
                 <EventList />
             </Box>
         </Box>
