@@ -10,3 +10,7 @@ export const serverRuntimeConfig = {
         private: __data + '/private',
     }
 }
+
+export const typescript = {
+    ignoreBuildErrors: process.env?.IGNORE_BUILD_ERRORS ? true : false,
+}

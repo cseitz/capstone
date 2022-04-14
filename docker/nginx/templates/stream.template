@@ -10,5 +10,5 @@
 
 
 # upstream mongo {
-#     server mongo:27020;
+#     server mongo:$NGINX_DOCKER_PORT;
 # }
