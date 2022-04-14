@@ -15,6 +15,8 @@ import { FavoriteBorder } from '@mui/icons-material';
 import { QueryClient } from 'react-query';
 import { EventList } from 'ui/components/event';
 
+
+//Event page export.. this is the websites event page
 export default function Eventpage() {
     return <Box height='100vh' display="flex">
         <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", textAlign: 'center', pt: 4 }}>
@@ -22,6 +24,7 @@ export default function Eventpage() {
                 <Typography variant="h3">Upcoming Events</Typography>
             </Box>
             <br />
+            {/* Events container that holds the eventlist component that is pull from ui/componenets/event */}
             <Box id="events-container" sx={{ backgroundColor: '', width: '700px', maxWidth: '90vw', margin: 'auto', border: 2, borderRadius: 1}}>
                 <EventList />
             </Box>

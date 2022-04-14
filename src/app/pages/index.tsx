@@ -21,7 +21,11 @@ export async function getServerSideProps({ req }) {
     }
 }
 
+// Each of the page components will take up one view for each computer. That way it is consistent.
+
+//Landing page component first thing you will see when you load the website.
 function LandingPage(props: { data }) {
+    // pulls data from api that staff specify
     const { isLoading, error, data = props.data } = useQuery(['details', 'landing'], () => {
         return fetch('/api/details/landing')
             .then(response => response.json())
@@ -43,7 +47,9 @@ function LandingPage(props: { data }) {
     </Box>
 }
 
+//About component for about the organization or event that the staff can change details about.
 function AboutPage(props: { data }) {
+    //pulling data from api about the details
     const { isLoading, error, data = props.data } = useQuery(['details', 'about'], () => {
         return fetch('/api/details/about')
             .then(response => response.json())
@@ -62,6 +68,7 @@ function AboutPage(props: { data }) {
     </Box>
 }
 
+// FAQ page using accordian from the FAQ component from the components folder.
 function FAQPage() {
     return <Box id="faq" sx={{ backgroundColor: 'cornsilk', width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", alignContent: 'center', textAlign: 'center', pt: 5 }}>
         <Typography variant="h3">FAQ</Typography>
@@ -76,12 +83,14 @@ function FAQPage() {
     </Box>
 }
 
+//footer for possible sponsors
 function Footer() {
     return <Box sx={{ backgroundColor: 'lightsalmon', height: '100px' }}>
         <Typography variant="h5" sx={{ textAlign: 'initial' }}>Powered By</Typography>
     </Box>
 }
 
+//Homepage utilizing all of the components
 export default function Homepage({ landing, about }) {
     return <QueryClientProvider client={queryClient}>
         <Box>

@@ -26,11 +26,13 @@ export default function EventPage() {
         }
     }), [isMobile]);
 
+    // event page 
     return <Box sx={{ p: 2 }}>
         <Box sx={{ ...sx.container }}>
             <Typography variant="h4" sx={{ ...sx.title }}>
                 Events
             </Typography>
+            {/* CREATE BUTTON FOR EVENT */}
             <Button variant="contained" sx={{ ...sx.button }} startIcon={<CreateIcon />} onClick={() => setShowCreate(true)}>
                 Create Event
             </Button>
