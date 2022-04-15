@@ -17,15 +17,21 @@ function stringifyChanges(changes) {
 //Routes to mongo db and creates csv file of Audit log 
 export default Route(async (req, res) => {
     if (!isStaff(req)) throw new StatusError(403, 'Unauthorized');
-    const AuditLogs = await AuditLogModel.find().populate('user', 'email')
+    const AuditLogs = await AuditLogModel.find().sort({ created: -1 }).populate('user', 'email')
     const lines = [];
     // Creates the headers for CSV
     // Below pushes each auditlog data point in each column then a new line is created to start another row
     lines.push("Method,Kind,User,Process,Action,Reason,Changes,Source,Payload,Document")
     for (const AuditLog of AuditLogs){
+        const method = AuditLog.method;
+        const kind = AuditLog.get('kind')?.replace("AuditLog", "");
+        let doc = AuditLog.document;
+        if (kind == 'User' && method != 'delete') {
+            doc = (await UserModel.findById(doc).select({ email: 1 }))?.email || doc;
+        }
         lines.push([
-            AuditLog.method,
-            AuditLog.get('kind')?.replace("AuditLog", ""),
+            method,
+            kind,
             AuditLog?.user?.email,
             AuditLog.process,
             AuditLog.action,
@@ -33,7 +39,7 @@ export default Route(async (req, res) => {
             AuditLog.changes && `"${stringifyChanges(AuditLog.changes)?.replace(/\"/g, "\"\"")}"`,
             AuditLog.source,
             AuditLog?.payload && `"${JSON.stringify(AuditLog?.payload)?.replace(/\"/g, "\"\"")}"`,
-            AuditLog.document
+            doc
         ].join(","))
     }
     res.setHeader("Content-Disposition", "attachment; filename=\"logs.csv\"")

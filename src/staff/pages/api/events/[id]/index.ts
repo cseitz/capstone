@@ -1,5 +1,4 @@
-import { isAuthenticated } from "lib/auth";
-import { isStaff } from "lib/auth/guards";
+import { isLoggedIn, isStaff } from "lib/auth/guards";
 import { EventModel, EventData } from "lib/mongo/schema/event";
 import { UpdateDocument } from "lib/mongo/utils";
 import { Route, StatusError } from "lib/route";
@@ -10,10 +9,10 @@ export interface EventResponse {
 }
 
 export default Route<EventResponse>(async (req, res) => {
-    const client = isStaff(req);
+    const client = isLoggedIn(req);
     const { method, headers, query } = req;
     const event = await EventModel.findById(req.query.id);
-    const rsvp = client ? event.signups.includes(client.id) : false;
+    const rsvp = client ? event.signups.includes(client.id) : undefined;
     if (method == 'GET') {
         const data = event.toJSON();
         if (!client) delete data.signups;
@@ -22,7 +21,7 @@ export default Route<EventResponse>(async (req, res) => {
             event: data,
         })
     } else if (method == 'PATCH') {
-        if (!client) throw new StatusError(403, 'Unauthorized');
+        if (!client || !isStaff(req)) throw new StatusError(403, 'Unauthorized');
         await event.audit({
             user: client.id,
         })
@@ -47,7 +46,7 @@ export default Route<EventResponse>(async (req, res) => {
             event: data,
         })
     } else if (method == 'DELETE') {
-        if (!client) throw new StatusError(403, 'Unauthorized');
+        if (!client || !isStaff(req)) throw new StatusError(403, 'Unauthorized');
         await event.audit({
             user: client.id,
         })

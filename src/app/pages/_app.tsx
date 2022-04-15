@@ -26,6 +26,13 @@ export default function App({ Component, pageProps }: AppProps) {
                             justifyContent: 'center'
                         }
                     }
+                },
+                MuiTextField: {
+                    defaultProps: {
+                        InputLabelProps: {
+                            shrink: true
+                        }
+                    }
                 }
             }
         })
