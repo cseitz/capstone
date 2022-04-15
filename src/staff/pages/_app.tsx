@@ -1,4 +1,5 @@
 import { createTheme, CssBaseline, useMediaQuery, ThemeProvider } from "@mui/material";
+import { useUser } from "lib/auth/client";
 import { AppProps } from "next/app";
 import { useMemo } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -36,9 +37,15 @@ export default function App({ Component, pageProps }: AppProps) {
         <CssBaseline />
         <QueryClientProvider client={queryClient}>
             <NavBar />
+            <UserSessionUpdater />
             <AlertProvider>
                 <Component {...pageProps} />
             </AlertProvider>
         </QueryClientProvider>
     </ThemeProvider>
+}
+
+function UserSessionUpdater() {
+    const user = useUser();
+    return <></>
 }
