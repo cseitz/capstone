@@ -74,6 +74,7 @@ function ExportsLink(props: {
                     duration: 2000,
                 });
             }).catch(err => {
+                setIsLoading(false);
                 alert.error('Download Failed: ' + err, {
                     unique: 'exports.download',
                     duration: 2000,
