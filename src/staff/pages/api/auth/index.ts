@@ -2,12 +2,11 @@ import { Route, StatusError } from "lib/route";
 import { createToken, isAuthenticated, verifyToken } from "lib/auth";
 import { UserModel } from "lib/mongo/schema/user";
 import { serialize } from "cookie";
+import { isLoggedIn } from "lib/auth/guards";
 
 export interface AuthenticationStatusResponse {
 
 }
-
-const isLoggedIn = isAuthenticated({});
 
 export default Route(async (req, res) => {
     let token = await verifyToken(req);

@@ -1,4 +1,5 @@
 import { isAuthenticated } from "lib/auth";
+import { isStaff } from "lib/auth/guards";
 import { TicketData, TicketModel } from "lib/mongo/schema/ticket";
 import { Route, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -7,11 +8,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 export interface TicketListResponse {
     tickets: TicketData[]
 }
-
-//makes sure the request is coming from an authenticated user
-const isStaff = isAuthenticated({
-    role: ['pending', 'user', 'staff', 'admin']
-})
 
 export default Route<TicketListResponse>(async (req, res) => {
     if (!isStaff(req)) throw new StatusError(403, 'Unauthorized');

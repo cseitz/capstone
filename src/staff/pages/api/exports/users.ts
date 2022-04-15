@@ -1,12 +1,8 @@
 import { isAuthenticated } from "lib/auth";
+import { isStaff } from "lib/auth/guards";
 import { UserData, UserDocument, UserModel } from "lib/mongo/schema/user";
 import { Route, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
-
-//This function allows Staff roles to be authenticated
-const isStaff = isAuthenticated({
-    role: ['pending', 'user', 'staff', 'admin']
-})
 
 //Routes to mongo db and creates csv file of Audit log 
 export default Route(async (req, res) => {

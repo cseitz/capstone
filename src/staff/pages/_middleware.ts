@@ -1,14 +1,7 @@
 import { isAuthenticated } from "lib/auth";
+import { isLoggedIn, isStaff } from "lib/auth/guards";
 import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 
-
-const isLoggedIn = isAuthenticated({
-    
-})
-
-const isStaff = isAuthenticated({
-    role: ['pending', 'user', 'staff', 'admin']
-})
 
 export default function handler(req: NextRequest, ev: NextFetchEvent) {
     const { nextUrl: { pathname }, cookies: { auth } } = req;

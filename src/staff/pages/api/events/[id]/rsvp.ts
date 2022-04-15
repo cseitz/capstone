@@ -1,4 +1,5 @@
 import { isAuthenticated } from "lib/auth";
+import { isLoggedIn } from "lib/auth/guards";
 import { EventModel, EventData } from "lib/mongo/schema/event";
 import { UpdateDocument } from "lib/mongo/utils";
 import { Route, StatusError } from "lib/route";
@@ -7,8 +8,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 export interface EventResponse {
     rsvp: boolean
 }
-
-const isLoggedIn = isAuthenticated({})
 
 export default Route<EventResponse>(async (req, res) => {
     const client = isLoggedIn(req);

@@ -1,4 +1,5 @@
 import { isAuthenticated } from "lib/auth";
+import { isAdmin, isStaff } from "lib/auth/guards";
 import { UserData, UserDocument, UserModel } from "lib/mongo/schema/user";
 import { UpdateDocument } from "lib/mongo/utils";
 import { Route, StatusError } from "lib/route";
@@ -7,14 +8,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 export interface UserResponse {
     user?: UserData
 }
-
-const isStaff = isAuthenticated({
-    role: ['staff', 'admin']
-})
-
-const isAdmin = isAuthenticated({
-    role: ['admin']
-})
 
 export default Route<UserResponse>(async (req, res) => {
     const { method, headers, query } = req;
