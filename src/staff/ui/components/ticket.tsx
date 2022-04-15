@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "reac
 import type { TicketListResponse } from "pages/api/tickets";
 import type { TicketResponse } from "pages/api/tickets/[id]";
 import { TicketData } from 'lib/mongo/schema/ticket';
+import { usePrompt } from './prompt';
 
 const queryClient = new QueryClient();
 
@@ -92,9 +93,22 @@ function TicketCard(props: {
         })
     }, [ticket])
 
+    const deletePrompt = usePrompt({
+        title: `Are you sure you want to delete this ticket?`,
+        content: <Typography>
+            This action cannot be undone.
+        </Typography>,
+        actions: () => <>
+            <Button onClick={() => { deletePrompt(false) }}>Cancel</Button>
+            <Button onClick={() => { deletePrompt(false); exit(); remove(); }}>Confirm</Button>
+        </>
+    })
+    const DeletePrompt = deletePrompt.Provider;
+    const promptRemove = () => deletePrompt(true);
+
     const topActions = <>
         <Tooltip title="Delete" placement="left" disableInteractive>
-            <IconButton onClick={() => remove()}>
+            <IconButton onClick={() => promptRemove()}>
                 <DeleteIcon />
             </IconButton>
         </Tooltip>
@@ -105,49 +119,52 @@ function TicketCard(props: {
         </Tooltip>
     </>
 
-    return <Card {...cardProps}>
-        <CardHeader {...{
-            title: <Box component="span" sx={{ color: !hasName && 'error.main' }}>
-                {hasName ? [ticket.name].map(o => o.trim()).join(' ') : 'Missing Name'}
-            </Box>,
-            subheader: <Box component="span" sx={{ color: !hasEmail && 'error.main' }}>
-                {hasEmail ? ticket.email : 'No Email'}
+    return <>
+        <DeletePrompt />
+        <Card {...cardProps}>
+            <CardHeader {...{
+                title: <Box component="span" sx={{ color: !hasName && 'error.main' }}>
+                    {hasName ? [ticket.name].map(o => o.trim()).join(' ') : 'Missing Name'}
+                </Box>,
+                subheader: <Box component="span" sx={{ color: !hasEmail && 'error.main' }}>
+                    {hasEmail ? ticket.email : 'No Email'}
 
-            </Box>
-        }} action={topActions} />
-        <CardContent>
-            <InputLabel sx={{ mb: 1 }}>Subject</InputLabel>
-            <Typography>{hasSubject ? ticket?.subject : 'No Subject'}</Typography>
-            <InputLabel sx={{ mb: 1, mt: 2 }}>Message</InputLabel>
-            <Typography>{hasMessage ? ticket?.message : 'No Message'}</Typography>
-            <InputLabel sx={{ mt: 2 }}>Metadata</InputLabel>
-            <List dense>
-                <ListItem>
-                    <ListItemText primary="Created" secondary={new Date(ticket?.created).toLocaleString('en-us', {
-                        dateStyle: 'short',
-                        timeStyle: 'short'
-                    })} />
-                </ListItem>
-                <ListItem>
+                </Box>
+            }} action={topActions} />
+            <CardContent>
+                <InputLabel sx={{ mb: 1 }}>Subject</InputLabel>
+                <Typography>{hasSubject ? ticket?.subject : 'No Subject'}</Typography>
+                <InputLabel sx={{ mb: 1, mt: 2 }}>Message</InputLabel>
+                <Typography>{hasMessage ? ticket?.message : 'No Message'}</Typography>
+                <InputLabel sx={{ mt: 2 }}>Metadata</InputLabel>
+                <List dense>
+                    <ListItem>
+                        <ListItemText primary="Created" secondary={new Date(ticket?.created).toLocaleString('en-us', {
+                            dateStyle: 'short',
+                            timeStyle: 'short'
+                        })} />
+                    </ListItem>
+                    <ListItem>
 
-                    <ListItemText primary="Updated" secondary={new Date(ticket?.updated).toLocaleString('en-us', {
-                        dateStyle: 'short',
-                        timeStyle: 'short'
-                    })} />
-                </ListItem>
-            </List>
-            <FormGroup>
-                <InputLabel sx={{ mb: 1 }}>Status</InputLabel>
-                <Select value={status} onChange={({ target }) => { setStatus(target.value as any) }} sx={{ width: 250 }}>
-                    <MenuItem value={'closed'}>Closed</MenuItem>
-                    <MenuItem value={'open'}>Open</MenuItem>
-                    <MenuItem value={'assigned'}>Assigned</MenuItem>
-                </Select>
-            </FormGroup>
+                        <ListItemText primary="Updated" secondary={new Date(ticket?.updated).toLocaleString('en-us', {
+                            dateStyle: 'short',
+                            timeStyle: 'short'
+                        })} />
+                    </ListItem>
+                </List>
+                <FormGroup>
+                    <InputLabel sx={{ mb: 1 }}>Status</InputLabel>
+                    <Select value={status} onChange={({ target }) => { setStatus(target.value as any) }} sx={{ width: 250 }}>
+                        <MenuItem value={'closed'}>Closed</MenuItem>
+                        <MenuItem value={'open'}>Open</MenuItem>
+                        <MenuItem value={'assigned'}>Assigned</MenuItem>
+                    </Select>
+                </FormGroup>
 
-        </CardContent>
+            </CardContent>
 
-    </Card>
+        </Card>
+    </>
 }
 function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => void }) {
     const { onClick = (ticket: string) => { }, } = props;

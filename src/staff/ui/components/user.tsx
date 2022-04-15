@@ -1,19 +1,26 @@
-import { Button, Card, CardActions, CardContent, CardHeader, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Box, Select, MenuItem, Grid, Modal, Tooltip } from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Box, Select, MenuItem, Grid, Modal, Tooltip, TextField, InputLabel } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import DeleteIcon from '@mui/icons-material/Delete'
+import CloseIcon from '@mui/icons-material/Close'
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
 import type { UserListResponse } from "pages/api/users";
 import type { UserResponse } from "pages/api/users/[id]";
 import { useAlert } from "./alert";
+import { UserRoles } from "lib/auth/constants";
+import { useUser } from "lib/auth/client";
+import { usePrompt } from "./prompt";
 
 
 function UserCard(props: {
     user: string;
+    exit?: () => void;
 } & CardProps) {
-    const { user: id, ...cardProps } = props;
+    const client = useUser();
+    const { user: id, exit = () => { }, ...cardProps } = props;
     const [paused, setPaused] = useState(false);
     const [mode, setMode] = useState<'view' | 'edit'>('view');
     const isEditing = mode == 'edit';
@@ -37,10 +44,13 @@ function UserCard(props: {
     const [email, setEmail] = useState<string>(null);
     const [firstName, setFirstName] = useState<string>(null);
     const [lastName, setLastName] = useState<string>(null);
+    const [role, setRole] = useState<UserResponse['user']['role']>(null);
+    const deps = [email, role, firstName, lastName];
     const initialize = () => {
         setEmail(user?.email);
         setFirstName(user?.info?.firstName);
         setLastName(user?.info?.lastName);
+        setRole(user?.role);
     }
     const discardChanges = useCallback(function () {
         initialize();
@@ -52,82 +62,184 @@ function UserCard(props: {
         initialize();
     }, [isLoading]);
 
+    const clientRoleIndex = client?.ready ? UserRoles.indexOf(client?.role) : 0;
+    const userRoleIndex = role ? UserRoles.indexOf(role) : 0;
+
+    const queryClient = useQueryClient();
 
     const hasName = Boolean(user?.info?.firstName?.trim() && user?.info?.lastName?.trim());
     const hasEmail = Boolean(user?.email.trim());
-    return <Card {...cardProps}>
-        <CardHeader {...{
-            title: <Box component="span" sx={{ color: !hasName && 'error.main' }}>
-                {hasName ? [user.info.firstName, user.info.lastName].map(o => o.trim()).join(' ') : 'Missing Name'}
-            </Box>,
-            subheader: <Box component="span" sx={{ color: !hasEmail && 'error.main' }}>
-                {hasEmail ? user.email : 'No Email'}
-            </Box>
-        }} action={<IconButton>
-            <MoreVertIcon />
-        </IconButton>} />
-        <CardContent>
-            <Grid container spacing={2}>
+    const fullName = hasName ? [user.info.firstName, user.info.lastName].map(o => o.trim()).join(' ') : 'Missing Name';
 
-                {isViewing && <>
-                    
-                    <Grid item xs={12}>
 
+    const remove = useCallback(() => {
+        fetch('/api/users/' + id, {
+            method: 'DELETE'
+        }).then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            alert.success('User Deleted');
+        }).catch(err => {
+            alert.error('Unable to delete user');
+            console.error('user.remove', err);
+        }).finally(() => {
+            exit();
+            queryClient.invalidateQueries({
+                predicate: (query) => query.queryKey.includes('users'),
+            });
+        })
+    }, [user]);
+
+    const deletePrompt = usePrompt({
+        title: `Are you sure you want to delete this user?`,
+        content: <Typography>
+            This action cannot be undone.
+        </Typography>,
+        actions: () => <>
+            <Button onClick={() => { deletePrompt(false) }}>Cancel</Button>
+            <Button onClick={() => { deletePrompt(false); exit(); remove(); }}>Confirm</Button>
+        </>
+    })
+    const DeletePrompt = deletePrompt.Provider;
+    const promptRemove = () => deletePrompt(true);
+
+    const submitChanges = useCallback((singleField?: string) => {
+        if (!singleField) setPaused(true);
+        fetch('/api/users/' + id, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email != user?.email && email ? email : undefined,
+                role: role != user?.role && role ? role : undefined,
+                'info.firstName': firstName != user?.info?.firstName && firstName ? firstName : undefined,
+                'info.lastName': lastName != user?.info?.lastName && lastName ? lastName : undefined,
+            })
+        }).then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            alert.success('User Updated', {
+                unique: 'update.user',
+                duration: 2000
+            })
+        }).catch(err => {
+            alert.error('Unable to update user');
+            console.error('user.submitChanges', err);
+        }).finally(() => {
+            if (singleField) return;
+            setPaused(false);
+            queryClient.invalidateQueries('users');
+            queryClient.invalidateQueries(['user', id]);
+            setMode('view');
+
+        })
+    }, [...deps]);
+
+    useEffect(() => {
+        if (isEditing) return;
+        if (!role) return;
+        if (role != user?.role) submitChanges('role');
+    }, [role]);
+
+    const topActions = <>
+        {clientRoleIndex > userRoleIndex && <Tooltip title="Delete" placement="left" disableInteractive>
+            <IconButton onClick={() => promptRemove()}>
+                <DeleteIcon />
+            </IconButton>
+        </Tooltip>}
+        <Tooltip title="Close" placement="left" disableInteractive>
+            <IconButton onClick={exit}>
+                <CloseIcon />
+            </IconButton>
+        </Tooltip>
+    </>
+
+
+    return <>
+        <DeletePrompt />
+        <Card {...cardProps}>
+            <CardHeader {...{
+                title: <Box component="span" sx={{ color: !hasName && 'error.main' }}>
+                    {fullName}
+                </Box>,
+                subheader: <Box component="span" sx={{ color: !hasEmail && 'error.main' }}>
+                    {hasEmail ? user.email : 'No Email'}
+                </Box>
+            }} action={topActions} />
+            <CardContent>
+                <Grid container spacing={2}>
+                    {isEditing && <>
+                        <Grid item xs={12}>
+                            <TextField disabled={paused} label="Email" placeholder="Email" fullWidth value={email} onChange={({ target: { value } }) => setEmail(value)} />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <TextField disabled={paused} label="First Name" placeholder="First Name" fullWidth value={firstName} onChange={({ target: { value } }) => setFirstName(value)} />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                            <TextField disabled={paused} label="Last Name" placeholder="Last Name" fullWidth value={lastName} onChange={({ target: { value } }) => setLastName(value)} />
+                        </Grid>
+                    </>}
+
+                    {isViewing && <>
+
+                        <Grid item xs={1}>
+                            <Tooltip title="Created" disableInteractive>
+                                <TodayIcon />
+                            </Tooltip>
+                        </Grid>
+
+
+
+                        <Grid item xs={5}>
+                            <Tooltip title="Created" disableInteractive>
+                                <Typography component="span">
+                                    {new Date(user?.created).toLocaleString('en-us', {
+                                        dateStyle: 'short',
+                                        timeStyle: 'short'
+                                    })}
+                                </Typography>
+                            </Tooltip>
+                        </Grid>
+
+                        <Grid item xs={1}>
+                            <Tooltip title="Updated" disableInteractive>
+                                <ScheduleIcon />
+                            </Tooltip>
+                        </Grid>
+                        <Grid item xs={5}>
+                            <Tooltip title="Updated" disableInteractive>
+                                <Typography component="span">
+                                    {new Date(user?.updated).toLocaleString('en-us', {
+                                        dateStyle: 'short',
+                                        timeStyle: 'short'
+                                    })}
+                                </Typography>
+                            </Tooltip>
+                        </Grid>
+                    </>}
+
+                    <Grid item xs={6}>
+                        <InputLabel sx={{ mb: 1 }}>Role</InputLabel>
+                        <Select disabled={paused || clientRoleIndex <= userRoleIndex} fullWidth value={role} onChange={({ target }) => { setRole(target.value as any); }}>
+                            {UserRoles.filter((val, key) => (clientRoleIndex == UserRoles.length - 1) || key < clientRoleIndex || key == userRoleIndex).map((val, key) => (
+                                <MenuItem value={val} key={val}>{val[0].toUpperCase() + val.slice(1)}</MenuItem>
+                            ))}
+                        </Select>
                     </Grid>
 
-                    <Grid item xs={1}>
-                        <Tooltip title="Created" disableInteractive>
-                            <TodayIcon />
-                        </Tooltip>
-                    </Grid>
+                </Grid>
 
-
-
-                    <Grid item xs={5}>
-                        <Tooltip title="Created" disableInteractive>
-                            <Typography component="span">
-                                {new Date(user?.created).toLocaleString('en-us', {
-                                    dateStyle: 'short',
-                                    timeStyle: 'short'
-                                })}
-                            </Typography>
-                        </Tooltip>
-                    </Grid>
-
-                    <Grid item xs={1}>
-                        <Tooltip title="Updated" disableInteractive>
-                            <ScheduleIcon />
-                        </Tooltip>
-                    </Grid>
-                    <Grid item xs={5}>
-                        <Tooltip title="Updated" disableInteractive>
-                            <Typography component="span">
-                                {new Date(user?.updated).toLocaleString('en-us', {
-                                    dateStyle: 'short',
-                                    timeStyle: 'short'
-                                })}
-                            </Typography>
-                        </Tooltip>
-                    </Grid>
-                </>}
-
-            </Grid>
-            <Select value={user.role} onChange={({ target }) => { user.role = target.value as any; }}>
-                <MenuItem value={'pending'}>Pending</MenuItem>
-                <MenuItem value={'banned'}>Banned</MenuItem>
-                <MenuItem value={'user'}>User</MenuItem>
-                <MenuItem value={'staff'}>Staff</MenuItem>
-                <MenuItem value={'admin'}>Admin</MenuItem>
-            </Select>
-        </CardContent>
-        <CardActions sx={{ justifyContent: 'space-between' }}>
+            </CardContent>
+            <CardActions sx={{ justifyContent: 'space-between' }}>
                 {isViewing && <Button disabled={paused} onClick={() => setMode('edit')}>Edit</Button>}
                 {isEditing && <>
-                    <Button disabled={paused} onClick={() => alert.error('Not Yet Implemented (save)')}>Save Changes</Button>
+                    <Button disabled={paused} onClick={() => submitChanges()}>Save Changes</Button>
                     <Button disabled={paused} onClick={() => discardChanges()}>Discard Changes</Button>
                 </>}
             </CardActions>
-    </Card>
+        </Card>
+    </>
 }
 
 
@@ -152,7 +264,7 @@ export function UserListItem(props: { user: string, onClick?: (user: string) => 
                 </>,
                 primaryTypographyProps: { color: !hasName && 'error.main', fontSize: 15 },
                 secondary: <>
-                    <Typography component="span">Registered on {new Date(user.created).toLocaleString('en-us', {
+                    <Typography component="span">Registered on {new Date(user?.created).toLocaleString('en-us', {
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })}</Typography>
@@ -189,11 +301,12 @@ function UserListComponent(props: { showCount?: boolean }) {
                 unique: 'userListRefreshedAt'
             });
         firstLoad.current = false;
-    }, [dataUpdatedAt])
+    }, [dataUpdatedAt]);
+    const exit = () => { setOpen(null); };
     return <>
         <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
             <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
-                {open && <UserCard user={open} />}
+                {open && <UserCard user={open} exit={exit} />}
             </Box>
         </Modal>
         {showCount && !isLoading && <Typography color="text.secondary">

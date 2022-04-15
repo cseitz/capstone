@@ -9,7 +9,11 @@ export interface UserResponse {
 }
 
 const isStaff = isAuthenticated({
-    role: ['pending', 'user', 'staff', 'admin']
+    role: ['staff', 'admin']
+})
+
+const isAdmin = isAuthenticated({
+    role: ['admin']
 })
 
 export default Route<UserResponse>(async (req, res) => {
@@ -33,7 +37,16 @@ export default Route<UserResponse>(async (req, res) => {
         return res.json({
             user
         })
+    } else if (method == 'DELETE') {
+        if (!isAdmin(req)) throw new StatusError(403, 'Unauthorized');
+        await user.audit({
+            user: client.id,
+        })
+        await user.remove();
+        return res.json({
+            user,
+        })
     }
 }, {
-    methods: ['GET', 'PATCH']
+    methods: ['GET', 'PATCH', 'DELETE']
 });

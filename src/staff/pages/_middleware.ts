@@ -3,9 +3,7 @@ import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 
 
 const isLoggedIn = isAuthenticated({
-    not: {
-        role: ['banned']
-    }
+    
 })
 
 const isStaff = isAuthenticated({

@@ -3,13 +3,14 @@ import { TimestampData, TimestampOptions, TimestampPlugin } from "../plugins/tim
 import { AuditData, AuditPlugin, AuditSchema } from "../plugins/audit";
 import 'lib/mongo';
 import { hashSync } from "bcrypt";
+import { UserRole, UserRoles } from "lib/auth/constants";
 
 export interface UserData
 extends TimestampData, AuditData {
     id: string;
     email: string;
     password: string;
-    role: 'pending' | 'user' | 'banned' | 'staff' | 'admin';
+    role: UserRole;
     info: UserInfo;
 }
 
@@ -39,7 +40,7 @@ const schema = new Schema<UserData>({
     },
     role: {
         type: String,
-        enum: ['pending', 'user', 'banned', 'staff', 'admin'],
+        enum: UserRoles,
         default: 'pending',
     },
     info: {

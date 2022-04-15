@@ -44,7 +44,7 @@ export function verifyToken(token: string | any): Promise<AuthenticationToken> {
     if (token.includes(' ')) return verifyToken(token.trim().split(' ').pop());
     if (token.length <= 1) throw new StatusError(401, 'Not Authenticated');
     return new Promise(function (resolve, reject) {
-        jwt.verify(token as string, JWT_SECRET, (err, decoded) => {
+        jwt.verify(token as string, JWT_SECRET, (err, decoded: any) => {
             if (err) return reject(err);
             resolve(decoded as any);
         })
