@@ -1,5 +1,6 @@
 import { isAuthenticated } from "lib/auth";
 import { EventModel, EventData } from "lib/mongo/schema/event";
+import { UpdateDocument } from "lib/mongo/utils";
 import { Route, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -12,13 +13,27 @@ const isStaff = isAuthenticated({
 })
 
 export default Route<EventResponse>(async (req, res) => {
-    const user = isStaff(req);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', '*');
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    // if (!user) throw new StatusError(403, 'Unauthorized');
+    const client = isStaff(req);
+    const { method, headers, query } = req;
     const event = await EventModel.findById(req.query.id);
-    res.json({
-        event
-    })
+    if (method == 'GET') {
+        return res.json({
+            event
+        })
+    } else if (method == 'PATCH') {
+        if (!client) throw new StatusError(403, 'Unauthorized');
+        await event.audit({
+            user: client.id,
+        })
+        UpdateDocument(event, req.body);
+        await event.commitWith(req, {
+            action: 'Updated Event',
+        });
+        await event.save();
+        return res.json({
+            event
+        })
+    }
+}, {
+    methods: ['GET', 'PATCH']
 });

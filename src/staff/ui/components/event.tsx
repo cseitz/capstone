@@ -92,7 +92,10 @@ export function EventCard(props: {
             setPaused(false);
             if (isCreate) {
                 exit();
-            } else queryClient.invalidateQueries(['event', id]);
+            } else {
+                queryClient.invalidateQueries(['event', id]);
+                setMode('view');
+            }
             queryClient.invalidateQueries('events');
         })
     }, [...deps]);
@@ -213,7 +216,7 @@ export function EventCard(props: {
             <CardActions sx={{ justifyContent: 'space-between' }}>
                 {isViewing && <Button disabled={paused} onClick={() => setMode('edit')}>Edit</Button>}
                 {isEditing && !isCreate && <>
-                    <Button disabled={paused} onClick={() => alert.error('Not Yet Implemented (Save)', { duration: 1000 })}>Save Changes</Button>
+                    <Button disabled={paused} onClick={() => submitChanges()}>Save Changes</Button>
                     <Button disabled={paused} onClick={discardChanges}>Discard Changes</Button>
                 </>}
                 {isEditing && isCreate && <>
