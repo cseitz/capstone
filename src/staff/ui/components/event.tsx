@@ -2,7 +2,7 @@ import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, Li
 import { EventListResponse } from "pages/api/events";
 import { EventResponse } from "pages/api/events/[id]";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
 import { useAlert } from "./alert";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
@@ -37,11 +37,14 @@ export function EventCard(props: {
     const hasType = Boolean(event?.type);
     const alert = useAlert();
 
+    const [paused, setPaused] = useState(false);
+
     const [title, setTitle] = useState<string>(null);
     const [type, setType] = useState<string>(null);
     const [description, setDescription] = useState<string>(null);
     const [startsAt, setStartsAt] = useState<Date | null>(null);
     const [endsAt, setEndsAt] = useState<Date | null>(null);
+    const deps = [title, type, description, startsAt, endsAt];
     const discardChanges = useCallback(function () {
         setTitle(event.title);
         setType(event.type);
@@ -63,6 +66,36 @@ export function EventCard(props: {
         setStartsAt(event?.startsAt ? new Date(event?.startsAt) : null);
         setEndsAt(event?.endsAt ? new Date(event?.endsAt) : null)
     }, [isLoading]);
+
+    const queryClient = useQueryClient();
+    const submitChanges = useCallback(() => {
+        setPaused(true);
+        fetch('/api/events/' + (isCreate ? 'create' : id), {
+            method: isCreate ? 'POST' : 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title || undefined,
+                type: type || undefined,
+                description: description || undefined,
+                startsAt,
+                endsAt
+            })
+        }).then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            alert.success(isCreate ? 'Created an event!' : 'Event Updated.');
+        }).catch(err => {
+            alert.error('Unable to ' + (isCreate ? 'create an event' : 'update this event') + '.');
+            console.error('event.submitChanges', err);
+        }).finally(() => {
+            setPaused(false);
+            if (isCreate) {
+                exit();
+            } else queryClient.invalidateQueries(['event', id]);
+            queryClient.invalidateQueries('events');
+        })
+    }, [...deps]);
 
     const topActions = <>
         {!isCreate && <Tooltip title="Delete" placement="left" disableInteractive>
@@ -104,23 +137,23 @@ export function EventCard(props: {
                     <Grid container spacing={2}>
                         {isEditing && <>
                             <Grid item xs={8}>
-                                <TextField label="Title" placeholder="Title" fullWidth value={title} onChange={({ target: { value } }) => setTitle(value)} />
+                                <TextField disabled={paused} label="Title" placeholder="Title" fullWidth value={title} onChange={({ target: { value } }) => setTitle(value)} />
                             </Grid>
 
                             <Grid item xs={4}>
-                                <TextField label="Type" placeholder="Type" fullWidth value={type} onChange={({ target: { value } }) => setType(value)} />
+                                <TextField disabled={paused} label="Type" placeholder="Type" fullWidth value={type} onChange={({ target: { value } }) => setType(value)} />
                             </Grid>
 
                             <Grid item xs={12}>
-                                <TextField label="Description" placeholder="Description" fullWidth multiline minRows={2} value={description} onChange={({ target: { value } }) => setDescription(value)} />
+                                <TextField disabled={paused} label="Description" placeholder="Description" fullWidth multiline minRows={2} value={description} onChange={({ target: { value } }) => setDescription(value)} />
                             </Grid>
 
                             <Grid item xs={6}>
-                                <DateTimePicker label="Starts" renderInput={(props) => <TextField fullWidth {...props} />} value={startsAt} onChange={val => setStartsAt(val)} />
+                                <DateTimePicker disabled={paused} label="Starts" renderInput={(props) => <TextField fullWidth {...props} />} value={startsAt} onChange={val => setStartsAt(val)} />
                             </Grid>
 
                             <Grid item xs={6}>
-                                <DateTimePicker label="Ends" renderInput={(props) => <TextField fullWidth {...props} />} value={endsAt} onChange={val => setEndsAt(val)} />
+                                <DateTimePicker disabled={paused} label="Ends" renderInput={(props) => <TextField fullWidth {...props} />} value={endsAt} onChange={val => setEndsAt(val)} />
                             </Grid>
                         </>}
 
@@ -178,14 +211,14 @@ export function EventCard(props: {
             </LocalizationProvider>
 
             <CardActions sx={{ justifyContent: 'space-between' }}>
-                {isViewing && <Button onClick={() => setMode('edit')}>Edit</Button>}
+                {isViewing && <Button disabled={paused} onClick={() => setMode('edit')}>Edit</Button>}
                 {isEditing && !isCreate && <>
-                    <Button onClick={() => alert.error('Not Yet Implemented (Save)', { duration: 1000 })}>Save Changes</Button>
-                    <Button onClick={discardChanges}>Discard Changes</Button>
+                    <Button disabled={paused} onClick={() => alert.error('Not Yet Implemented (Save)', { duration: 1000 })}>Save Changes</Button>
+                    <Button disabled={paused} onClick={discardChanges}>Discard Changes</Button>
                 </>}
                 {isEditing && isCreate && <>
-                    <Button onClick={() => alert.error('Not Yet Implemented (Create)', { duration: 1000 })}>Create Event</Button>
-                    <Button onClick={exit}>Cancel</Button>
+                    <Button disabled={paused} onClick={() => submitChanges()}>Create Event</Button>
+                    <Button disabled={paused} onClick={exit}>Cancel</Button>
                 </>}
             </CardActions>
 
