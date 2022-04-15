@@ -33,7 +33,16 @@ export default Route<EventResponse>(async (req, res) => {
         return res.json({
             event
         })
+    } else if (method == 'DELETE') {
+        if (!client) throw new StatusError(403, 'Unauthorized');
+        await event.audit({
+            user: client.id,
+        })
+        await event.remove();
+        return res.json({
+            event
+        })
     }
 }, {
-    methods: ['GET', 'PATCH']
+    methods: ['GET', 'PATCH', 'DELETE']
 });

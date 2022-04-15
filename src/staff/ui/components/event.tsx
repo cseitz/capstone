@@ -84,9 +84,9 @@ export function EventCard(props: {
             })
         }).then(async (res) => {
             if (!res.ok) throw (await res.json())?.error;
-            alert.success(isCreate ? 'Created an event!' : 'Event Updated.');
+            alert.success(isCreate ? 'Created an event!' : 'Event Updated');
         }).catch(err => {
-            alert.error('Unable to ' + (isCreate ? 'create an event' : 'update this event') + '.');
+            alert.error('Unable to ' + (isCreate ? 'create an event' : 'update this event'));
             console.error('event.submitChanges', err);
         }).finally(() => {
             setPaused(false);
@@ -100,9 +100,26 @@ export function EventCard(props: {
         })
     }, [...deps]);
 
+    const remove = useCallback(() => {
+        setPaused(true);
+        fetch('/api/events/' + id, {
+            method: 'DELETE'
+        }).then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            alert.success('Event Deleted');
+        }).catch(err => {
+            alert.error('Unable to delete event');
+            console.error('event.remove', err);
+        }).finally(() => {
+            setPaused(false);
+            exit();
+            queryClient.invalidateQueries('events');
+        })
+    }, [event])
+
     const topActions = <>
         {!isCreate && <Tooltip title="Delete" placement="left" disableInteractive>
-            <IconButton onClick={() => alert.error('Not Yet Implemented (Delete)', { duration: 1000 })}>
+            <IconButton onClick={() => remove()}>
                 <DeleteIcon />
             </IconButton>
         </Tooltip>}
