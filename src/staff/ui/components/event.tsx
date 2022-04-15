@@ -1,8 +1,8 @@
-import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button, ListItemIcon, TextField, Grid, Tooltip, Divider } from "@mui/material";
+import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button, ListItemIcon, TextField, Grid, Tooltip, Divider, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from "@mui/material";
 import { EventListResponse } from "pages/api/events";
 import { EventResponse } from "pages/api/events/[id]";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
+import { QueryClient, QueryClientProvider, useIsFetching, useQuery, useQueryClient } from "react-query";
 import { useAlert } from "./alert";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
@@ -14,6 +14,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import type { EventData } from "lib/mongo/schema/event";
+import { UserListItem } from "./user";
 
 export function EventCard(props: {
     event: string;
@@ -115,7 +116,37 @@ export function EventCard(props: {
             exit();
             queryClient.invalidateQueries('events');
         })
-    }, [event])
+    }, [event]);
+
+    const [showUsers, setShowUsers] = useState(false);
+    const [didShowUsers, setDidShowUsers] = useState(false);
+    const [didLoadUsers, setDidLoadUsers] = useState(false);
+    useEffect(() => {
+        if (event?.signups?.length == 0) setDidLoadUsers(true);
+    }, [event?.signups])
+    useEffect(() => {
+        if (showUsers && !didShowUsers) setDidShowUsers(true);
+    }, [showUsers]);
+    const isFetching = useIsFetching({
+        predicate: query => showUsers && query.queryKey.includes('user')
+    });
+    useEffect(() => {
+        if (!didShowUsers) return;
+        if (didLoadUsers) return;
+        if (isFetching == 0) setDidLoadUsers(true);
+    }, [isFetching]);
+    const userList = <Accordion expanded={showUsers} onChange={() => setShowUsers(!showUsers)}>
+        <AccordionSummary>{showUsers ? 'Hide Roster (' + event?.signups?.length + ' signup' + (event?.signups.length > 1 ? 's' : '') + ')' : 'Show Roster'}</AccordionSummary>
+        <AccordionDetails sx={{ maxHeight: 400, overflowY: 'auto' }}>
+            {event?.signups?.length == 0 && <Typography sx={{ textAlign: 'center' }}>No Users</Typography>}
+            <List hidden={!didLoadUsers}>
+                {didShowUsers && event?.signups.map((id: string) => <UserListItem key={id} user={id} />)}
+            </List>
+            {!didLoadUsers ? <Box sx={{ textAlign: 'center' }}>
+                <CircularProgress />
+            </Box> : ''}
+        </AccordionDetails>
+    </Accordion>
 
     const topActions = <>
         {!isCreate && <Tooltip title="Delete" placement="left" disableInteractive>
@@ -175,6 +206,10 @@ export function EventCard(props: {
                             <Grid item xs={6}>
                                 <DateTimePicker disabled={paused} label="Ends" renderInput={(props) => <TextField fullWidth {...props} />} value={endsAt} onChange={val => setEndsAt(val)} />
                             </Grid>
+
+                            <Grid item xs={12}>
+                                {userList}
+                            </Grid>
                         </>}
 
                         {isViewing && <>
@@ -221,6 +256,10 @@ export function EventCard(props: {
                                         })}
                                     </Typography>
                                 </Tooltip>
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                {userList}
                             </Grid>
                         </>}
 

@@ -88,7 +88,7 @@ function UserCard(props: {
 }
 
 
-function UserListItem(props: { user: string, onClick?: (user: string) => void }) {
+export function UserListItem(props: { user: string, onClick?: (user: string) => void }) {
     const { onClick = (user: string) => { }, } = props;
     const { isLoading, error, data } = useQuery<UserResponse>(['user', props.user], () => (
         fetch('/api/users/' + props.user).then(res => res.json())
