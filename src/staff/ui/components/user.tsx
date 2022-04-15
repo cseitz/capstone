@@ -64,6 +64,7 @@ function UserCard(props: {
 
     const clientRoleIndex = client?.ready ? UserRoles.indexOf(client?.role) : 0;
     const userRoleIndex = role ? UserRoles.indexOf(role) : 0;
+    const isAdmin = (clientRoleIndex == UserRoles.length - 1);
 
     const queryClient = useQueryClient();
 
@@ -221,8 +222,8 @@ function UserCard(props: {
 
                     <Grid item xs={6}>
                         <InputLabel sx={{ mb: 1 }}>Role</InputLabel>
-                        <Select disabled={paused || clientRoleIndex <= userRoleIndex} fullWidth value={role} onChange={({ target }) => { setRole(target.value as any); }}>
-                            {UserRoles.filter((val, key) => (clientRoleIndex == UserRoles.length - 1) || key < clientRoleIndex || key == userRoleIndex).map((val, key) => (
+                        <Select disabled={paused || (!isAdmin && clientRoleIndex <= userRoleIndex) || client.id == user.id} fullWidth value={role} onChange={({ target }) => { setRole(target.value as any); }}>
+                            {UserRoles.filter((val, key) => isAdmin || key < clientRoleIndex || key == userRoleIndex).map((val, key) => (
                                 <MenuItem value={val} key={val}>{val[0].toUpperCase() + val.slice(1)}</MenuItem>
                             ))}
                         </Select>
