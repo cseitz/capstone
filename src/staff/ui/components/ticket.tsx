@@ -84,7 +84,7 @@ function TicketCard(props: {
             console.error('event.remove', err);
         }).finally(() => {
             exit();
-            queryClient.invalidateQueries('events');
+            queryClient.invalidateQueries('tickets');
         })
     }, [ticket])
 
