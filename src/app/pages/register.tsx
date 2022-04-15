@@ -1,6 +1,7 @@
 import { Button, CircularProgress, Grid, Paper, Step, StepContent, StepLabel, Stepper, TextField, Typography, useMediaQuery } from "@mui/material";
 import { Box } from "@mui/system";
 import { first, uniqueId } from "lodash";
+import { useRouter } from "next/router";
 import { cloneElement, createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { RegistrationData } from 'schema/user';
 import { useAlert } from "ui/components/alert";
@@ -82,7 +83,9 @@ export default function RegisterPage() {
     const alert = useAlert();
     const [submitting, setSubmitting] = useState(false);
     const [status, setStatus] = useState(null);
+    const router = useRouter();
     form.submit = function() {
+        setActiveStep(steps.length + 1);
         fetch('/api/auth/register', {
             method: 'POST',
             headers: {
@@ -95,12 +98,14 @@ export default function RegisterPage() {
             alert.success({
                 message: 'Registered Account'
             });
-            // router.push('/');
+            router.push('/');
+            form.reset(false);
         })
         .catch(err => {
+            setActiveStep(steps.length - 1);
             setSubmitting(false);
             setStatus(err);
-            form.reset(false);
+            alert.error(err);
         })
     }
 
@@ -136,7 +141,7 @@ export default function RegisterPage() {
                     </Box>
                 ) : ''}
             </Stepper>
-            {showReset && activeStep != steps.length - 0 ? <>
+            {showReset && activeStep != steps.length - 0 && activeStep < steps.length - 1 ? <>
                 <Button onClick={() => reset(true)} sx={{ mt: 2, mb: 1 }}>
                     Reset Form
                 </Button>
