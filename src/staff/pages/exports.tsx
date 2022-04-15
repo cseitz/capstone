@@ -55,31 +55,31 @@ function ExportsLink(props: {
     const download = useCallback(async () => {
         setIsLoading(true);
         const minDuration = new Promise(resolve => {
-            setTimeout(function() {
+            setTimeout(function () {
                 resolve(true);
             }, 500)
         });
         fetch(endpoint)
-        .then(async (res) => {
-            if (!res.ok) throw (await res.json())?.error;
-            const blob = await res.blob();
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = decodeURIComponent(res.headers.get('content-disposition')).match(/filename="(.+)"/)[1];
-            await minDuration;
-            a.click();
-            setIsLoading(false);
-            alert.success('Downloaded File', {
-                unique: 'exports.download',
-                duration: 2000,
-            });
-        }).catch(err => {
-            alert.error('Download Failed: ' + err, {
-                unique: 'exports.download',
-                duration: 2000,
-            });
-            console.error('event.remove', err);
-        })
+            .then(async (res) => {
+                if (!res.ok) throw (await res.json())?.error;
+                const blob = await res.blob();
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = decodeURIComponent(res.headers.get('content-disposition')).match(/filename="(.+)"/)[1];
+                await minDuration;
+                a.click();
+                setIsLoading(false);
+                alert.success('Downloaded File', {
+                    unique: 'exports.download',
+                    duration: 2000,
+                });
+            }).catch(err => {
+                alert.error('Download Failed: ' + err, {
+                    unique: 'exports.download',
+                    duration: 2000,
+                });
+                console.error('event.remove', err);
+            })
     }, [endpoint, setIsLoading]);
     const pre = isLoading ? <CircularProgress size={24} variant="indeterminate" sx={{
         position: 'absolute',
