@@ -5,20 +5,24 @@ import {
     CardActions,
     CardContent,
     CardHeader,
+    CircularProgress,
     Collapse,
     List,
     ListItem,
     ListItemButton,
     ListItemText,
     Typography,
+    Box,
 } from "@mui/material";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import { useAlert } from "./alert";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import AssignmentIcon from "@mui/icons-material/AssignmentOutlined";
 import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import type { EventResponse } from "api/events/[id]";
 import type { EventListResponse } from "api/events";
+import { isAuthenticated } from 'lib/auth/client';
+import { useRouter } from "next/router";
 
 const queryClient = new QueryClient();
 
@@ -33,11 +37,26 @@ export function EventListItem(props: { event: string }) {
                 res.json()
             )
     );
+
     // initializing data
     const { event } = data || {};
-    if (isLoading) return <ListItem disablePadding />;
+
+    const [signedUp, setSignedUp] = useState(false);
+
+    const alert = useAlert();
+    const router = useRouter();
+    const signUp = useCallback(() => {
+        if (!isAuthenticated()) router.push('/register');
+        alert.error('Not Yet Implemented (sign up)', { duration: 2000 });
+    }, [event])
+
+    const signOff = useCallback(() => {
+        alert.error('Not Yet Implemented (sign off)', { duration: 2000 })
+    }, [event])
+
+    if (isLoading || !event) return <ListItem dense />;
     // destructering the event object
-    const { title, description, startsAt, endsAt, type } = event;
+    const { title, description, startsAt, endsAt, type } = event || {};
     const hasType = Boolean(event.type);
     return (
         <ListItem disablePadding sx={{ mb: 2 }}>
@@ -56,8 +75,10 @@ export function EventListItem(props: { event: string }) {
                         })
                     }
                     action={
-                        <Button size="large" startIcon={<AssignmentIcon />}>
+                        !signedUp ? <Button size="large" startIcon={<AssignmentIcon />} onClick={() => signUp()}>
                             Sign Up
+                        </Button> : <Button size="large" startIcon={<AssignmentIcon />} onClick={() => signOff()} variant="outlined">
+                            Cancel Registration
                         </Button>
                     }
                 />
@@ -87,6 +108,9 @@ function EventListComponent(props: {}) {
         });
     }, [isLoading]);
     const firstLoad = useRef(true);
+    if (isLoading) return <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center' }}>
+        <CircularProgress style={{ textAlign: 'center', marginTop: 25, fontSize: 40 }} />
+    </Box>;
     // List of events
     return (
         <>
