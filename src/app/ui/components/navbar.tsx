@@ -94,7 +94,7 @@ function HideOnScroll(props: {
 }
 
 export function NavBar() {
-    const [open, setOpen] = useState(false)
+    let [open, setOpen] = useState(false)
     const [anchor, setAnchor] = useState('left');
     const router = useRouter();
     const lastRoute = useRef("");
@@ -141,7 +141,14 @@ export function NavBar() {
     const [transitionStep, setTransitionStep] = useState(0);
     const drawerLinks = items.filter(o => !o?.visible || o?.visible('drawer')).map((x, index) =>
         <Link href={x.url} key={x.url}>
-            <Slide in={open && transitionStep > index} direction="right" timeout={200}>
+            <Slide in={open && transitionStep > index} direction="right" timeout={200} onClick={(evt) => {
+                    if (open) {
+                        evt.preventDefault();
+                        open = false;
+                        setOpen(false);
+                        (evt.target as any).click();
+                    }
+                }}>
                 <ListItem button sx={{ ...styles.drawer }}>
                     <ListItemIcon>
                         {x.icon}
