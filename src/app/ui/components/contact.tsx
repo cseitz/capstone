@@ -3,14 +3,25 @@ import Box from '@mui/material/Box'
 import { Button, CircularProgress, Grid, Paper, Step, StepContent, StepLabel, Stepper, TextField, Typography } from "@mui/material";
 import { useRouter } from 'next/router';
 import CheckIcon from '@mui/icons-material/Check';
+import { useUser } from 'lib/auth/client';
 
 export function Contact() {
     //Form Fields
     const router = useRouter();
-    const [name, setUsername] = useState("");
+    const user = useUser();
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [subject, setSubject] = useState("");
     const [message, setMessage] = useState("");
+
+    useEffect(() => {
+        console.log(user);
+        if (user) {
+            console.log('bruh')
+            setName(user?.info?.firstName + ' ' + user?.info?.lastName);
+            setEmail(user?.email);
+        }
+    }, [user?.ready, user])
 
     const [errors, setErrors] = useState<{ [key: string]: string }>(null);
     const [status, setStatus] = useState<string>(null);
@@ -72,13 +83,13 @@ export function Contact() {
             <Box sx={{ mx: 'auto', width: 'min(500px, 90vw)', textAlign: 'center', mt: 10 }}>
                 <Typography variant="h4" style={{ textAlign: 'center', fontWeight: 'bold', marginTop: 25 }} >Contact Us</Typography>
                 <Typography style={{ textAlign: 'center', marginTop: 15, marginBottom: 25 }} >If you have any questions, concerns, or problems, please do not hesitate to contact us. Someone will get back to you shortly.</Typography>
-                <TextField label="Name" type="text" name="name" fullWidth onChange={(e) => { setStatus(null); setUsername(e.target.value) }} placeholder="Name" />
+                <TextField label="Name" type="text" name="name" value={name} fullWidth onChange={(e) => { setStatus(null); setName(e.target.value) }} placeholder="Name" />
                 <br /><br />
-                <TextField label="Email" type="text" name="email" fullWidth onChange={(e) => { setStatus(null); setEmail(e.target.value) }} placeholder="Email" />
+                <TextField label="Email" type="text" name="email" fullWidth value={email} onChange={(e) => { setStatus(null); setEmail(e.target.value) }} placeholder="Email" />
                 <br /><br />
-                <TextField label="Whats the topic?" type="text" name="subject" fullWidth onChange={(e) => { setStatus(null); setSubject(e.target.value) }} placeholder="Whats the topic?" />
+                <TextField label="Whats the topic?" type="text" name="subject" fullWidth value={subject} onChange={(e) => { setStatus(null); setSubject(e.target.value) }} placeholder="Whats the topic?" />
                 <br /><br />
-                <TextField label="Write your message here." type="text" name="message" fullWidth multiline minRows={2} onChange={(e) => { setStatus(null); setMessage(e.target.value) }} placeholder="Write your message here." />
+                <TextField label="Write your message here." type="text" name="message" value={message} fullWidth multiline minRows={2} onChange={(e) => { setStatus(null); setMessage(e.target.value) }} placeholder="Write your message here." />
                 <br /><br />
                 <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Send</Button>
                 <br /><br />
