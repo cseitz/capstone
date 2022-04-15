@@ -1,8 +1,10 @@
-import React, { useRef, useEffect, useState } from 'react'
-import { Modal, Button, CircularProgress, List, ListItem, MenuItem, ListItemButton, Select, ListItemText, Card, CardActions, CardContent, CardHeader, CardProps, Checkbox, Grid, IconButton, TextField, Typography } from '@mui/material'
+import React, { useRef, useEffect, useState, useCallback } from 'react'
+import { Modal, Button, CircularProgress, List, ListItem, MenuItem, ListItemButton, Select, ListItemText, Card, CardActions, CardContent, CardHeader, CardProps, Checkbox, Grid, IconButton, TextField, Typography, Tooltip, FormLabel, FormGroup, InputLabel } from '@mui/material'
 import { Box } from '@mui/system';
 import { useRouter } from 'next/router';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import DeleteIcon from '@mui/icons-material/Delete'
+import CloseIcon from '@mui/icons-material/Close'
 
 import { useAlert } from 'ui/components/alert';
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
@@ -14,8 +16,9 @@ const queryClient = new QueryClient();
 
 function TicketCard(props: {
     ticket: string;
+    exit?: () => void;
 } & CardProps) {
-    const { ticket: id, ...cardProps } = props;
+    const { ticket: id, exit = () => { }, ...cardProps } = props;
     const [mode, setMode] = useState<'view' | 'edit'>('view');
     const { isLoading, error, data } = useQuery<TicketResponse>(['ticket', id], () => (
         fetch('/api/tickets/' + id).then(res => res.json())
@@ -70,6 +73,34 @@ function TicketCard(props: {
         })
     }, [status])
 
+    const remove = useCallback(() => {
+        fetch('/api/tickets/' + id, {
+            method: 'DELETE'
+        }).then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            alert.success('Ticket Deleted');
+        }).catch(err => {
+            alert.error('Unable to delete ticket');
+            console.error('event.remove', err);
+        }).finally(() => {
+            exit();
+            queryClient.invalidateQueries('events');
+        })
+    }, [ticket])
+
+    const topActions = <>
+        <Tooltip title="Delete" placement="left" disableInteractive>
+            <IconButton onClick={() => remove()}>
+                <DeleteIcon />
+            </IconButton>
+        </Tooltip>
+        <Tooltip title="Close" placement="left" disableInteractive>
+            <IconButton onClick={exit}>
+                <CloseIcon />
+            </IconButton>
+        </Tooltip>
+    </>
+
     return <Card {...cardProps}>
         <CardHeader {...{
             title: <Box component="span" sx={{ color: !hasName && 'error.main' }}>
@@ -79,14 +110,14 @@ function TicketCard(props: {
                 {hasEmail ? ticket.email : 'No Email'}
 
             </Box>
-        }} action={<IconButton>
-            <MoreVertIcon />
-        </IconButton>} />
+        }} action={topActions} />
         <CardContent>
-            <Typography variant="h6">Details</Typography>
-            <Typography>Subject: {hasSubject ? ticket?.subject : 'No Subject'}</Typography>
-            <Typography>Message: {hasMessage ? ticket?.message : 'No Message'}</Typography>
-            <List subheader={"Details"} dense>
+            <InputLabel sx={{ mb: 1 }}>Subject</InputLabel>
+            <Typography>{hasSubject ? ticket?.subject : 'No Subject'}</Typography>
+            <InputLabel sx={{ mb: 1, mt: 2 }}>Message</InputLabel>
+            <Typography>{hasMessage ? ticket?.message : 'No Message'}</Typography>
+            <InputLabel sx={{ mt: 2 }}>Metadata</InputLabel>
+            <List dense>
                 <ListItem>
                     <ListItemText primary="Created" secondary={new Date(ticket?.created).toLocaleString('en-us', {
                         dateStyle: 'short',
@@ -101,11 +132,15 @@ function TicketCard(props: {
                     })} />
                 </ListItem>
             </List>
-            <Select value={status} onChange={({ target }) => { setStatus(target.value as any) }}>
-                <MenuItem value={'closed'}>Closed</MenuItem>
-                <MenuItem value={'open'}>Open</MenuItem>
-                <MenuItem value={'assigned'}>Assigned</MenuItem>
-            </Select>
+            <FormGroup>
+                <InputLabel sx={{ mb: 1 }}>Status</InputLabel>
+                <Select value={status} onChange={({ target }) => { setStatus(target.value as any) }} sx={{ width: 250 }}>
+                    <MenuItem value={'closed'}>Closed</MenuItem>
+                    <MenuItem value={'open'}>Open</MenuItem>
+                    <MenuItem value={'assigned'}>Assigned</MenuItem>
+                </Select>
+            </FormGroup>
+
         </CardContent>
 
     </Card>
