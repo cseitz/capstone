@@ -8,11 +8,12 @@ import { useMemo } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import Image from "next/image";
 import { hostname } from "os";
+import { isAuthenticated } from "lib/auth/client";
 
 const queryClient = new QueryClient();
 
 export async function getServerSideProps({ req }) {
-    let { 
+    let {
         origin = req.headers['host']
     } = new URL(req.headers?.['referer'] || 'http://' + req.headers?.['host']);
     if (hostname() == 'capstone') origin = 'https://capstone.lol';
@@ -36,6 +37,7 @@ function LandingPage(props: { data }) {
             .then(response => response.json())
     })
     const { title, subtitle, backgroundImage, logo } = data;
+    const loggedIn = isAuthenticated();
     return <Box sx={{ backgroundColor: "lightblue", width: '100%', height: '100%', backgroundSize: "cover", backgroundRepeat: "no-repeat", textAlign: 'center' }}>
         <Box id="logo-container" sx={{ textAlign: 'center', mt: 10 }}>
             <img src={logo} style={{ padding: '20px', width: '300px', maxWidth: '90vw' }} />
@@ -43,9 +45,14 @@ function LandingPage(props: { data }) {
         </Box>
         <Box id="lading-content-container" sx={{ textAlign: 'center' }}>
             <Typography variant="h4">{subtitle}</Typography>
-            <Link href={'/register'}>
+            <Link href={!loggedIn ? '/register' : '/events'}>
                 <Button variant="contained" color="primary" sx={{ m: 2 }}>
-                    <Typography variant="h6">Register Here</Typography>
+                    {!loggedIn ? (
+                        <Typography variant="h6">Register Here</Typography>
+                    ) : (
+                         <Typography variant="h6">View Events</Typography>
+                     )}
+
                 </Button>
             </Link>
         </Box>
