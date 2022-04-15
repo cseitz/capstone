@@ -16,9 +16,13 @@ export default Route<EventResponse>(async (req, res) => {
     const client = isStaff(req);
     const { method, headers, query } = req;
     const event = await EventModel.findById(req.query.id);
+    const rsvp = client ? event.signups.includes(client.id) : false;
     if (method == 'GET') {
+        const data = event.toJSON();
+        if (!client) delete data.signups;
+        data.rsvp = rsvp;
         return res.json({
-            event
+            event: data,
         })
     } else if (method == 'PATCH') {
         if (!client) throw new StatusError(403, 'Unauthorized');
@@ -30,8 +34,10 @@ export default Route<EventResponse>(async (req, res) => {
             action: 'Updated Event',
         });
         await event.save();
+        const data = event.toJSON();
+        data.rsvp = rsvp;
         return res.json({
-            event
+            event: data,
         })
     } else if (method == 'DELETE') {
         if (!client) throw new StatusError(403, 'Unauthorized');
@@ -39,8 +45,10 @@ export default Route<EventResponse>(async (req, res) => {
             user: client.id,
         })
         await event.remove();
+        const data = event.toJSON();
+        data.rsvp = rsvp;
         return res.json({
-            event
+            event: data,
         })
     }
 }, {
