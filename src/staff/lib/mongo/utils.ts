@@ -8,7 +8,8 @@ const allowedOperands = [
     'pull',
     'pop',
     'addToSet',
-    'pullAll'
+    'pullAll',
+    'in'
 ].map(o => '$' + o);
 
 export function MongoSanitize(payload: any) {
@@ -32,6 +33,7 @@ export function UpdateDocument<T = Document>(doc: T & Document, payload: Partial
         if (key[0] != '$') {
             doc.set(key, payload[key])
         } else {
+            // console.log('update', key, payload[key])
             doc.update({ [key]: payload[key] })
         }
     }

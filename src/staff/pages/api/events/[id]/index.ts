@@ -29,7 +29,17 @@ export default Route<EventResponse>(async (req, res) => {
         await event.audit({
             user: client.id,
         })
-        UpdateDocument(event, req.body);
+        const { $pullAll: pull, ...updatePayload } = req.body;
+        UpdateDocument(event, updatePayload);
+        if (pull) {
+            for (const key in pull) {
+                // console.log('pullAll', key, pull[key]);
+                for (const val of pull[key]) {
+                    event[key].pull(val);
+                }
+                // event[key].pullAll(pull[key]);
+            }
+        }
         await event.commitWith(req, {
             action: 'Updated Event',
         });

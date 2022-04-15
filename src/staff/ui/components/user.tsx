@@ -88,8 +88,8 @@ function UserCard(props: {
 }
 
 
-export function UserListItem(props: { user: string, onClick?: (user: string) => void }) {
-    const { onClick = (user: string) => { }, } = props;
+export function UserListItem(props: { user: string, onClick?: (user: string) => void, action?: any }) {
+    const { onClick = (user: string) => { }, action = '' } = props;
     const { isLoading, error, data } = useQuery<UserResponse>(['user', props.user], () => (
         fetch('/api/users/' + props.user).then(res => res.json())
     ));
@@ -99,7 +99,7 @@ export function UserListItem(props: { user: string, onClick?: (user: string) => 
     const hasEmail = Boolean(user?.email.trim());
     const name = !hasName ? 'Missing Name' : user.info.firstName + ' ' + user.info.lastName;
     const email = !hasEmail ? 'No Email' : user.email;
-    return <ListItem /*secondaryAction={<Checkbox edge="start" />}*/ disablePadding onClick={() => onClick(user?.id)}>
+    return <ListItem secondaryAction={action} disablePadding onClick={() => onClick(user?.id)}>
         <ListItemButton dense>
             <ListItemText {...{
                 primary: <>
@@ -113,7 +113,7 @@ export function UserListItem(props: { user: string, onClick?: (user: string) => 
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })}</Typography>
-                </>
+                </>,
             }} />
         </ListItemButton>
     </ListItem>

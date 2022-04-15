@@ -42,13 +42,15 @@ export function EventCard(props: {
 
     const [title, setTitle] = useState<string>(null);
     const [type, setType] = useState<string>(null);
+    const [signups, setSignups] = useState<string[]>(null);
     const [description, setDescription] = useState<string>(null);
     const [startsAt, setStartsAt] = useState<Date | null>(null);
     const [endsAt, setEndsAt] = useState<Date | null>(null);
-    const deps = [title, type, description, startsAt, endsAt];
+    const deps = [title, type, signups, description, startsAt, endsAt];
     const discardChanges = useCallback(function () {
         setTitle(event.title);
         setType(event.type);
+        setSignups(event.signups as string[]);
         setDescription(event.description);
         setStartsAt(event?.startsAt ? new Date(event?.startsAt) : null);
         setEndsAt(event?.endsAt ? new Date(event?.endsAt) : null);
@@ -57,12 +59,14 @@ export function EventCard(props: {
 
     useEffect(() => {
         if (isLoading || isCreate) { return; }
+        // event.signups = [...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups];
         alert.success({
             message: 'Loaded ' + (event?.title || "[Missing title]"),
             duration: 2000,
         })
         setTitle(event?.title || '');
         setType(event?.type || '');
+        setSignups(event.signups as string[]);
         setDescription(event?.description || '');
         setStartsAt(event?.startsAt ? new Date(event?.startsAt) : null);
         setEndsAt(event?.endsAt ? new Date(event?.endsAt) : null)
@@ -71,6 +75,7 @@ export function EventCard(props: {
     const queryClient = useQueryClient();
     const submitChanges = useCallback(() => {
         setPaused(true);
+        const pull = { signups: event.signups.filter(o => !signups.includes(o as string)) };
         fetch('/api/events/' + (isCreate ? 'create' : id), {
             method: isCreate ? 'POST' : 'PATCH',
             headers: {
@@ -80,6 +85,7 @@ export function EventCard(props: {
                 title: title || undefined,
                 type: type || undefined,
                 description: description || undefined,
+                $pullAll: pull,
                 startsAt,
                 endsAt
             })
@@ -135,12 +141,21 @@ export function EventCard(props: {
         if (didLoadUsers) return;
         if (isFetching == 0) setDidLoadUsers(true);
     }, [isFetching]);
-    const userList = <Accordion expanded={showUsers} onChange={() => setShowUsers(!showUsers)}>
-        <AccordionSummary>{showUsers ? 'Hide Roster (' + event?.signups?.length + ' signup' + (event?.signups.length > 1 ? 's' : '') + ')' : 'Show Roster'}</AccordionSummary>
-        <AccordionDetails sx={{ maxHeight: 400, overflowY: 'auto' }}>
-            {event?.signups?.length == 0 && <Typography sx={{ textAlign: 'center' }}>No Users</Typography>}
+    const userList = <Accordion expanded={showUsers} onChange={() => setShowUsers(!showUsers)} elevation={2}>
+        <AccordionSummary>{showUsers ? 'Hide Roster (' + signups?.length + ' signup' + (signups.length > 1 ? 's' : '') + ')' : 'Show Roster'}</AccordionSummary>
+        <AccordionDetails sx={{ maxHeight: '30vh', overflowY: 'auto' }}>
+            {signups?.length == 0 && <Typography sx={{ textAlign: 'center' }}>No Users</Typography>}
             <List hidden={!didLoadUsers}>
-                {didShowUsers && event?.signups.map((id: string) => <UserListItem key={id} user={id} />)}
+                {didShowUsers && signups.map((id: string) => <UserListItem key={id} user={id} action={
+                    mode == 'edit' ? (
+                        <Tooltip title="Remove Signup" onClick={(evt) => { evt.preventDefault(); setSignups(signups.filter(o => o != id)) }}>
+                            <IconButton>
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
+
+                    ) : ''
+                } />)}
             </List>
             {!didLoadUsers ? <Box sx={{ textAlign: 'center' }}>
                 <CircularProgress />
