@@ -96,7 +96,8 @@ export default function RegisterPage() {
             if (!res.ok) throw (await res.json())?.error;
             // alert('registered');
             alert.success({
-                message: 'Registered Account'
+                message: 'Registered Account',
+                duration: 2000,
             });
             router.push('/');
             form.reset(false);
@@ -105,7 +106,10 @@ export default function RegisterPage() {
             setActiveStep(steps.length - 1);
             setSubmitting(false);
             setStatus(err);
-            alert.error(err);
+            alert.error(err, {
+                unique: 'register.error',
+                duration: 2000
+            });
         })
     }
 

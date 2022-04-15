@@ -65,6 +65,7 @@ function UserCard(props: {
     const clientRoleIndex = client?.ready ? UserRoles.indexOf(client?.role) : 0;
     const userRoleIndex = role ? UserRoles.indexOf(role) : 0;
     const isAdmin = (clientRoleIndex == UserRoles.length - 1);
+    const canEdit = (isAdmin || clientRoleIndex >= userRoleIndex);
 
     const queryClient = useQueryClient();
 
@@ -233,7 +234,7 @@ function UserCard(props: {
 
             </CardContent>
             <CardActions sx={{ justifyContent: 'space-between' }}>
-                {isViewing && <Button disabled={paused} onClick={() => setMode('edit')}>Edit</Button>}
+                {isViewing && canEdit && <Button disabled={paused} onClick={() => setMode('edit')}>Edit</Button>}
                 {isEditing && <>
                     <Button disabled={paused} onClick={() => submitChanges()}>Save Changes</Button>
                     <Button disabled={paused} onClick={() => discardChanges()}>Discard Changes</Button>

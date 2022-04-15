@@ -76,7 +76,7 @@ export function EventCard(props: {
     const queryClient = useQueryClient();
     const submitChanges = useCallback(() => {
         setPaused(true);
-        const pull = { signups: event.signups.filter(o => !signups.includes(o as string)) };
+        const pull = isCreate ? undefined : { signups: event.signups.filter(o => !signups.includes(o as string)) };
         fetch('/api/events/' + (isCreate ? 'create' : id), {
             method: isCreate ? 'POST' : 'PATCH',
             headers: {
@@ -155,7 +155,7 @@ export function EventCard(props: {
         if (didLoadUsers) return;
         if (isFetching == 0) setDidLoadUsers(true);
     }, [isFetching]);
-    const userList = <Accordion expanded={showUsers} onChange={() => setShowUsers(!showUsers)} elevation={2}>
+    const userList = !isCreate && <Accordion expanded={showUsers} onChange={() => setShowUsers(!showUsers)} elevation={2}>
         <AccordionSummary>{showUsers ? 'Hide Roster (' + signups?.length + ' signup' + (signups.length > 1 ? 's' : '') + ')' : 'Show Roster'}</AccordionSummary>
         <AccordionDetails sx={{ maxHeight: '30vh', overflowY: 'auto' }}>
             {signups?.length == 0 && <Typography sx={{ textAlign: 'center' }}>No Users</Typography>}
@@ -175,7 +175,7 @@ export function EventCard(props: {
                 <CircularProgress />
             </Box> : ''}
         </AccordionDetails>
-    </Accordion>
+    </Accordion>;
 
     const topActions = <>
         {!isCreate && <Tooltip title="Delete" placement="left" disableInteractive>
