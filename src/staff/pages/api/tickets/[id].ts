@@ -1,4 +1,5 @@
 import { isAuthenticated } from "lib/auth";
+import { isAdmin, isStaff } from "lib/auth/guards";
 import { TicketData, TicketModel } from "lib/mongo/schema/ticket";
 import { UpdateDocument } from "lib/mongo/utils";
 import { Route, StatusError } from "lib/route";
@@ -8,10 +9,6 @@ export interface TicketResponse {
     ticket?: TicketData
 }
 
-
-const isStaff = isAuthenticated({
-    role: ['pending', 'user', 'staff', 'admin']
-})
 
 export default Route<TicketResponse>(async (req, res) => {
     const client = isStaff(req);
@@ -38,7 +35,7 @@ export default Route<TicketResponse>(async (req, res) => {
             ticket
         })
     } else if (method == 'DELETE') {
-        if (!client) throw new StatusError(403, 'Unauthorized');
+        if (!isAdmin(req)) throw new StatusError(403, 'Unauthorized');
         await ticket.audit({
             user: client.id,
         })

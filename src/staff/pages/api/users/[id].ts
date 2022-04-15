@@ -1,4 +1,5 @@
 import { isAuthenticated } from "lib/auth";
+import { isAdmin, isStaff } from "lib/auth/guards";
 import { UserData, UserDocument, UserModel } from "lib/mongo/schema/user";
 import { UpdateDocument } from "lib/mongo/utils";
 import { Route, StatusError } from "lib/route";
@@ -7,10 +8,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 export interface UserResponse {
     user?: UserData
 }
-
-const isStaff = isAuthenticated({
-    role: ['pending', 'user', 'staff', 'admin']
-})
 
 export default Route<UserResponse>(async (req, res) => {
     const { method, headers, query } = req;
@@ -33,7 +30,16 @@ export default Route<UserResponse>(async (req, res) => {
         return res.json({
             user
         })
+    } else if (method == 'DELETE') {
+        if (!isAdmin(req)) throw new StatusError(403, 'Unauthorized');
+        await user.audit({
+            user: client.id,
+        })
+        await user.remove();
+        return res.json({
+            user,
+        })
     }
 }, {
-    methods: ['GET', 'PATCH']
+    methods: ['GET', 'PATCH', 'DELETE']
 });

@@ -1,4 +1,5 @@
 import { isAuthenticated } from "lib/auth";
+import { isStaff } from "lib/auth/guards";
 import { EventModel, EventData } from "lib/mongo/schema/event";
 import { UpdateDocument } from "lib/mongo/utils";
 import { Route, StatusError } from "lib/route";
@@ -7,10 +8,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 export interface EventResponse {
     event?: EventData
 }
-
-const isStaff = isAuthenticated({
-    role: ['pending', 'user', 'staff', 'admin']
-})
 
 export default Route<EventResponse>(async (req, res) => {
     const client = isStaff(req);

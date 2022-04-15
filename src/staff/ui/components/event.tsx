@@ -15,6 +15,7 @@ import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import type { EventData } from "lib/mongo/schema/event";
 import { UserListItem } from "./user";
+import { usePrompt } from "./prompt";
 
 export function EventCard(props: {
     event: string;
@@ -124,6 +125,19 @@ export function EventCard(props: {
         })
     }, [event]);
 
+    const deletePrompt = usePrompt({
+        title: `Are you sure you want to delete this event?`,
+        content: <Typography>
+            This action cannot be undone.
+        </Typography>,
+        actions: () => <>
+            <Button onClick={() => { deletePrompt(false) }}>Cancel</Button>
+            <Button onClick={() => { deletePrompt(false); exit(); remove(); }}>Confirm</Button>
+        </>
+    })
+    const DeletePrompt = deletePrompt.Provider;
+    const promptRemove = () => deletePrompt(true);
+
     const [showUsers, setShowUsers] = useState(false);
     const [didShowUsers, setDidShowUsers] = useState(false);
     const [didLoadUsers, setDidLoadUsers] = useState(false);
@@ -165,7 +179,7 @@ export function EventCard(props: {
 
     const topActions = <>
         {!isCreate && <Tooltip title="Delete" placement="left" disableInteractive>
-            <IconButton onClick={() => remove()}>
+            <IconButton onClick={() => promptRemove()}>
                 <DeleteIcon />
             </IconButton>
         </Tooltip>}
@@ -178,6 +192,7 @@ export function EventCard(props: {
 
     // if (isLoading) return <Card {...cardProps} />;
     return <>
+        <DeletePrompt />
         <Card {...cardProps}>
 
             <CardHeader {...{
