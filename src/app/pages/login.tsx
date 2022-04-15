@@ -5,6 +5,7 @@ import Button from '@mui/material/Button'
 import { ButtonGroup, Typography } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useAlert } from 'ui/components/alert'
+import { isAuthenticated } from 'lib/auth/client'
 
 export function LoginRegisterContainer(props: { variant: 'login' | 'register', children: any }) {
     const { variant, children } = props;
@@ -48,6 +49,12 @@ export default function LoginPage() {
     const [password, setPassword] = useState("");
     const [status, setStatus] = useState<string>(null);
     const router = useRouter();
+
+    useEffect(() => {
+        if (isAuthenticated()) {
+            router.push('/');
+        }
+    }, [])
 
     function handleSubmit(e?: any) {
         e?.preventDefault();
