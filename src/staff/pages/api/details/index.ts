@@ -3,6 +3,7 @@
 
 import { NextApiRequest, NextApiResponse } from "next";
 import { Details } from "lib/mongo/schema/details";
+import { v4 as uuidv4 } from 'uuid';
 
 export interface LandingDetails {
     title: string;
@@ -50,7 +51,7 @@ const About = Details<AboutDetails>('about', {
     }
 })
 
-import { v4 as uuidv4 } from 'uuid';
+
 const FAQ = Details<FAQDetails>('faq', {
     questions: {
         type: [{
