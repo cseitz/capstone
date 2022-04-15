@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import CloseIcon from '@mui/icons-material/Close'
 
 import { useAlert } from 'ui/components/alert';
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from "react-query";
 import type { TicketListResponse } from "pages/api/tickets";
 import type { TicketResponse } from "pages/api/tickets/[id]";
 import { TicketData } from 'lib/mongo/schema/ticket';
@@ -73,6 +73,8 @@ function TicketCard(props: {
         })
     }, [status])
 
+    const queryClient = useQueryClient();
+    console.log(queryClient);
     const remove = useCallback(() => {
         fetch('/api/tickets/' + id, {
             method: 'DELETE'
@@ -84,7 +86,9 @@ function TicketCard(props: {
             console.error('event.remove', err);
         }).finally(() => {
             exit();
-            queryClient.invalidateQueries('tickets');
+            queryClient.invalidateQueries({
+                predicate: (query) => query.queryKey.includes('tickets'),
+            });
         })
     }, [ticket])
 
@@ -147,7 +151,7 @@ function TicketCard(props: {
 }
 function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => void }) {
     const { onClick = (ticket: string) => { }, } = props;
-    const { isLoading, error, data } = useQuery<TicketResponse>(['tickets', props.ticket], () => (
+    const { isLoading, error, data } = useQuery<TicketResponse>(['ticket', props.ticket], () => (
         fetch('/api/tickets/' + props.ticket).then(res => res.json())
     ));
     const { ticket } = data || {};
@@ -184,7 +188,8 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
     const { isLoading, error, data, dataUpdatedAt } = useQuery<TicketListResponse>(['tickets', query], () => (
         fetch('/api/tickets?' + query).then(res => res.json())
     ));
-    const [open, setOpen] = useState<string>(null)
+    const [open, setOpen] = useState<string>(null);
+    const exit = () => { setOpen(null) };
     const { tickets } = data || { tickets: [] };
     const alert = useAlert();
     useEffect(() => {
@@ -221,7 +226,7 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
         <Box>
             <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
                 <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
-                    {open && <TicketCard ticket={open} />}
+                    {open && <TicketCard ticket={open} exit={exit} />}
                 </Box>
             </Modal>
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
