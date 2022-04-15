@@ -37,7 +37,16 @@ export default Route<TicketResponse>(async (req, res) => {
         return res.json({
             ticket
         })
+    } else if (method == 'DELETE') {
+        if (!client) throw new StatusError(403, 'Unauthorized');
+        await ticket.audit({
+            user: client.id,
+        })
+        await ticket.remove();
+        return res.json({
+            ticket
+        })
     }
 }, {
-    methods: ['GET', 'PATCH']
+    methods: ['GET', 'PATCH', 'DELETE']
 });

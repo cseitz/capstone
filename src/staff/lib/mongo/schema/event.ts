@@ -16,6 +16,7 @@ export interface EventData
     endsAt: any;
     type: string,
     signups: (UserData | string)[];
+    rsvp?: boolean;
 }
 
 const schema = new Schema<EventData>({

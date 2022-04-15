@@ -1,8 +1,8 @@
-import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button, ListItemIcon, TextField, Grid, Tooltip, Divider } from "@mui/material";
+import { Box, Card, CardHeader, CardActions, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemText, Modal, Typography, CardContent, Button, ListItemIcon, TextField, Grid, Tooltip, Divider, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from "@mui/material";
 import { EventListResponse } from "pages/api/events";
 import { EventResponse } from "pages/api/events/[id]";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { QueryClient, QueryClientProvider, useIsFetching, useQuery, useQueryClient } from "react-query";
 import { useAlert } from "./alert";
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
@@ -14,6 +14,7 @@ import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import type { EventData } from "lib/mongo/schema/event";
+import { UserListItem } from "./user";
 
 export function EventCard(props: {
     event: string;
@@ -37,14 +38,19 @@ export function EventCard(props: {
     const hasType = Boolean(event?.type);
     const alert = useAlert();
 
+    const [paused, setPaused] = useState(false);
+
     const [title, setTitle] = useState<string>(null);
     const [type, setType] = useState<string>(null);
+    const [signups, setSignups] = useState<string[]>(null);
     const [description, setDescription] = useState<string>(null);
     const [startsAt, setStartsAt] = useState<Date | null>(null);
     const [endsAt, setEndsAt] = useState<Date | null>(null);
+    const deps = [title, type, signups, description, startsAt, endsAt];
     const discardChanges = useCallback(function () {
         setTitle(event.title);
         setType(event.type);
+        setSignups(event.signups as string[]);
         setDescription(event.description);
         setStartsAt(event?.startsAt ? new Date(event?.startsAt) : null);
         setEndsAt(event?.endsAt ? new Date(event?.endsAt) : null);
@@ -53,20 +59,113 @@ export function EventCard(props: {
 
     useEffect(() => {
         if (isLoading || isCreate) { return; }
+        // event.signups = [...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups];
         alert.success({
             message: 'Loaded ' + (event?.title || "[Missing title]"),
             duration: 2000,
         })
         setTitle(event?.title || '');
         setType(event?.type || '');
+        setSignups(event.signups as string[]);
         setDescription(event?.description || '');
         setStartsAt(event?.startsAt ? new Date(event?.startsAt) : null);
         setEndsAt(event?.endsAt ? new Date(event?.endsAt) : null)
     }, [isLoading]);
 
+    const queryClient = useQueryClient();
+    const submitChanges = useCallback(() => {
+        setPaused(true);
+        const pull = { signups: event.signups.filter(o => !signups.includes(o as string)) };
+        fetch('/api/events/' + (isCreate ? 'create' : id), {
+            method: isCreate ? 'POST' : 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title || undefined,
+                type: type || undefined,
+                description: description || undefined,
+                $pullAll: pull,
+                startsAt,
+                endsAt
+            })
+        }).then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            alert.success(isCreate ? 'Created an event!' : 'Event Updated');
+        }).catch(err => {
+            alert.error('Unable to ' + (isCreate ? 'create an event' : 'update this event'));
+            console.error('event.submitChanges', err);
+        }).finally(() => {
+            setPaused(false);
+            if (isCreate) {
+                exit();
+            } else {
+                queryClient.invalidateQueries(['event', id]);
+                setMode('view');
+            }
+            queryClient.invalidateQueries('events');
+        })
+    }, [...deps]);
+
+    const remove = useCallback(() => {
+        setPaused(true);
+        fetch('/api/events/' + id, {
+            method: 'DELETE'
+        }).then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            alert.success('Event Deleted');
+        }).catch(err => {
+            alert.error('Unable to delete event');
+            console.error('event.remove', err);
+        }).finally(() => {
+            setPaused(false);
+            exit();
+            queryClient.invalidateQueries('events');
+        })
+    }, [event]);
+
+    const [showUsers, setShowUsers] = useState(false);
+    const [didShowUsers, setDidShowUsers] = useState(false);
+    const [didLoadUsers, setDidLoadUsers] = useState(false);
+    useEffect(() => {
+        if (event?.signups?.length == 0) setDidLoadUsers(true);
+    }, [event?.signups])
+    useEffect(() => {
+        if (showUsers && !didShowUsers) setDidShowUsers(true);
+    }, [showUsers]);
+    const isFetching = useIsFetching({
+        predicate: query => showUsers && query.queryKey.includes('user')
+    });
+    useEffect(() => {
+        if (!didShowUsers) return;
+        if (didLoadUsers) return;
+        if (isFetching == 0) setDidLoadUsers(true);
+    }, [isFetching]);
+    const userList = <Accordion expanded={showUsers} onChange={() => setShowUsers(!showUsers)} elevation={2}>
+        <AccordionSummary>{showUsers ? 'Hide Roster (' + signups?.length + ' signup' + (signups.length > 1 ? 's' : '') + ')' : 'Show Roster'}</AccordionSummary>
+        <AccordionDetails sx={{ maxHeight: '30vh', overflowY: 'auto' }}>
+            {signups?.length == 0 && <Typography sx={{ textAlign: 'center' }}>No Users</Typography>}
+            <List hidden={!didLoadUsers}>
+                {didShowUsers && signups.map((id: string) => <UserListItem key={id} user={id} action={
+                    mode == 'edit' ? (
+                        <Tooltip title="Remove Signup" onClick={(evt) => { evt.preventDefault(); setSignups(signups.filter(o => o != id)) }}>
+                            <IconButton>
+                                <DeleteIcon />
+                            </IconButton>
+                        </Tooltip>
+
+                    ) : ''
+                } />)}
+            </List>
+            {!didLoadUsers ? <Box sx={{ textAlign: 'center' }}>
+                <CircularProgress />
+            </Box> : ''}
+        </AccordionDetails>
+    </Accordion>
+
     const topActions = <>
         {!isCreate && <Tooltip title="Delete" placement="left" disableInteractive>
-            <IconButton onClick={() => alert.error('Not Yet Implemented (Delete)', { duration: 1000 })}>
+            <IconButton onClick={() => remove()}>
                 <DeleteIcon />
             </IconButton>
         </Tooltip>}
@@ -104,23 +203,27 @@ export function EventCard(props: {
                     <Grid container spacing={2}>
                         {isEditing && <>
                             <Grid item xs={8}>
-                                <TextField label="Title" placeholder="Title" fullWidth value={title} onChange={({ target: { value } }) => setTitle(value)} />
+                                <TextField disabled={paused} label="Title" placeholder="Title" fullWidth value={title} onChange={({ target: { value } }) => setTitle(value)} />
                             </Grid>
 
                             <Grid item xs={4}>
-                                <TextField label="Type" placeholder="Type" fullWidth value={type} onChange={({ target: { value } }) => setType(value)} />
+                                <TextField disabled={paused} label="Type" placeholder="Type" fullWidth value={type} onChange={({ target: { value } }) => setType(value)} />
                             </Grid>
 
                             <Grid item xs={12}>
-                                <TextField label="Description" placeholder="Description" fullWidth multiline minRows={2} value={description} onChange={({ target: { value } }) => setDescription(value)} />
+                                <TextField disabled={paused} label="Description" placeholder="Description" fullWidth multiline minRows={2} value={description} onChange={({ target: { value } }) => setDescription(value)} />
                             </Grid>
 
                             <Grid item xs={6}>
-                                <DateTimePicker label="Starts" renderInput={(props) => <TextField fullWidth {...props} />} value={startsAt} onChange={val => setStartsAt(val)} />
+                                <DateTimePicker disabled={paused} label="Starts" renderInput={(props) => <TextField fullWidth {...props} />} value={startsAt} onChange={val => setStartsAt(val)} />
                             </Grid>
 
                             <Grid item xs={6}>
-                                <DateTimePicker label="Ends" renderInput={(props) => <TextField fullWidth {...props} />} value={endsAt} onChange={val => setEndsAt(val)} />
+                                <DateTimePicker disabled={paused} label="Ends" renderInput={(props) => <TextField fullWidth {...props} />} value={endsAt} onChange={val => setEndsAt(val)} />
+                            </Grid>
+
+                            <Grid item xs={12}>
+                                {userList}
                             </Grid>
                         </>}
 
@@ -169,6 +272,10 @@ export function EventCard(props: {
                                     </Typography>
                                 </Tooltip>
                             </Grid>
+
+                            <Grid item xs={12}>
+                                {userList}
+                            </Grid>
                         </>}
 
                     </Grid>
@@ -178,14 +285,14 @@ export function EventCard(props: {
             </LocalizationProvider>
 
             <CardActions sx={{ justifyContent: 'space-between' }}>
-                {isViewing && <Button onClick={() => setMode('edit')}>Edit</Button>}
+                {isViewing && <Button disabled={paused} onClick={() => setMode('edit')}>Edit</Button>}
                 {isEditing && !isCreate && <>
-                    <Button onClick={() => alert.error('Not Yet Implemented (Save)', { duration: 1000 })}>Save Changes</Button>
-                    <Button onClick={discardChanges}>Discard Changes</Button>
+                    <Button disabled={paused} onClick={() => submitChanges()}>Save Changes</Button>
+                    <Button disabled={paused} onClick={discardChanges}>Discard Changes</Button>
                 </>}
                 {isEditing && isCreate && <>
-                    <Button onClick={() => alert.error('Not Yet Implemented (Create)', { duration: 1000 })}>Create Event</Button>
-                    <Button onClick={exit}>Cancel</Button>
+                    <Button disabled={paused} onClick={() => submitChanges()}>Create Event</Button>
+                    <Button disabled={paused} onClick={exit}>Cancel</Button>
                 </>}
             </CardActions>
 

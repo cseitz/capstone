@@ -22,11 +22,14 @@ function UserCard(props: {
     if (isLoading) return <Card {...cardProps} />;
     const alert = useAlert();
     useEffect(() => {
-        alert.success({
-            message: 'Loaded User ' + user?.email || "[Missing name]",
-            duration: 2000,
-        })
-    }, []);
+        if (!error) {
+            alert.success({
+                message: 'Loaded User ' + user?.email || "[Missing name]",
+                duration: 2000,
+            });
+        }
+        if (error) alert.error('An error occured loading this user.');
+    }, [error]);
     const hasName = Boolean(user?.info?.firstName?.trim() && user?.info?.lastName?.trim());
     const hasEmail = Boolean(user?.email.trim());
     return <Card {...cardProps}>
@@ -85,8 +88,8 @@ function UserCard(props: {
 }
 
 
-function UserListItem(props: { user: string, onClick?: (user: string) => void }) {
-    const { onClick = (user: string) => { }, } = props;
+export function UserListItem(props: { user: string, onClick?: (user: string) => void, action?: any }) {
+    const { onClick = (user: string) => { }, action = '' } = props;
     const { isLoading, error, data } = useQuery<UserResponse>(['user', props.user], () => (
         fetch('/api/users/' + props.user).then(res => res.json())
     ));
@@ -96,7 +99,7 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
     const hasEmail = Boolean(user?.email.trim());
     const name = !hasName ? 'Missing Name' : user.info.firstName + ' ' + user.info.lastName;
     const email = !hasEmail ? 'No Email' : user.email;
-    return <ListItem /*secondaryAction={<Checkbox edge="start" />}*/ disablePadding onClick={() => onClick(user?.id)}>
+    return <ListItem secondaryAction={action} disablePadding onClick={() => onClick(user?.id)}>
         <ListItemButton dense>
             <ListItemText {...{
                 primary: <>
@@ -110,7 +113,7 @@ function UserListItem(props: { user: string, onClick?: (user: string) => void })
                         dateStyle: 'short',
                         timeStyle: 'short'
                     })}</Typography>
-                </>
+                </>,
             }} />
         </ListItemButton>
     </ListItem>

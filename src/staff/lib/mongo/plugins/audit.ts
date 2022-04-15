@@ -173,6 +173,7 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
 
 
     schema.pre('validate', async function (next) {
+        if ('_bypassAudit' in this) return next();
         if (this?._audit?.ready) await this._audit.ready;
         if (!('_audit' in this)) {
             throw new Error('Missing Audit Documentation');
@@ -189,6 +190,7 @@ export function AuditPlugin<Data = {}>(schema: Schema, options?: AuditOptions<Da
     })
 
     schema.pre('save', async function () {
+        if ('_bypassAudit' in this) return;
         this.$initAudit();
         if (this._audit.ready) await this._audit.ready;
         await this.$commit();
