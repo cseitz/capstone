@@ -1,9 +1,9 @@
-import { Button, Card, CardActions, CardContent, CardHeader, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Box, Select, MenuItem, Grid, Modal } from "@mui/material";
+import { Button, Card, CardActions, CardContent, CardHeader, CardProps, Checkbox, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography, Box, Select, MenuItem, Grid, Modal, Tooltip } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import { useState, useMemo, useEffect, useRef } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import type { UserListResponse } from "pages/api/users";
 import type { UserResponse } from "pages/api/users/[id]";
@@ -14,7 +14,10 @@ function UserCard(props: {
     user: string;
 } & CardProps) {
     const { user: id, ...cardProps } = props;
+    const [paused, setPaused] = useState(false);
     const [mode, setMode] = useState<'view' | 'edit'>('view');
+    const isEditing = mode == 'edit';
+    const isViewing = mode == 'view';
     const { isLoading, error, data } = useQuery<UserResponse>(['user', id], () => (
         fetch('/api/users/' + id).then(res => res.json())
     ));
@@ -30,6 +33,26 @@ function UserCard(props: {
         }
         if (error) alert.error('An error occured loading this user.');
     }, [error]);
+
+    const [email, setEmail] = useState<string>(null);
+    const [firstName, setFirstName] = useState<string>(null);
+    const [lastName, setLastName] = useState<string>(null);
+    const initialize = () => {
+        setEmail(user?.email);
+        setFirstName(user?.info?.firstName);
+        setLastName(user?.info?.lastName);
+    }
+    const discardChanges = useCallback(function () {
+        initialize();
+        setMode('view');
+    }, [user]);
+
+    useEffect(() => {
+        if (isLoading) return;
+        initialize();
+    }, [isLoading]);
+
+
     const hasName = Boolean(user?.info?.firstName?.trim() && user?.info?.lastName?.trim());
     const hasEmail = Boolean(user?.email.trim());
     return <Card {...cardProps}>
@@ -44,35 +67,51 @@ function UserCard(props: {
             <MoreVertIcon />
         </IconButton>} />
         <CardContent>
-            <Typography variant="h6">Details</Typography>
-            <Grid container columns={12} spacing={2}>
-                <Grid item xs={6}>
-                    <Typography>what</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                    <Typography>test</Typography>
-                </Grid>
+            <Grid container spacing={2}>
+
+                {isViewing && <>
+                    
+                    <Grid item xs={12}>
+
+                    </Grid>
+
+                    <Grid item xs={1}>
+                        <Tooltip title="Created" disableInteractive>
+                            <TodayIcon />
+                        </Tooltip>
+                    </Grid>
+
+
+
+                    <Grid item xs={5}>
+                        <Tooltip title="Created" disableInteractive>
+                            <Typography component="span">
+                                {new Date(user?.created).toLocaleString('en-us', {
+                                    dateStyle: 'short',
+                                    timeStyle: 'short'
+                                })}
+                            </Typography>
+                        </Tooltip>
+                    </Grid>
+
+                    <Grid item xs={1}>
+                        <Tooltip title="Updated" disableInteractive>
+                            <ScheduleIcon />
+                        </Tooltip>
+                    </Grid>
+                    <Grid item xs={5}>
+                        <Tooltip title="Updated" disableInteractive>
+                            <Typography component="span">
+                                {new Date(user?.updated).toLocaleString('en-us', {
+                                    dateStyle: 'short',
+                                    timeStyle: 'short'
+                                })}
+                            </Typography>
+                        </Tooltip>
+                    </Grid>
+                </>}
+
             </Grid>
-            <List subheader={"Details"} dense>
-                <ListItem>
-                    <ListItemIcon>
-                        <TodayIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Registered" secondary={new Date(user.created).toLocaleString('en-us', {
-                        dateStyle: 'short',
-                        timeStyle: 'short'
-                    })} />
-                </ListItem>
-                <ListItem>
-                    <ListItemIcon>
-                        <ScheduleIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Updated" secondary={new Date(user.updated).toLocaleString('en-us', {
-                        dateStyle: 'short',
-                        timeStyle: 'short'
-                    })} />
-                </ListItem>
-            </List>
             <Select value={user.role} onChange={({ target }) => { user.role = target.value as any; }}>
                 <MenuItem value={'pending'}>Pending</MenuItem>
                 <MenuItem value={'banned'}>Banned</MenuItem>
@@ -81,9 +120,13 @@ function UserCard(props: {
                 <MenuItem value={'admin'}>Admin</MenuItem>
             </Select>
         </CardContent>
-        <CardActions>
-            <Button>what</Button>
-        </CardActions>
+        <CardActions sx={{ justifyContent: 'space-between' }}>
+                {isViewing && <Button disabled={paused} onClick={() => setMode('edit')}>Edit</Button>}
+                {isEditing && <>
+                    <Button disabled={paused} onClick={() => alert.error('Not Yet Implemented (save)')}>Save Changes</Button>
+                    <Button disabled={paused} onClick={() => discardChanges()}>Discard Changes</Button>
+                </>}
+            </CardActions>
     </Card>
 }
 
