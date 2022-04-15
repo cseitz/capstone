@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Button, Grid, TextField, Typography } from '@mui/material'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Button, CircularProgress, Grid, TextField, Typography } from '@mui/material'
 import { Box } from '@mui/system';
 import { useRouter } from 'next/router';
 import { useAlert } from 'ui/components/alert';
@@ -35,12 +35,64 @@ export default function ExportsPage() {
                         <Typography>{endpoint.description}</Typography>
                     </Box>
                     <Box sx={{ p: 1 }}>
-                        <Link href={"/api/exports/" + endpoint.key}>
-                            <Button variant="contained">Download</Button>
-                        </Link>
+                        <ExportsLink url={endpoint.key} />
                     </Box>
                 </Box>
             })}
         </Box>
     );
+}
+
+function ExportsLink(props: {
+    url: string
+}) {
+    const { url } = props;
+    const router = useRouter();
+
+    let [isLoading, setIsLoading] = useState(false);
+    const endpoint = '/api/exports/' + url;
+    const alert = useAlert();
+    const download = useCallback(async () => {
+        setIsLoading(true);
+        const minDuration = new Promise(resolve => {
+            setTimeout(function() {
+                resolve(true);
+            }, 500)
+        });
+        fetch(endpoint)
+        .then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            const blob = await res.blob();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = decodeURIComponent(res.headers.get('content-disposition')).match(/filename="(.+)"/)[1];
+            await minDuration;
+            a.click();
+            setIsLoading(false);
+            alert.success('Downloaded File', {
+                unique: 'exports.download',
+                duration: 2000,
+            });
+        }).catch(err => {
+            alert.error('Download Failed: ' + err, {
+                unique: 'exports.download',
+                duration: 2000,
+            });
+            console.error('event.remove', err);
+        })
+    }, [endpoint, setIsLoading]);
+    const pre = isLoading ? <CircularProgress size={24} variant="indeterminate" sx={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        marginTop: '-12px',
+        marginLeft: '-12px',
+    }} /> : '';
+    return <Box sx={{ m: 1, position: 'relative' }}>
+        <Button variant='contained' fullWidth disabled={isLoading} onClick={() => download()}>
+            Download
+        </Button>
+        {pre}
+    </Box>
+
 }

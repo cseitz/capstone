@@ -1,12 +1,12 @@
 import { isAuthenticated } from "lib/auth";
-import { isStaff } from "lib/auth/guards";
+import { isAdmin, isStaff } from "lib/auth/guards";
 import { UserData, UserDocument, UserModel } from "lib/mongo/schema/user";
 import { Route, StatusError } from "lib/route";
 import { NextApiRequest, NextApiResponse } from "next";
 
 //Routes to mongo db and creates csv file of Audit log 
 export default Route(async (req, res) => {
-    if (!isStaff(req)) throw new StatusError(403, 'Unauthorized');
+    if (!isAdmin(req)) throw new StatusError(403, 'Unauthorized');
     const users = await UserModel.find()
     const lines = []
     //Creates the headers for each column in the CSV file
@@ -17,10 +17,13 @@ export default Route(async (req, res) => {
             user.role,
             user.info.firstName,
             user.info.lastName,
-            user.created
+            formatDate(user.created)
         ].join(","))
     }
     res.setHeader("Content-Disposition", "attachment; filename=\"users.csv\"")
     res.send(lines.join("\r\n"))
 });
 
+function formatDate(date: string | Date) {
+    return `"${new Date(date).toUTCString()}"`;
+}
