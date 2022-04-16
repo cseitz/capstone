@@ -1,7 +1,9 @@
 import type { UserData } from "lib/mongo/schema/user";
 import type { UserResponse } from "pages/api/users/[id]";
+import { createElement, useCallback, useEffect, useState } from "react";
 import { QueryClient, useQuery } from "react-query";
 import type { AuthenticationToken } from ".";
+import { UserRoles } from "./constants";
 
 export { }
 
@@ -54,4 +56,34 @@ export function useUser(): UserData & { ready: boolean } {
     if (isLoading) return token as any;
     (data.user as any).ready = true;
     return data.user as any;
+}
+
+// Automatically refreshes session, especially the user's role.
+export function UserSessionUpdater() {
+    const [user, setUser] = useState<UserData>(null);
+    const refetch = useCallback(() => {
+        fetch('/api/users/me')
+        .then(res => res.json())
+        .then(({ user }) => setUser(user))
+    }, []);
+    const [previousRole, setPreviousRole] = useState('');
+    useEffect(() => {
+        if (!user) return;
+        const isStaff = UserRoles.indexOf(user?.role) >= UserRoles.indexOf('staff');
+        const wasStaff = UserRoles.indexOf(previousRole) >= UserRoles.indexOf('staff');
+        if (isStaff != wasStaff && previousRole) {
+            location.reload();
+        }
+        if (user?.role) setPreviousRole(user?.role)
+    }, [user?.role])
+    useEffect(() => {
+        refetch();
+        const intv = setInterval(refetch, 2000);
+        window?.addEventListener('focus', refetch);
+        return () => {
+            clearInterval(intv);
+            window?.removeEventListener('focus', refetch);
+        }
+    }, [])
+    return createElement('span', {});
 }
