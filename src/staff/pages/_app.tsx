@@ -1,8 +1,9 @@
 import { createTheme, CssBaseline, useMediaQuery, ThemeProvider } from "@mui/material";
 import { useUser } from "lib/auth/client";
 import { AppProps } from "next/app";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
+import { clearInterval } from "timers";
 import { AlertProvider } from "ui/components/alert";
 import { NavBar } from "../ui/components/navbar";
 import '../ui/styles/global.scss';
@@ -44,7 +45,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <CssBaseline />
         <QueryClientProvider client={queryClient}>
             <NavBar />
-            {/* <UserSessionUpdater /> */}
+            <UserSessionUpdater />
             <AlertProvider>
                 <Component {...pageProps} />
             </AlertProvider>
@@ -53,6 +54,18 @@ export default function App({ Component, pageProps }: AppProps) {
 }
 
 function UserSessionUpdater() {
-    const user = useUser();
-    return <></>
+    // const user = useUser();
+    const refetch = useCallback(() => {
+        fetch('/api/users/me').then(res => res.json())
+    }, []);
+    useEffect(() => {
+        refetch();
+        const intv = setInterval(refetch, 2000);
+        window?.addEventListener('focus', refetch);
+        return () => {
+            clearInterval(intv);
+            window?.removeEventListener('focus', refetch);
+        }
+    }, [])
+    return <span />;
 }
