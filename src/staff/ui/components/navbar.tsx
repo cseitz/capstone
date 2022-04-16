@@ -15,6 +15,8 @@ import { useRouter } from 'next/router';
 import { EventNote } from '@mui/icons-material';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 
+
+
 const title = 'Staff Portal';
 const items: {
     name: string;
@@ -82,12 +84,12 @@ function HideOnScroll(props: {
 
 export function NavBar() {
     const [open, setOpen] = useState(false);
-    const [visible, setVisible] = useState(true);
+    const [visible, setVisible] = useState(false);
     const [anchor, setAnchor] = useState('left');
     const router = useRouter();
     const lastRoute = useRef("");
     useEffect(() => {
-        setVisible(router.route != '/login');
+        setVisible(router.route != '/login' && router.route != '/denied');
         if (lastRoute.current != router.route) {
             lastRoute.current = router.route;
             if (open) {
