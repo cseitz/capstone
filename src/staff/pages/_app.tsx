@@ -44,7 +44,7 @@ export default function App({ Component, pageProps }: AppProps) {
         <CssBaseline />
         <QueryClientProvider client={queryClient}>
             <NavBar />
-            <UserSessionUpdater />
+            {/* <UserSessionUpdater /> */}
             <AlertProvider>
                 <Component {...pageProps} />
             </AlertProvider>
