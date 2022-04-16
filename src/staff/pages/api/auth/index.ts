@@ -11,7 +11,7 @@ export interface AuthenticationStatusResponse {
 export default Route(async (req, res) => {
     let token = await verifyToken(req);
     if (token) {
-        token = await refreshTokenRole(req, res, token);
+        // token = await refreshTokenRole(req, res, token);
         return res.json({ token });
     }
     throw new StatusError(401, 'Unauthorized');

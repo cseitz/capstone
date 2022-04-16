@@ -5,7 +5,7 @@ import { NextFetchEvent, NextRequest, NextResponse } from "next/server";
 
 export default function handler(req: NextRequest, ev: NextFetchEvent) {
     const { nextUrl: { pathname }, cookies: { auth } } = req;
-    console.log('visit', pathname);
+    console.log('visit', pathname, isLoggedIn(auth));
     // if (pathname.startsWith('/assets'))
     //     return NextResponse.next();
     // if (pathname.includes('/api'))
