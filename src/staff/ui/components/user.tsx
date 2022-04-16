@@ -25,7 +25,7 @@ function UserCard(props: {
     const [mode, setMode] = useState<'view' | 'edit'>('view');
     const isEditing = mode == 'edit';
     const isViewing = mode == 'view';
-    const { isLoading, error, data } = useQuery<UserResponse>(['user', id], () => (
+    const { isLoading, error, data, refetch } = useQuery<UserResponse>(['user', id], () => (
         fetch('/api/users/' + id).then(res => res.json())
     ));
     const { user } = data || {};
@@ -123,14 +123,19 @@ function UserCard(props: {
                 unique: 'update.user',
                 duration: 2000
             })
+            queryClient.setQueryData(['user', id], await res.json());
         }).catch(err => {
             alert.error('Unable to update user');
             console.error('user.submitChanges', err);
         }).finally(() => {
             if (singleField) return;
             setPaused(false);
-            queryClient.invalidateQueries('users');
-            queryClient.invalidateQueries(['user', id]);
+            user.role = role;
+            user.email = email;
+            user.info.firstName = firstName;
+            user.info.lastName = lastName;
+            queryClient.refetchQueries('users');
+            // queryClient.refetchQueries(['user', id]);
             setMode('view');
 
         })

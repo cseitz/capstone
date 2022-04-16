@@ -93,6 +93,7 @@ export function EventCard(props: {
         }).then(async (res) => {
             if (!res.ok) throw (await res.json())?.error;
             alert.success(isCreate ? 'Created an event!' : 'Event Updated');
+            queryClient.setQueryData(['event', id], await res.json());
         }).catch(err => {
             alert.error('Unable to ' + (isCreate ? 'create an event' : 'update this event'));
             console.error('event.submitChanges', err);

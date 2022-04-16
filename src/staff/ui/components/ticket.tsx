@@ -43,6 +43,7 @@ function TicketCard(props: {
         setStatus(ticket.status);
     }, [isLoading]);
 
+    const queryClient = useQueryClient();
     useEffect(() => {
         if (isLoading) return;
         if (!status) return;
@@ -64,6 +65,7 @@ function TicketCard(props: {
                 message: 'Updated Ticket',
                 duration: 2000,
             })
+            queryClient.setQueryData(['ticket', id], await res.json());
             setTimeout(() => {
                 queryClient.refetchQueries({ queryKey: 'tickets' })
             }, 2000)
@@ -74,8 +76,6 @@ function TicketCard(props: {
         })
     }, [status])
 
-    const queryClient = useQueryClient();
-    console.log(queryClient);
     const remove = useCallback(() => {
         fetch('/api/tickets/' + id, {
             method: 'DELETE'
