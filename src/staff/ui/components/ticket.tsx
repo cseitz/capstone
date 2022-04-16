@@ -210,7 +210,7 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
     const { tickets } = data || { tickets: [] };
     const alert = useAlert();
     useEffect(() => {
-        if (isLoading) return;
+        if (isLoading || tickets.length == 0) return;
         alert.success({
             message: 'Loaded ' + tickets.length + ' Tickets',
             duration: 2000,
