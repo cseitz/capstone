@@ -1,8 +1,6 @@
 import type { UserData } from "schema/user";
-import { QueryClient, useQuery } from "react-query";
-// import type { AuthenticationToken } from "staff/lib/auth";
+import { useQuery } from "react-query";
 
-export { }
 
 function getCookie(name) {
     if (typeof window == 'undefined') return undefined;
@@ -45,7 +43,7 @@ export function getToken(): any {
 
 export function useUser(): UserData & { ready: boolean } {
     const token = getToken() as any;
-    const { isLoading, error, data } = useQuery<{ user: UserData }>('loggedInUser', () => 
+    const { isLoading, error, data } = useQuery<{ user: UserData }>('loggedInUser', () =>
         fetch('/api/users/me').then(res => res.json())
     );
     if (!isAuthenticated() || error) return;
