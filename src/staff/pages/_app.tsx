@@ -1,7 +1,7 @@
 import { createTheme, CssBaseline, useMediaQuery, ThemeProvider } from "@mui/material";
 import { UserSessionUpdater } from "lib/auth/client";
 import { AppProps } from "next/app";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { AlertProvider } from "ui/components/alert";
 import { NavBar } from "../ui/components/navbar";

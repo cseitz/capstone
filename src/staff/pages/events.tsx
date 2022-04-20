@@ -1,15 +1,16 @@
-import { Button, Icon, IconButton, Typography, useMediaQuery } from "@mui/material";
+import { Button, Typography, useMediaQuery } from "@mui/material";
 import { Box } from "@mui/system";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { EventCard, EventList, EventListItem } from "ui/components/event";
+import { EventList, } from "ui/components/event";
 import CreateIcon from '@mui/icons-material/Create';
 import { useMemo, useState } from "react";
+import { title } from "ui/components/navbar";
+import Head from "next/head";
 
-//const queryClient = new QueryClient();
-
+// The Events page shows the list of events and allows creating and editing events
 export default function EventPage() {
-    const [showCreate, setShowCreate] = useState(false);
+
     const isMobile = useMediaQuery('(max-width:600px)');
+
     const sx = useMemo(() => (!isMobile ? {
         container: {
             display: 'flex',
@@ -26,18 +27,27 @@ export default function EventPage() {
         }
     }), [isMobile]);
 
+    const [showCreate, setShowCreate] = useState(false);
+
     // event page 
     return <Box sx={{ p: 2 }}>
+
+        <Head>
+            <title>{title} - Events</title>
+        </Head>
+
         <Box sx={{ ...sx.container }}>
+
             <Typography variant="h4" sx={{ ...sx.title }}>
                 Events
             </Typography>
-            {/* CREATE BUTTON FOR EVENT */}
+
             <Button variant="contained" sx={{ ...sx.button }} startIcon={<CreateIcon />} onClick={() => setShowCreate(true)}>
                 Create Event
             </Button>
         </Box>
 
         <EventList showCreate={showCreate} onClose={() => setShowCreate(false)} />
+
     </Box>
 }

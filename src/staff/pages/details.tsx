@@ -1,12 +1,19 @@
-import { Add, ArrowDropDown, ArrowDropUp, Delete, ExpandMore, PlusOne } from "@mui/icons-material";
-import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Collapse, Divider, Grid, IconButton, InputLabel, ListItem, ListItemText, Paper, TextField, Typography, useMediaQuery } from "@mui/material";
+import { Add, ArrowDropDown, ArrowDropUp, Delete, DeleteForeverSharp } from "@mui/icons-material";
+import { Box, Button, Collapse, Divider, Grid, IconButton, TextField, Typography, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import type { AboutDetails, FAQDetails, LandingDetails } from "./api/details";
 import { v4 as uuidv4 } from 'uuid';
+import Head from "next/head";
+import { title } from "ui/components/navbar";
 
+
+// The details page allows details to be edited
 export default function DetailsPage() {
     return <Box sx={{ p: 2, maxWidth: '1000px', mx: 'auto' }}>
+        <Head>
+            <title>{title} - Details</title>
+        </Head>
         <Typography variant="h4">Details</Typography>
         <LandingDetailsPage />
         <AboutDetailsPage />
@@ -14,6 +21,7 @@ export default function DetailsPage() {
     </Box>
 }
 
+// Base section on the details page
 function DetailsComponent(props: {
     children: any;
     title: string;
@@ -241,17 +249,17 @@ export function FAQDetailsPage() {
         </Grid>
 
         <Grid item xs={12} sx={{ textAlign: 'center' }}>
-                <Button variant="outlined" endIcon={<Add />} onClick={() => {
-                    if (!expanded) return setExpanded(true);
-                    setQuestions([
-                        ...questions,
-                        {
-                            id: uuidv4(),
-                            question: '',
-                            answer: '',
-                        }
-                    ])
-                }} fullWidth={isMobile}>{expanded ? 'Add Entry' : 'Show'}</Button>
+            <Button variant="outlined" endIcon={<Add />} onClick={() => {
+                if (!expanded) return setExpanded(true);
+                setQuestions([
+                    ...questions,
+                    {
+                        id: uuidv4(),
+                        question: '',
+                        answer: '',
+                    }
+                ])
+            }} fullWidth={isMobile}>{expanded ? 'Add Entry' : 'Show'}</Button>
         </Grid>
 
     </DetailsComponent >

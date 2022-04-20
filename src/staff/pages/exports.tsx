@@ -1,9 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Button, CircularProgress, Grid, TextField, Typography } from '@mui/material'
+import React, { useCallback, useState } from 'react'
+import { Button, CircularProgress, Typography } from '@mui/material'
 import { Box } from '@mui/system';
-import { useRouter } from 'next/router';
 import { useAlert } from 'ui/components/alert';
-import Link from 'next/link'
+import Head from 'next/head';
+import { title } from 'ui/components/navbar';
+
 
 const endpoints: {
     key: string,
@@ -22,36 +23,49 @@ const endpoints: {
         }
     ]
 
+
+// The exports page shows various export endpoints and allows downloading of their CSV files.
 export default function ExportsPage() {
-    return (
-        <Box sx={{ maxWidth: "800px", mx: "auto", p: 2 }}>
-            <Typography variant="h4">Exports</Typography>
-            {endpoints.map(endpoint => {
-                return <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }} key={endpoint.key}>
-                    <Box>
-                        <Typography variant="h5">
-                            {endpoint.title}
-                        </Typography>
-                        <Typography>{endpoint.description}</Typography>
-                    </Box>
-                    <Box sx={{ p: 1 }}>
-                        <ExportsLink url={endpoint.key} />
-                    </Box>
-                </Box>
-            })}
+
+    const Endpoints = endpoints.map(endpoint => {
+        return <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }} key={endpoint.key}>
+            <Box>
+                <Typography variant="h5">
+                    {endpoint.title}
+                </Typography>
+                <Typography>{endpoint.description}</Typography>
+            </Box>
+            <Box sx={{ p: 1 }}>
+                <ExportsLink url={endpoint.key} />
+            </Box>
         </Box>
-    );
+    });
+
+    return <>
+        <Head>
+            <title>{title} - Exports</title>
+        </Head>
+
+        <Box sx={{ maxWidth: "800px", mx: "auto", p: 2 }}>
+
+            <Typography variant="h4">Exports</Typography>
+
+            {Endpoints}
+
+        </Box>
+    </>
 }
 
+// The exports link provides a fancy button for downloading the CSV's
 function ExportsLink(props: {
     url: string
 }) {
+    const alert = useAlert();
     const { url } = props;
-    const router = useRouter();
 
     let [isLoading, setIsLoading] = useState(false);
     const endpoint = '/api/exports/' + url;
-    const alert = useAlert();
+
     const download = useCallback(async () => {
         setIsLoading(true);
         const minDuration = new Promise(resolve => {
@@ -59,28 +73,27 @@ function ExportsLink(props: {
                 resolve(true);
             }, 500)
         });
-        fetch(endpoint)
-            .then(async (res) => {
-                if (!res.ok) throw (await res.json())?.error;
-                const blob = await res.blob();
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = decodeURIComponent(res.headers.get('content-disposition')).match(/filename="(.+)"/)[1];
-                await minDuration;
-                a.click();
-                setIsLoading(false);
-                alert.success('Downloaded File', {
-                    unique: 'exports.download',
-                    duration: 2000,
-                });
-            }).catch(err => {
-                setIsLoading(false);
-                alert.error('Download Failed: ' + err, {
-                    unique: 'exports.download',
-                    duration: 2000,
-                });
-                console.error('event.remove', err);
-            })
+        fetch(endpoint).then(async (res) => {
+            if (!res.ok) throw (await res.json())?.error;
+            const blob = await res.blob();
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = decodeURIComponent(res.headers.get('content-disposition')).match(/filename="(.+)"/)[1];
+            await minDuration;
+            a.click();
+            setIsLoading(false);
+            alert.success('Downloaded File', {
+                unique: 'exports.download',
+                duration: 2000,
+            });
+        }).catch(err => {
+            setIsLoading(false);
+            alert.error('Download Failed: ' + err, {
+                unique: 'exports.download',
+                duration: 2000,
+            });
+            console.error('event.remove', err);
+        })
     }, [endpoint, setIsLoading]);
     const pre = isLoading ? <CircularProgress size={24} variant="indeterminate" sx={{
         position: 'absolute',

@@ -17,7 +17,7 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 
 
 
-const title = 'Staff Portal';
+export const title = 'Staff Portal';
 const items: {
     name: string;
     url: string;
