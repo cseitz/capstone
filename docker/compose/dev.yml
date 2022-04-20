@@ -1,11 +1,6 @@
 version: '3.9'
 services: 
 
-  mongo:
-    extends:
-      file: ./services.yml
-      service: mongo
-
   nginx:
     extends:
       file: ./services.yml
@@ -15,5 +10,3 @@ services:
       - NGINX_HOST_WEB=http://host.docker.internal:5001
     ports:
       - 80:80
-    links:
-      - mongo:mongo
