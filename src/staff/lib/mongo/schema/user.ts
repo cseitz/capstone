@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, model, models, Schema } from "mongoose";
+import { HydratedDocument, Model, model, models, Query, Schema } from "mongoose";
 import { TimestampData, TimestampOptions, TimestampPlugin } from "../plugins/timestamped";
 import { AuditData, AuditPlugin, AuditSchema } from "../plugins/audit";
 import { UserRole, UserRoles } from "lib/auth/constants";
@@ -68,7 +68,13 @@ schema.plugin(AuditPlugin);
 
 
 //** Model */
-interface QueryHelpers { }
+interface QueryHelpers {
+    byName(name: string): Query<any, UserDocument> & QueryHelpers;
+}
+
+schema.query.byName = function(name: string) {
+    return this.findOne({ name: name })
+}
 
 type UserModelType = Model<UserSchema, QueryHelpers>;
 export type UserDocument = HydratedDocument<UserSchema>;
