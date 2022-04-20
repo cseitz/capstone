@@ -15,23 +15,30 @@ import { usePrompt } from './prompt';
 
 const queryClient = new QueryClient();
 
+// Displays a ticket in its editable form
 function TicketCard(props: {
     ticket: string;
     exit?: () => void;
 } & CardProps) {
     const { ticket: id, exit = () => { }, ...cardProps } = props;
+
     const [mode, setMode] = useState<'view' | 'edit'>('view');
+
     const { isLoading, error, data } = useQuery<TicketResponse>(['ticket', id], () => (
         fetch('/api/tickets/' + id).then(res => res.json())
     ));
+
     const { ticket } = data || {};
+
     const alert = useAlert();
+
     useEffect(() => {
         alert.success({
             message: 'Loaded Ticket ' + ticket?.email || "[Missing name]",
             duration: 2000,
         })
     }, []);
+
     const hasName = Boolean(ticket?.name?.trim());
     const hasEmail = Boolean(ticket?.email.trim());
     const hasSubject = Boolean(ticket?.subject.trim());
@@ -48,8 +55,6 @@ function TicketCard(props: {
         if (isLoading) return;
         if (!status) return;
         if (ticket.status == status) return;
-        console.log('gotta update ticket');
-        const originalStatus = ticket.status;
         fetch('/api/tickets/' + id, {
             method: 'PATCH',
             headers: {
@@ -103,6 +108,7 @@ function TicketCard(props: {
             <Button onClick={() => { deletePrompt(false); exit(); remove(); }}>Confirm</Button>
         </>
     })
+
     const DeletePrompt = deletePrompt.Provider;
     const promptRemove = () => deletePrompt(true);
 
@@ -166,19 +172,28 @@ function TicketCard(props: {
         </Card>
     </>
 }
+
+
+// Displays a single ticket in a list of tickets. Clicking triggers TicketCard
 function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => void }) {
     const { onClick = (ticket: string) => { }, } = props;
+
     const { isLoading, error, data } = useQuery<TicketResponse>(['ticket', props.ticket], () => (
         fetch('/api/tickets/' + props.ticket).then(res => res.json())
     ));
+
     const { ticket } = data || {};
+
     if (isLoading) return <ListItem disablePadding />;
+
     const hasName = Boolean(ticket?.name?.trim());
     const hasEmail = Boolean(ticket?.email.trim());
     const hasSubject = Boolean(ticket?.subject.trim());
+
     const name = !hasName ? 'Missing Name' : ticket.name;
     const email = !hasEmail ? 'No Email' : ticket.email;
     const subject = !hasSubject ? 'No Subject' : ticket.subject;
+
     return <Card sx={{ margin: 'auto', width: 'min(300px, 80vw)' }} onClick={() => onClick(ticket?.id)}>
         <ListItemButton dense>
             <ListItemText {...{
@@ -200,15 +215,21 @@ function TicketListItem(props: { ticket: string, onClick?: (ticket: string) => v
     </Card>
 }
 
+// Displays a list of tickets
 function TicketListComponent(props: { filter?: any, setCount?: any }) {
     const query = new URLSearchParams(props.filter || {}).toString();
+
     const { isLoading, error, data, dataUpdatedAt } = useQuery<TicketListResponse>(['tickets', query], () => (
         fetch('/api/tickets?' + query).then(res => res.json())
     ));
+
     const [open, setOpen] = useState<string>(null);
     const exit = () => { setOpen(null) };
+
     const { tickets } = data || { tickets: [] };
+
     const alert = useAlert();
+
     useEffect(() => {
         if (isLoading || tickets.length == 0) return;
         alert.success({
@@ -217,7 +238,9 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
             unique: 'ticketsLoaded'
         })
     }, [isLoading]);
+
     const firstLoad = useRef(true);
+
     useEffect(() => {
         if (isLoading) return;
         if (!firstLoad.current)
@@ -227,12 +250,16 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
                 unique: 'ticketListRefreshedAt'
             });
         firstLoad.current = false;
-    }, [dataUpdatedAt])
+    }, [dataUpdatedAt]);
+
+    // display loading spinner
     if (isLoading) return <>
         <Box sx={{ margin: 'auto', width: 'min(400px, 80vw)', textAlign: 'center', mt: '30vh' }}>
             <CircularProgress size={50} />
         </Box>
     </>;
+
+    // display no tickets
     if (tickets.length == 0) return <>
         <Typography variant="h5" sx={{ textAlign: 'center', mt: 10 }}>No Tickets</Typography>
     </>;
@@ -247,13 +274,18 @@ function TicketListComponent(props: { filter?: any, setCount?: any }) {
                 </Box>
             </Modal>
             <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
-                {tickets.map(({ id }) => <Grid item key={id}>
-                    <TicketListItem ticket={id} onClick={setOpen} />
-                </Grid>)}
+                {tickets.map(({ id }) =>
+                    <Grid item key={id}>
+                        <TicketListItem ticket={id} onClick={setOpen} />
+                    </Grid>
+                )}
             </Grid>
         </Box>
     </>
 }
+
+
+// Wraps the TicketListComponent and provides the query client
 export function TicketList(props: (Parameters<typeof TicketListComponent>)[0]) {
     return <QueryClientProvider client={queryClient}>
         <TicketListComponent {...props} />

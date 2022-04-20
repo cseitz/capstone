@@ -15,15 +15,20 @@ import type { EventData } from "lib/mongo/schema/event";
 import { UserListItem } from "./user";
 import { usePrompt } from "./prompt";
 
+
+// Displays an event in its editable form. Also used for event creation.
 export function EventCard(props: {
     event: string;
     exit?: () => void;
 } & CardProps) {
     const { event: id, exit = () => { }, ...cardProps } = props;
+    const alert = useAlert();
+
     const isCreate = id == 'create';
     const [mode, setMode] = useState<'view' | 'edit'>(isCreate ? 'edit' : 'view');
     const isEditing = mode == 'edit';
     const isViewing = mode == 'view';
+
     const { isLoading, error, data } = useQuery<EventResponse>(['event', id], () => {
         if (isCreate) return {};
         return fetch('/api/events/' + id).then(res => res.json())
@@ -33,48 +38,51 @@ export function EventCard(props: {
 
         }
     }, [])
+
     const { event } = !isCreate ? (data || {}) : { event: creating };
     const hasType = Boolean(event?.type);
-    const alert = useAlert();
 
     const [paused, setPaused] = useState(false);
 
+    // fields
     const [title, setTitle] = useState<string>(null);
     const [type, setType] = useState<string>(null);
     const [signups, setSignups] = useState<string[]>(null);
     const [description, setDescription] = useState<string>(null);
     const [startsAt, setStartsAt] = useState<Date | null>(null);
     const [endsAt, setEndsAt] = useState<Date | null>(null);
-    const deps = [title, type, signups, description, startsAt, endsAt];
-    const discardChanges = useCallback(function () {
-        setTitle(event.title);
-        setType(event.type);
-        setSignups(event.signups as string[]);
-        setDescription(event.description);
-        setStartsAt(event?.startsAt ? new Date(event?.startsAt) : null);
-        setEndsAt(event?.endsAt ? new Date(event?.endsAt) : null);
-        setMode('view');
-    }, [event]);
 
-    useEffect(() => {
-        if (isLoading || isCreate) { return; }
-        // event.signups = [...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups, ...event?.signups];
-        alert.success({
-            message: 'Loaded ' + (event?.title || "[Missing title]"),
-            duration: 2000,
-        })
+    const initialize = function () {
         setTitle(event?.title || '');
         setType(event?.type || '');
         setSignups(event.signups as string[]);
         setDescription(event?.description || '');
         setStartsAt(event?.startsAt ? new Date(event?.startsAt) : null);
         setEndsAt(event?.endsAt ? new Date(event?.endsAt) : null)
+    }
+
+    const deps = [title, type, signups, description, startsAt, endsAt];
+    const discardChanges = useCallback(function () {
+        initialize();
+        setMode('view');
+    }, [event]);
+
+    // initialize fields
+    useEffect(() => {
+        if (isLoading || isCreate) { return; }
+        alert.success({
+            message: 'Loaded ' + (event?.title || "[Missing title]"),
+            duration: 2000,
+        })
+        initialize();
     }, [isLoading]);
 
     const queryClient = useQueryClient();
     const submitChanges = useCallback(() => {
         setPaused(true);
-        const pull = isCreate ? undefined : { signups: event.signups.filter(o => !signups.includes(o as string)) };
+        const pull = isCreate ? undefined : {
+            signups: event.signups.filter(o => !signups.includes(o as string))
+        };
         fetch('/api/events/' + (isCreate ? 'create' : id), {
             method: isCreate ? 'POST' : 'PATCH',
             headers: {
@@ -90,17 +98,19 @@ export function EventCard(props: {
             })
         }).then(async (res) => {
             if (!res.ok) throw (await res.json())?.error;
+            // show success message
             alert.success(isCreate ? 'Created an event!' : 'Event Updated');
             queryClient.setQueryData(['event', id], await res.json());
         }).catch(err => {
+            // show error
             alert.error('Unable to ' + (isCreate ? 'create an event' : 'update this event'));
             console.error('event.submitChanges', err);
         }).finally(() => {
             setPaused(false);
             if (isCreate) {
+                // exit modal if in creation mode
                 exit();
             } else {
-                queryClient.invalidateQueries(['event', id]);
                 setMode('view');
             }
             queryClient.invalidateQueries('events');
@@ -133,29 +143,38 @@ export function EventCard(props: {
             <Button onClick={() => { deletePrompt(false) }}>Cancel</Button>
             <Button onClick={() => { deletePrompt(false); exit(); remove(); }}>Confirm</Button>
         </>
-    })
+    });
+
     const DeletePrompt = deletePrompt.Provider;
     const promptRemove = () => deletePrompt(true);
 
     const [showUsers, setShowUsers] = useState(false);
     const [didShowUsers, setDidShowUsers] = useState(false);
     const [didLoadUsers, setDidLoadUsers] = useState(false);
+
     useEffect(() => {
         if (event?.signups?.length == 0) setDidLoadUsers(true);
-    }, [event?.signups])
+    }, [event?.signups]);
+
     useEffect(() => {
         if (showUsers && !didShowUsers) setDidShowUsers(true);
     }, [showUsers]);
+
     const isFetching = useIsFetching({
         predicate: query => showUsers && query.queryKey.includes('user')
     });
+
     useEffect(() => {
         if (!didShowUsers) return;
         if (didLoadUsers) return;
         if (isFetching == 0) setDidLoadUsers(true);
     }, [isFetching]);
+
+
     const userList = !isCreate && <Accordion expanded={showUsers} onChange={() => setShowUsers(!showUsers)} elevation={2}>
-        <AccordionSummary>{showUsers ? 'Hide Roster (' + signups?.length + ' signup' + (signups.length > 1 ? 's' : '') + ')' : 'Show Roster'}</AccordionSummary>
+        <AccordionSummary>
+            {showUsers ? 'Hide Roster (' + signups?.length + ' signup' + (signups.length > 1 ? 's' : '') + ')' : 'Show Roster'}
+        </AccordionSummary>
         <AccordionDetails sx={{ maxHeight: '30vh', overflowY: 'auto' }}>
             {signups?.length == 0 && <Typography sx={{ textAlign: 'center' }}>No Users</Typography>}
             <List hidden={!didLoadUsers}>
@@ -189,7 +208,6 @@ export function EventCard(props: {
         </Tooltip>
     </>
 
-    // if (isLoading) return <Card {...cardProps} />;
     return <>
         <DeletePrompt />
         <Card {...cardProps}>
@@ -217,23 +235,30 @@ export function EventCard(props: {
                     <Grid container spacing={2}>
                         {isEditing && <>
                             <Grid item xs={8}>
-                                <TextField disabled={paused} label="Title" placeholder="Title" fullWidth value={title} onChange={({ target: { value } }) => setTitle(value)} />
+                                <TextField fullWidth disabled={paused} label="Title" placeholder="Title"
+                                    value={title} onChange={({ target: { value } }) => setTitle(value)} />
                             </Grid>
 
                             <Grid item xs={4}>
-                                <TextField disabled={paused} label="Type" placeholder="Type" fullWidth value={type} onChange={({ target: { value } }) => setType(value)} />
+                                <TextField fullWidth disabled={paused} label="Type" placeholder="Type"
+                                    value={type} onChange={({ target: { value } }) => setType(value)} />
                             </Grid>
 
                             <Grid item xs={12}>
-                                <TextField disabled={paused} label="Description" placeholder="Description" fullWidth multiline minRows={2} value={description} onChange={({ target: { value } }) => setDescription(value)} />
+                                <TextField fullWidth disabled={paused} label="Description" placeholder="Description" multiline minRows={2}
+                                    value={description} onChange={({ target: { value } }) => setDescription(value)} />
                             </Grid>
 
                             <Grid item xs={6}>
-                                <DateTimePicker disabled={paused} label="Starts" renderInput={(props) => <TextField fullWidth {...props} />} value={startsAt} onChange={val => setStartsAt(val)} />
+                                <DateTimePicker disabled={paused} label="Starts"
+                                    renderInput={(props) => <TextField fullWidth {...props} />}
+                                    value={startsAt} onChange={val => setStartsAt(val)} />
                             </Grid>
 
                             <Grid item xs={6}>
-                                <DateTimePicker disabled={paused} label="Ends" renderInput={(props) => <TextField fullWidth {...props} />} value={endsAt} onChange={val => setEndsAt(val)} />
+                                <DateTimePicker disabled={paused} label="Ends"
+                                    renderInput={(props) => <TextField fullWidth {...props} />}
+                                    value={endsAt} onChange={val => setEndsAt(val)} />
                             </Grid>
 
                             <Grid item xs={12}>
@@ -276,6 +301,7 @@ export function EventCard(props: {
                                     <ScheduleIcon />
                                 </Tooltip>
                             </Grid>
+
                             <Grid item xs={5}>
                                 <Tooltip title="Updated" disableInteractive>
                                     <Typography component="span">
@@ -314,22 +340,28 @@ export function EventCard(props: {
     </>
 }
 
+
+// Displays a single event in list form
 export function EventListItem(props: { event: string, onClick?: (event: string) => void }) {
     const { onClick = (event: string) => { }, } = props;
+
     const { isLoading, error, data } = useQuery<EventResponse>(['event', props.event], () => (
         fetch('/api/events/' + props.event).then(res => res.json())
     ));
+
     const { event } = data || {};
+
     if (isLoading) return <ListItem disablePadding />;
+
     const { title, description, startsAt, endsAt, type } = event;
-    const hasType = Boolean(event.type);
+
     return <ListItem disablePadding onClick={() => onClick(event?.id)} sx={{ width: '100%' }}>
         <ListItemButton dense>
             <ListItemText {...{
                 primary: <>
                     {title}
-                    {event?.type && <Typography component="span" sx={{ color: 'text.disabled', m: 1 }}>-</Typography>}
-                    {event?.type && <Typography component="span" sx={{}}>{event.type} </Typography>}
+                    {type && <Typography component="span" sx={{ color: 'text.disabled', m: 1 }}>-</Typography>}
+                    {type && <Typography component="span" sx={{}}>{type} </Typography>}
                 </>,
                 primaryTypographyProps: { fontSize: 15 },
                 secondary: <>
@@ -347,28 +379,36 @@ export function EventListItem(props: { event: string, onClick?: (event: string) 
 }
 
 const queryClient = new QueryClient();
+
+// Shows a list of events
 function EventListComponent(props: { showCreate?: boolean, onClose?: () => void }) {
     const {
         showCreate = false,
         onClose: onCloseListener = () => { }
     } = props;
+
     const { isLoading, error, data, dataUpdatedAt } = useQuery<EventListResponse>(['events'], () => (
         fetch('/api/events').then(res => res.json())
     ));
+
     const [open, setOpen] = useState<string>(null);
     useEffect(() => {
         if (showCreate && open != 'create') setOpen('create');
         if (!showCreate && open == 'create') setOpen(null);
     }, [showCreate])
+
     const { events } = data || { events: [] };
     const alert = useAlert();
+
     useEffect(() => {
         if (isLoading) return;
         alert.success({
             message: 'Loaded ' + events.length + ' Events',
         })
     }, [isLoading]);
+
     const firstLoad = useRef(true);
+
     useEffect(() => {
         if (isLoading) return;
         if (!firstLoad.current)
@@ -379,7 +419,9 @@ function EventListComponent(props: { showCreate?: boolean, onClose?: () => void 
             });
         firstLoad.current = false;
     }, [dataUpdatedAt]);
+
     const exit = () => { setOpen(null); onCloseListener() };
+
     return <>
         <Modal open={Boolean(open)} onClose={exit}>
             <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
@@ -392,6 +434,8 @@ function EventListComponent(props: { showCreate?: boolean, onClose?: () => void 
     </>
 }
 
+
+// Wraps EventListComponent and provides the query client
 export function EventList(props: (Parameters<typeof EventListComponent>)[0]) {
     return <QueryClientProvider client={queryClient}>
         <EventListComponent {...props} />

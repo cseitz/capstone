@@ -15,22 +15,32 @@ import { useUser } from "lib/auth/client";
 import { usePrompt } from "./prompt";
 
 
+// Displays a user in their editable form
 function UserCard(props: {
     user: string;
     exit?: () => void;
 } & CardProps) {
+    // get client permissions
     const client = useUser();
+
     const { user: id, exit = () => { }, ...cardProps } = props;
+
     const [paused, setPaused] = useState(false);
+
     const [mode, setMode] = useState<'view' | 'edit'>('view');
     const isEditing = mode == 'edit';
     const isViewing = mode == 'view';
+
     const { isLoading, error, data, refetch } = useQuery<UserResponse>(['user', id], () => (
         fetch('/api/users/' + id).then(res => res.json())
     ));
+
     const { user } = data || {};
+
     if (isLoading) return <Card {...cardProps} />;
+
     const alert = useAlert();
+
     useEffect(() => {
         if (!error) {
             alert.success({
@@ -41,17 +51,21 @@ function UserCard(props: {
         if (error) alert.error('An error occured loading this user.');
     }, [error]);
 
+    // fields
     const [email, setEmail] = useState<string>(null);
     const [firstName, setFirstName] = useState<string>(null);
     const [lastName, setLastName] = useState<string>(null);
     const [role, setRole] = useState<UserResponse['user']['role']>(null);
+
     const deps = [email, role, firstName, lastName];
+
     const initialize = () => {
         setEmail(user?.email);
         setFirstName(user?.info?.firstName);
         setLastName(user?.info?.lastName);
         setRole(user?.role);
     }
+
     const discardChanges = useCallback(function () {
         initialize();
         setMode('view');
@@ -101,6 +115,7 @@ function UserCard(props: {
             <Button onClick={() => { deletePrompt(false); exit(); remove(); }}>Confirm</Button>
         </>
     })
+
     const DeletePrompt = deletePrompt.Provider;
     const promptRemove = () => deletePrompt(true);
 
@@ -135,17 +150,18 @@ function UserCard(props: {
             user.info.firstName = firstName;
             user.info.lastName = lastName;
             queryClient.refetchQueries('users');
-            // queryClient.refetchQueries(['user', id]);
             setMode('view');
 
         })
     }, [...deps]);
 
+    // auto-submit changes when the roll dropdown is utilized
     useEffect(() => {
         if (isEditing) return;
         if (!role) return;
         if (role != user?.role) submitChanges('role');
     }, [role]);
+
 
     const topActions = <>
         {clientRoleIndex > userRoleIndex && <Tooltip title="Delete" placement="left" disableInteractive>
@@ -176,15 +192,18 @@ function UserCard(props: {
                 <Grid container spacing={2}>
                     {isEditing && <>
                         <Grid item xs={12}>
-                            <TextField disabled={paused} label="Email" placeholder="Email" fullWidth value={email} onChange={({ target: { value } }) => setEmail(value)} />
+                            <TextField disabled={paused} label="Email" placeholder="Email" fullWidth
+                                value={email} onChange={({ target: { value } }) => setEmail(value)} />
                         </Grid>
 
                         <Grid item xs={6}>
-                            <TextField disabled={paused} label="First Name" placeholder="First Name" fullWidth value={firstName} onChange={({ target: { value } }) => setFirstName(value)} />
+                            <TextField disabled={paused} label="First Name" placeholder="First Name" fullWidth
+                                value={firstName} onChange={({ target: { value } }) => setFirstName(value)} />
                         </Grid>
 
                         <Grid item xs={6}>
-                            <TextField disabled={paused} label="Last Name" placeholder="Last Name" fullWidth value={lastName} onChange={({ target: { value } }) => setLastName(value)} />
+                            <TextField disabled={paused} label="Last Name" placeholder="Last Name" fullWidth
+                                value={lastName} onChange={({ target: { value } }) => setLastName(value)} />
                         </Grid>
                     </>}
 
@@ -228,7 +247,8 @@ function UserCard(props: {
 
                     <Grid item xs={6}>
                         <InputLabel sx={{ mb: 1 }}>Role</InputLabel>
-                        <Select disabled={paused || (!isAdmin && clientRoleIndex <= userRoleIndex) || client.id == user.id} fullWidth value={role} onChange={({ target }) => { setRole(target.value as any); }}>
+                        <Select disabled={paused || (!isAdmin && clientRoleIndex <= userRoleIndex) || client.id == user.id} fullWidth
+                            value={role} onChange={({ target }) => { setRole(target.value as any); }}>
                             {UserRoles.filter((val, key) => isAdmin || key < clientRoleIndex || key == userRoleIndex).map((val, key) => (
                                 <MenuItem value={val} key={val}>{val[0].toUpperCase() + val.slice(1)}</MenuItem>
                             ))}
@@ -250,17 +270,24 @@ function UserCard(props: {
 }
 
 
+// Displays a single user in a list of users
 export function UserListItem(props: { user: string, onClick?: (user: string) => void, action?: any }) {
     const { onClick = (user: string) => { }, action = '' } = props;
+
     const { isLoading, error, data } = useQuery<UserResponse>(['user', props.user], () => (
         fetch('/api/users/' + props.user).then(res => res.json())
     ));
+
     const { user } = data || {};
+
     if (isLoading) return <ListItem disablePadding />;
+
     const hasName = Boolean(user?.info?.firstName?.trim() && user?.info?.lastName?.trim());
     const hasEmail = Boolean(user?.email.trim());
     const name = !hasName ? 'Missing Name' : user.info.firstName + ' ' + user.info.lastName;
     const email = !hasEmail ? 'No Email' : user.email;
+
+
     return <ListItem secondaryAction={action} disablePadding onClick={() => onClick(user?.id)}>
         <ListItemButton dense>
             <ListItemText {...{
@@ -282,23 +309,32 @@ export function UserListItem(props: { user: string, onClick?: (user: string) => 
 }
 
 const queryClient = new QueryClient();
+
+// Shows a list of users
 function UserListComponent(props: { showCount?: boolean }) {
     const {
         showCount = false,
     } = props;
+
     const { isLoading, error, data, dataUpdatedAt } = useQuery<UserListResponse>(['users'], () => (
         fetch('/api/users').then(res => res.json())
     ));
-    const [open, setOpen] = useState<string>(null)
+
+    const [open, setOpen] = useState<string>(null);
+
     const { users } = data || { users: [] };
+
     const alert = useAlert();
+
     useEffect(() => {
         if (isLoading) return;
         alert.success({
             message: 'Loaded ' + users.length + ' Users',
         })
     }, [isLoading]);
+
     const firstLoad = useRef(true);
+
     useEffect(() => {
         if (isLoading) return;
         if (!firstLoad.current)
@@ -309,7 +345,9 @@ function UserListComponent(props: { showCount?: boolean }) {
             });
         firstLoad.current = false;
     }, [dataUpdatedAt]);
+
     const exit = () => { setOpen(null); };
+
     return <>
         <Modal open={Boolean(open)} onClose={() => setOpen(null)}>
             <Box sx={{ width: '100vw', maxWidth: 600, mx: 'auto', mt: '10vh' }}>
@@ -325,6 +363,7 @@ function UserListComponent(props: { showCount?: boolean }) {
     </>
 }
 
+// Wraps UserListComponent and provides the query client
 export function UserList(props: (Parameters<typeof UserListComponent>)[0]) {
     return <QueryClientProvider client={queryClient}>
         <UserListComponent {...props} />
