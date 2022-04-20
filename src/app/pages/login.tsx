@@ -62,18 +62,22 @@ export default function LoginPage() {
 
                 <br />
 
-                <TextField label="Email" type="text" name="email" placeholder="Email" fullWidth onChange={(e) => { setStatus(null); setEmail(e.target.value) }} />
+                <TextField fullWidth label="Email" type="text" name="email" placeholder="Email"
+                    value={email} onChange={(e) => { setStatus(null); setEmail(e.target.value) }} />
 
                 <br /><br />
 
-                <TextField label="Password" type="password" name="password" placeholder="Password" fullWidth onChange={(e) => { setStatus(null); setPassword(e.target.value) }} onKeyDown={({ key }) => key == 'Enter' && handleSubmit()} />
+                <TextField fullWidth label="Password" type="password" name="password" placeholder="Password"
+                    value={password} onChange={(e) => { setStatus(null); setPassword(e.target.value) }}
+                    onKeyDown={({ key }) => key == 'Enter' && handleSubmit()} />
 
                 <br /><br />
 
-                <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Log In</Button>
+                <Button fullWidth variant="contained" type="submit" onClick={handleSubmit}>Log In</Button>
 
 
                 {status ? <Typography sx={{ color: 'red', textAlign: 'center', mt: '1em' }} >{status}</Typography> : ''}
+
                 <a onClick={() => router.push({ pathname: 'register' })}>
                     <Typography sx={{ cursor: 'pointer', textAlign: 'center', mt: 2 }}>
                         Create Account
