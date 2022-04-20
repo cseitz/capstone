@@ -4,10 +4,8 @@ import { EventResponse } from "pages/api/events/[id]";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { QueryClient, QueryClientProvider, useIsFetching, useQuery, useQueryClient } from "react-query";
 import { useAlert } from "./alert";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import TodayIcon from '@mui/icons-material/Today';
 import ScheduleIcon from '@mui/icons-material/Schedule';
-import PeopleIcon from '@mui/icons-material/People';
 import DeleteIcon from '@mui/icons-material/Delete'
 import CloseIcon from '@mui/icons-material/Close'
 import AdapterDateFns from '@mui/lab/AdapterDateFns';

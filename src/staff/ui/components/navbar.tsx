@@ -40,15 +40,15 @@ const items: {
         {
             name: "Tickets",
             url: "/tickets",
-            icon:<ContactSupportIcon />
-        }, 
+            icon: <ContactSupportIcon />
+        },
         {
             name: "Details",
             url: "/details",
-            icon:<DriveFileRenameOutlineIcon />
-        }, 
+            icon: <DriveFileRenameOutlineIcon />
+        },
         {
-       
+
             name: "Exports",
             url: "/exports",
             icon: <HomeIcon />
@@ -85,9 +85,11 @@ function HideOnScroll(props: {
 export function NavBar() {
     const [open, setOpen] = useState(false);
     const [visible, setVisible] = useState(false);
-    const [anchor, setAnchor] = useState('left');
+
     const router = useRouter();
     const lastRoute = useRef("");
+
+    // Hide drawer on navigation
     useEffect(() => {
         setVisible(router.route != '/login' && router.route != '/denied');
         if (lastRoute.current != router.route) {
@@ -97,6 +99,7 @@ export function NavBar() {
             }
         }
     }, [router.route, open, setOpen]);
+
     useEffect(() => {
         if (lastRoute.current != router.route) {
             lastRoute.current = router.route;
@@ -106,7 +109,7 @@ export function NavBar() {
         }
     }, [router.route, open, setOpen]);
 
-    const handleDrawer = () => {
+    const openDrawer = () => {
         setOpen(true)
     }
 
@@ -121,6 +124,7 @@ export function NavBar() {
         }
     }
 
+    // left-aligned links
     const navbarLinksLeft = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement != 'right').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon} sx={{ ...styles.button }}>
@@ -129,6 +133,7 @@ export function NavBar() {
         </Link>
     );
 
+    // right-aligned links
     const navbarLinksRight = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement == 'right').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon} sx={{ ...styles.button }}>
@@ -138,7 +143,10 @@ export function NavBar() {
     );
 
 
+    // drawer link slide-in stepper
     const [transitionStep, setTransitionStep] = useState(0);
+
+    // navigation drawer links
     const drawerLinks = items.filter(o => !o?.visible || o?.visible('drawer')).map((x, index) =>
         <Link href={x.url} key={x.url}>
             <Slide in={open && transitionStep > index} direction="right" timeout={200}>
@@ -152,6 +160,7 @@ export function NavBar() {
         </Link>
     );
 
+    // make steps slide in
     useEffect(() => {
         if (!open) return setTransitionStep(0);
         if (transitionStep <= drawerLinks.length) {
@@ -163,12 +172,13 @@ export function NavBar() {
     }, [transitionStep, open]);
 
     const isMobile = useMediaQuery('(max-width:600px)');
+
     return visible && <>
         <HideOnScroll>
             <AppBar position="sticky" style={{ boxShadow: "0px 0px 0px 0px" }}>
                 <Toolbar>
                     <IconButton
-                        onClick={handleDrawer}
+                        onClick={openDrawer}
                         size="large"
                         edge="start"
                         color="inherit"

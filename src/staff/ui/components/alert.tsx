@@ -3,6 +3,7 @@ import { createRenderAuthority, mergeProps, RenderAuthority, useRenderAuthority 
 import { uniqueId } from "lodash";
 import { createContext, MutableRefObject, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
+// Used to display alerts and feedback to users.
 
 type AlertType = AlertProps['color'];
 type IAlert = {
@@ -66,7 +67,7 @@ export function useAlert(base?: Partial<IAlert>) {
 export function createAlert(...args: Partial<AlertOrMessage>[]) {
     const details = ConstructAlert(...args)
     if (!details.context) details.context = AlertGlobalContext;
-    console.log('alert', details);
+    // console.log('alert', details);
     if (details.unique) {
         const uniques = details.context.alerts.filter(o => o.unique == details.unique);
         let foundActive = false;
@@ -150,7 +151,6 @@ function AlertItemDisplay(props: { alert: IAlert }) {
     }, [previousAlert?.height, previousAlert?.offset]);
     useEffect(() => {
         alert.stage = stage;
-        // console.log('do render');
         if (stage >= 3) {
             alert.height = 0;
             const tmt = setTimeout(() => {

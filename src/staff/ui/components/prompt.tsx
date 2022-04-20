@@ -1,7 +1,8 @@
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { createElement, useState } from "react";
 
-
+// Facilitates prompts to staff
+// Frequently used as delete confirmation
 interface BasePrompt<Data = {}> {
     title?: string | JSX.Element | ((context: BasePrompt<Data>) => JSX.Element);
     content?: string | JSX.Element | ((context: BasePrompt<Data>) => JSX.Element);
