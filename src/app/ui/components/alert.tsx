@@ -1,8 +1,9 @@
-import { Alert, AlertProps, Box, Collapse, Slide, Snackbar, Stack } from "@mui/material";
+import { Alert, AlertProps, Box, Slide, Snackbar } from "@mui/material";
 import { createRenderAuthority, mergeProps, RenderAuthority, useRenderAuthority } from "lib/hooks";
 import { uniqueId } from "lodash";
 import { createContext, MutableRefObject, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
+// Used to display alerts and feedback to users.
 
 type AlertType = AlertProps['color'];
 type IAlert = {
@@ -66,7 +67,7 @@ export function useAlert(base?: Partial<IAlert>) {
 export function createAlert(...args: Partial<AlertOrMessage>[]) {
     const details = ConstructAlert(...args)
     if (!details.context) details.context = AlertGlobalContext;
-    console.log('alert', details);
+    // console.log('alert', details);
     if (details.unique) {
         const uniques = details.context.alerts.filter(o => o.unique == details.unique);
         let foundActive = false;

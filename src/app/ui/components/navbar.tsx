@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AppBar, Button, IconButton, Toolbar, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Slide, useScrollTrigger, useMediaQuery, Divider } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import Box from '@mui/material/Box';
 import Link from 'next/link'
 import HomeIcon from '@mui/icons-material/Home';
@@ -15,7 +13,7 @@ import { useRouter } from 'next/router';
 import { isAuthenticated } from 'lib/auth/client';
 import { EventNote } from '@mui/icons-material';
 
-const title = 'Website Title';
+export const title = 'Website Title';
 const items: {
     name: string;
     url: string;
@@ -95,9 +93,10 @@ function HideOnScroll(props: {
 
 export function NavBar() {
     let [open, setOpen] = useState(false)
-    const [anchor, setAnchor] = useState('left');
     const router = useRouter();
     const lastRoute = useRef("");
+
+    // Hide drawer on navigation
     useEffect(() => {
         if (lastRoute.current != router.route) {
             lastRoute.current = router.route;
@@ -107,7 +106,7 @@ export function NavBar() {
         }
     }, [router.route, open, setOpen]);
 
-    const handleDrawer = () => {
+    const openDrawer = () => {
         setOpen(true)
     }
 
@@ -122,6 +121,7 @@ export function NavBar() {
         }
     }
 
+    // left-aligned links
     const navbarLinksLeft = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement != 'right').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon} sx={{ ...styles.button }}>
@@ -130,6 +130,7 @@ export function NavBar() {
         </Link>
     );
 
+    // right-aligned links
     const navbarLinksRight = items.filter(o => !o?.visible || o?.visible('navbar')).filter(o => o?.placement == 'right').map((x) =>
         <Link href={x.url} key={x.url}>
             <Button color='inherit' startIcon={x.showIcon == 'left' && x.icon} endIcon={x.showIcon == 'right' && x.icon} sx={{ ...styles.button }}>
@@ -138,17 +139,20 @@ export function NavBar() {
         </Link>
     );
 
+    // drawer link slide-in stepper
     const [transitionStep, setTransitionStep] = useState(0);
+
+    // navigation drawer links
     const drawerLinks = items.filter(o => !o?.visible || o?.visible('drawer')).map((x, index) =>
         <Link href={x.url} key={x.url}>
             <Slide in={open && transitionStep > index} direction="right" timeout={200} onClick={(evt) => {
-                    if (open) {
-                        evt.preventDefault();
-                        open = false;
-                        setOpen(false);
-                        (evt.target as any).click();
-                    }
-                }}>
+                if (open) {
+                    evt.preventDefault();
+                    open = false;
+                    setOpen(false);
+                    (evt.target as any).click();
+                }
+            }}>
                 <ListItem button sx={{ ...styles.drawer }}>
                     <ListItemIcon>
                         {x.icon}
@@ -159,6 +163,7 @@ export function NavBar() {
         </Link>
     );
 
+    // make steps slide in
     useEffect(() => {
         if (!open) return setTransitionStep(0);
         if (transitionStep <= drawerLinks.length) {
@@ -170,24 +175,30 @@ export function NavBar() {
     }, [transitionStep, open]);
 
     const isMobile = useMediaQuery('(max-width:600px)');
+    
     return <>
         <HideOnScroll>
             <AppBar position="sticky" style={{ boxShadow: "0px 0px 0px 0px" }}>
                 <Toolbar>
                     <IconButton
-                        onClick={handleDrawer}
+                        onClick={openDrawer}
                         size="large"
                         edge="start"
                         color="inherit"
                         aria-label="menu"
                         sx={{ mr: 2 }}
                     >
+
                         <MenuIcon />
 
                     </IconButton>
+
                     <Box style={{ flexGrow: 2 }}>
+
                         {title && <Typography variant="h6" component="span" sx={{ verticalAlign: 'middle', mr: 2 }}>{title}</Typography>}
+
                         {!isMobile && navbarLinksLeft}
+
                     </Box>
 
                     {navbarLinksRight}
@@ -201,12 +212,16 @@ export function NavBar() {
             open={open}
             onClose={() => setOpen(false)}
         >
+
             <Box sx={{ width: 250, mt: 5 }}>
                 <Typography variant="h6" sx={{ textAlign: 'center', mb: 3 }}>Navigation</Typography>
+
                 <Divider orientation='horizontal' />
+
                 <List>
                     {drawerLinks}
                 </List>
+
             </Box>
 
         </Drawer>

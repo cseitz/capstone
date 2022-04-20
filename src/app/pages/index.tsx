@@ -1,15 +1,14 @@
-import { BottomNavigation, Button, CardContent, Container, Fab, Typography } from "@mui/material";
-import { alignProperty, convertLength } from "@mui/material/styles/cssUtils";
+import { Button, CardContent, Typography } from "@mui/material";
 import Card from '@mui/material/Card';
 import { Box } from "@mui/system";
 import { FAQ } from "ui/components/faq";
 import Link from "next/link";
-import { useMemo } from "react";
 import { QueryClient, QueryClientProvider, useQuery } from "react-query";
-import Image from "next/image";
 import { hostname } from "os";
 import { isAuthenticated } from "lib/auth/client";
 import { Copyright } from "@mui/icons-material";
+import { title } from "ui/components/navbar";
+import Head from "next/head";
 
 const queryClient = new QueryClient();
 
@@ -31,20 +30,25 @@ export async function getServerSideProps({ req }) {
 // Homepage utilizing all of the components
 // Each section takes up the display's height.
 export default function Homepage({ landing, about }) {
-    return <QueryClientProvider client={queryClient}>
-        <Box>
-            <Box height='100vh' display="flex" flexDirection="column">
-                <LandingPage data={landing} />
+    return <>
+        <Head>
+            <title>{title} - Home</title>
+        </Head>
+        <QueryClientProvider client={queryClient}>
+            <Box>
+                <Box height='100vh' display="flex" flexDirection="column">
+                    <LandingPage data={landing} />
+                </Box>
+                <Box height='100vh' display="flex" flexDirection="column">
+                    <AboutPage data={about} />
+                </Box>
+                <Box height='100vh' display="flex" flexDirection="column" sx={{ alignContent: 'center' }}>
+                    <FAQPage />
+                </Box>
+                <Footer />
             </Box>
-            <Box height='100vh' display="flex" flexDirection="column">
-                <AboutPage data={about} />
-            </Box>
-            <Box height='100vh' display="flex" flexDirection="column" sx={{ alignContent: 'center' }}>
-                <FAQPage />
-            </Box>
-            <Footer />
-        </Box>
-    </QueryClientProvider>
+        </QueryClientProvider>
+    </>
 }
 
 

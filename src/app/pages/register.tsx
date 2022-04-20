@@ -1,10 +1,11 @@
-import { Button, CircularProgress, Grid, Paper, Step, StepContent, StepLabel, Stepper, TextField, Typography, useMediaQuery } from "@mui/material";
+import { Button, CircularProgress, Grid, Step, StepContent, StepLabel, Stepper, TextField, Typography, useMediaQuery } from "@mui/material";
 import { Box } from "@mui/system";
-import { first, uniqueId } from "lodash";
 import { useRouter } from "next/router";
-import { cloneElement, createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { RegistrationData } from 'schema/user';
 import { useAlert } from "ui/components/alert";
+import Head from 'next/head'
+import { title } from 'ui/components/navbar'
 
 // List of steps in the registration form
 // This is where each step is defined
@@ -160,32 +161,37 @@ export default function RegisterPage() {
         </Step>
     });
 
-    return <Box sx={{ mb: 3, mt: isMobile ? 4 : 10 }}>
-        <Box sx={{ margin: 'auto', width: 'min(500px, 90vw)', textAlign: 'center' }}>
+    return <>
+        <Head>
+            <title>{title} - Register</title>
+        </Head>
+        <Box sx={{ mb: 3, mt: isMobile ? 4 : 10 }}>
+            <Box sx={{ margin: 'auto', width: 'min(500px, 90vw)', textAlign: 'center' }}>
 
-            <Typography variant={!isMobile ? 'h3' : 'h4'} style={{ textAlign: 'center', fontWeight: 'bold', marginTop: 25, marginBottom: 25 }}>
-                Register
-            </Typography>
-
-
-            <Stepper activeStep={activeStep} orientation="vertical">
-                {Steps}
-                {activeStep >= steps.length ? (
-                    <Box>
-                        <CircularProgress />
-                    </Box>
-                ) : ''}
-            </Stepper>
+                <Typography variant={!isMobile ? 'h3' : 'h4'} style={{ textAlign: 'center', fontWeight: 'bold', marginTop: 25, marginBottom: 25 }}>
+                    Register
+                </Typography>
 
 
-            {showReset && activeStep != steps.length - 0 && activeStep < steps.length - 1 ? <>
-                <Button onClick={() => reset(true)} sx={{ mt: 2, mb: 1 }}>
-                    Reset Form
-                </Button>
-            </> : ''}
+                <Stepper activeStep={activeStep} orientation="vertical">
+                    {Steps}
+                    {activeStep >= steps.length ? (
+                        <Box>
+                            <CircularProgress />
+                        </Box>
+                    ) : ''}
+                </Stepper>
 
+
+                {showReset && activeStep != steps.length - 0 && activeStep < steps.length - 1 ? <>
+                    <Button onClick={() => reset(true)} sx={{ mt: 2, mb: 1 }}>
+                        Reset Form
+                    </Button>
+                </> : ''}
+
+            </Box>
         </Box>
-    </Box>
+    </>
 }
 
 const REQUIRED_TEXT = 'This field is required!';
