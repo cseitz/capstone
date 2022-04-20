@@ -80,21 +80,19 @@ export function Contact() {
 
     return <>
         <Box>
-            <Box sx={{ mx: 'auto', width: 'min(500px, 90vw)', textAlign: 'center', mt: 10 }}>
-                <Typography variant="h4" style={{ textAlign: 'center', fontWeight: 'bold', marginTop: 25 }} >Contact Us</Typography>
-                <Typography style={{ textAlign: 'center', marginTop: 15, marginBottom: 25 }} >If you have any questions, concerns, or problems, please do not hesitate to contact us. Someone will get back to you shortly.</Typography>
-                <TextField label="Name" type="text" name="name" value={name} fullWidth onChange={(e) => { setStatus(null); setName(e.target.value) }} placeholder="Name" />
-                <br /><br />
-                <TextField label="Email" type="text" name="email" fullWidth value={email} onChange={(e) => { setStatus(null); setEmail(e.target.value) }} placeholder="Email" />
-                <br /><br />
-                <TextField label="Whats the topic?" type="text" name="subject" fullWidth value={subject} onChange={(e) => { setStatus(null); setSubject(e.target.value) }} placeholder="Whats the topic?" />
-                <br /><br />
-                <TextField label="Write your message here." type="text" name="message" value={message} fullWidth multiline minRows={2} onChange={(e) => { setStatus(null); setMessage(e.target.value) }} placeholder="Write your message here." />
-                <br /><br />
-                <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Send</Button>
-                <br /><br />
-                {status ? <Typography id="errormessage" style={{ color: 'red', textAlign: 'center' }} >{status}</Typography> : ''}
-            </Box>
+            <Typography variant="h4" style={{ textAlign: 'center', fontWeight: 'bold', marginTop: 25 }} >Contact Us</Typography>
+            <Typography style={{ textAlign: 'center', marginTop: 15, marginBottom: 25 }} >If you have any questions, concerns, or problems, please do not hesitate to contact us. Someone will get back to you shortly.</Typography>
+            <TextField label="Name" type="text" name="name" value={name} fullWidth onChange={(e) => { setStatus(null); setName(e.target.value) }} placeholder="Name" />
+            <br /><br />
+            <TextField label="Email" type="text" name="email" fullWidth value={email} onChange={(e) => { setStatus(null); setEmail(e.target.value) }} placeholder="Email" />
+            <br /><br />
+            <TextField label="Whats the topic?" type="text" name="subject" fullWidth value={subject} onChange={(e) => { setStatus(null); setSubject(e.target.value) }} placeholder="Whats the topic?" />
+            <br /><br />
+            <TextField label="Write your message here." type="text" name="message" value={message} fullWidth multiline minRows={2} onChange={(e) => { setStatus(null); setMessage(e.target.value) }} placeholder="Write your message here." />
+            <br /><br />
+            <Button variant="contained" type="submit" fullWidth onClick={handleSubmit}>Send</Button>
+            <br /><br />
+            {status ? <Typography id="errormessage" style={{ color: 'red', textAlign: 'center' }} >{status}</Typography> : ''}
         </Box>
     </>
 
