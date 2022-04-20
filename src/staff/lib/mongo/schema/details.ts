@@ -3,6 +3,7 @@ import { TimestampData, TimestampOptions, TimestampPlugin } from "../plugins/tim
 import { AuditData, AuditPlugin, AuditSchema } from "../plugins/audit";
 import 'lib/mongo';
 
+// Define details baseline
 export interface DetailsBaseData
 extends TimestampData, AuditData {
     id: string;
@@ -10,6 +11,7 @@ extends TimestampData, AuditData {
 }
 
 
+// Define details base schema
 const schema = new Schema<DetailsBaseData>({
     name: {
         type: String,
@@ -30,7 +32,6 @@ interface DetailsBaseSchema
 extends DetailsBaseData, AuditSchema {}
 
 schema.plugin(TimestampPlugin);
-// schema.plugin(AuditPlugin);
 
 
 //** Model */
@@ -46,7 +47,7 @@ type DetailsBaseModelType = Model<DetailsBaseSchema, QueryHelpers>;
 export type DetailsBaseDocument = HydratedDocument<DetailsBaseSchema>;
 export const DetailsBaseModel = (models?.['Details'] || model<DetailsBaseSchema, DetailsBaseModelType>('Details', schema)) as DetailsBaseModelType;
 
-export async function Details<Fields = { name: string }>(name: string, fields?: SchemaDefinition<SchemaDefinitionType<Fields>>) { // Schema<Fields>
+export async function Details<Fields = { name: string }>(name: string, fields?: SchemaDefinition<SchemaDefinitionType<Fields>>) {
     let doInitialized;
     const initialized = new Promise((resolve) => { doInitialized = resolve });
     const initalize = function () {
@@ -61,21 +62,14 @@ export async function Details<Fields = { name: string }>(name: string, fields?: 
         ...TimestampOptions,
         discriminatorKey: 'kind',
     })
-    // schema.plugin(TimestampPlugin);
-    // schema.plugin(AuditPlugin);
     const specificDetails = DetailsBaseModel.discriminators?.[name] || DetailsBaseModel.discriminator<SpecificSchema>(name, schema);
-    type SpecificDetailsDocument = HydratedDocument<SpecificSchema>;
     let details = await specificDetails.findOne({ name });
     if (!details) {
         details = new specificDetails({
             name,
         })
-        // await details.audit({
-        //     process: 'system'
-        // });
         await details.save();
     }
-    console.log({ details })
     const func = async function(): Promise<HydratedDocument<SpecificSchema>> {
         return await specificDetails.findOne({ name });
     };
@@ -83,10 +77,6 @@ export async function Details<Fields = { name: string }>(name: string, fields?: 
     return func;
 }
 
-// new Schema<{
-//     what: string;
-//     stuff: [];
-// }>()
 
 
 

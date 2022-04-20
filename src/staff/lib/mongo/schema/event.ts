@@ -1,24 +1,28 @@
-import { HydratedDocument, Model, model, models, Schema, Query } from "mongoose";
+import { HydratedDocument, Model, model, models, Schema } from "mongoose";
 import { TimestampData, TimestampOptions, TimestampPlugin } from "../plugins/timestamped";
 import { AuditData, AuditPlugin, AuditSchema } from "../plugins/audit";
-import 'lib/mongo';
-import { IntegrationInstructionsRounded } from "@mui/icons-material";
-import { integerPropType } from "@mui/utils";
 import { UserData } from "./user"
+import 'lib/mongo';
 
+
+// Define Event Data and plugin data
 export interface EventData
     extends TimestampData, AuditData {
     id: string;
-    // username: string;
+    
     title: string;
+    type: string;
     description: string;
+
     startsAt: any;
     endsAt: any;
-    type: string,
+
     signups: (UserData | string)[];
     rsvp?: boolean;
 }
 
+
+// Define event schema
 const schema = new Schema<EventData>({
     title: {
         type: String,
@@ -61,16 +65,9 @@ schema.plugin(AuditPlugin);
 
 
 //** Model */
-interface QueryHelpers {
-    // byName(name: string): Query<any, EventDocument> & QueryHelpers;
-}
-
-// schema.query.byName = function(name: string) {
-//     return this.findOne({ name: name })
-// }
+interface QueryHelpers { }
 
 type EventModelType = Model<EventSchema, QueryHelpers>;
 export type EventDocument = HydratedDocument<EventSchema>;
 export const EventModel = (models?.['Event'] || model<EventSchema, EventModelType>('Event', schema)) as EventModelType;
 
-// console.log('running server user');

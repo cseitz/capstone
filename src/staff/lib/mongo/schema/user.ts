@@ -1,15 +1,18 @@
-import { HydratedDocument, Model, model, models, Schema, Query } from "mongoose";
+import { HydratedDocument, Model, model, models, Schema } from "mongoose";
 import { TimestampData, TimestampOptions, TimestampPlugin } from "../plugins/timestamped";
 import { AuditData, AuditPlugin, AuditSchema } from "../plugins/audit";
-import 'lib/mongo';
-import { hashSync } from "bcrypt";
 import { UserRole, UserRoles } from "lib/auth/constants";
+import { hashSync } from "bcrypt";
+import 'lib/mongo';
 
+// Define User Data and plugin data
 export interface UserData
-extends TimestampData, AuditData {
+    extends TimestampData, AuditData {
     id: string;
+    
     email: string;
     password: string;
+
     role: UserRole;
     info: UserInfo;
 }
@@ -19,13 +22,14 @@ export interface UserInfo {
     lastName: string;
 }
 
+// Define what is required for account registration
 export type RegistrationData = UserInfo & {
     email: string;
     password: string;
     confirmPassword: string;
 }
 
-
+// Define user schema
 const schema = new Schema<UserData>({
     email: {
         type: String,
@@ -57,23 +61,16 @@ schema.set('toJSON', {
 
 //** Apply Plugins */
 interface UserSchema
-extends UserData, AuditSchema {}
+    extends UserData, AuditSchema { }
 
 schema.plugin(TimestampPlugin);
 schema.plugin(AuditPlugin);
 
 
 //** Model */
-interface QueryHelpers {
-    byName(name: string): Query<any, UserDocument> & QueryHelpers;
-}
-
-schema.query.byName = function(name: string) {
-    return this.findOne({ name: name })
-}
+interface QueryHelpers { }
 
 type UserModelType = Model<UserSchema, QueryHelpers>;
 export type UserDocument = HydratedDocument<UserSchema>;
 export const UserModel = (models?.['User'] || model<UserSchema, UserModelType>('User', schema)) as UserModelType;
 
-console.log('running server user');

@@ -1,21 +1,28 @@
-import { HydratedDocument, Model, model, models, Schema, Query } from "mongoose";
+import { HydratedDocument, Model, model, models, Schema } from "mongoose";
 import { TimestampData, TimestampOptions, TimestampPlugin } from "../plugins/timestamped";
 import { AuditData, AuditPlugin, AuditSchema } from "../plugins/audit";
+import { UserData } from "./user"
 import 'lib/mongo';
-import {UserData} from "./user"
 
+
+// Define Ticket Data and plugin data
 export interface TicketData
-extends TimestampData, AuditData {
+    extends TimestampData, AuditData {
     id: string;
+
     name: string;
     email: string;
+
     subject: string;
     message: string;
-    status: 'closed' | 'open' | 'assigned' ;
-    assignee: UserData | string;
     conclusion: string;
+
+    status: 'closed' | 'open' | 'assigned';
+    assignee: UserData | string;
 }
 
+
+// Define ticket schema
 const schema = new Schema<TicketData>({
     name: {
         type: String,
@@ -38,8 +45,8 @@ const schema = new Schema<TicketData>({
         enum: ['closed', 'open', 'assigned'],
         default: 'open',
     },
-    assignee: { 
-        type: Schema.Types.ObjectId, 
+    assignee: {
+        type: Schema.Types.ObjectId,
         ref: 'User',
     },
     conclusion: {
@@ -55,23 +62,15 @@ schema.set('toJSON', {
 
 //** Apply Plugins */
 interface TicketSchema
-extends TicketData, AuditSchema {}
+    extends TicketData, AuditSchema { }
 
 schema.plugin(TimestampPlugin);
 schema.plugin(AuditPlugin);
 
 
 //** Model */
-interface QueryHelpers {
-    byName(name: string): Query<any, TicketDocument> & QueryHelpers;
-}
-
-schema.query.byName = function(name: string) {
-    return this.findOne({ name: name })
-}
+interface QueryHelpers { }
 
 type TicketModelType = Model<TicketSchema, QueryHelpers>;
 export type TicketDocument = HydratedDocument<TicketSchema>;
 export const TicketModel = (models?.['Ticket'] || model<TicketSchema, TicketModelType>('Ticket', schema)) as TicketModelType;
-
-console.log('running server ticket');
