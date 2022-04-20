@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider, useQuery } from "react-query";
 import Image from "next/image";
 import { hostname } from "os";
 import { isAuthenticated } from "lib/auth/client";
+import { Copyright } from "@mui/icons-material";
 
 const queryClient = new QueryClient();
 
@@ -97,8 +98,8 @@ function FAQPage() {
 
 //footer for possible sponsors
 function Footer() {
-    return <Box sx={{ backgroundColor: 'lightsalmon', height: '100px' }}>
-        <Typography variant="h5" sx={{ textAlign: 'initial' }}>Powered By</Typography>
+    return <Box sx={{ backgroundColor: 'lightsalmon', height: '100px', p: 2 }}>
+        <Typography variant="h5" sx={{ textAlign: 'initial' }}> <Copyright sx={{ fontSize: 'inherit', pt: 0.75, pb: 0 }} /> Event Management System</Typography>
     </Box>
 }
 
