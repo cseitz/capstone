@@ -1,3 +1,9 @@
+# Documents
+
+For extensive details on this project, please check our the following documents:
+- [Technical Report](./docs/Capstone%20-%20Technical%20Report.pdf) - Project Planning & Documentation
+- [User Guide](./docs/Capstone%20-%20User%20Guide.pdf) - Insight into how to use the system
+
 # Requirements
 
 [Node.JS and NPM](https://nodejs.org/en/download/). All installer defaults will work fine, just keep clicking next. As of writing, `node v16.13.1` and `npm 8.1.2` are in use.
